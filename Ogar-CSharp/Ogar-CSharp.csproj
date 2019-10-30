@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <RootNamespace>Ogar_CSharp</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="commands\" />
+    <Folder Include="gamemodes\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Math.Spatial" Version="1.0.6" />
+    <PackageReference Include="WebSocketSharp" Version="1.0.3-rc11" />
+  </ItemGroup>
+
+</Project>
