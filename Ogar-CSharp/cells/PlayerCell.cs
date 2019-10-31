@@ -20,6 +20,10 @@ namespace Ogar_CSharp.cells
         public bool IsSpiked => false;
         public bool IsAgitated => false;
         public bool AvoidWhenSpawning => true;
+        public PlayerCell(Player owner, int x, int y, int size) : base(owner.world, x, y, size, owner.cellColor)
+        {
+
+        }
         public int GetEatResult(Cell other)
         {
             if(other.Type == 0)
