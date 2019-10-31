@@ -16,10 +16,16 @@ namespace Ogar_CSharp.cells
         public double MoveSpeed
             => 88 * Math.Pow(size, -0.4396754) * owner.Settings.playerMoveMult;
         public bool CanMerge => __canMerge;
-        public short Type => 0;
+        public override short Type => 0;
         public bool IsSpiked => false;
         public bool IsAgitated => false;
         public bool AvoidWhenSpawning => true;
-
+        public int GetEatResult(Cell other)
+        {
+            if(other.Type == 0)
+            {
+                var delay =
+            }
+        }
     }
 }

@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Ogar_CSharp.cells
 {
-    public abstract class Cell
+    public class EjectedCell : Cell
     {
-        public abstract short Type { get; }
+        public override short Type => 3;
     }
 }

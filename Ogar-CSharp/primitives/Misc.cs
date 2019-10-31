@@ -7,6 +7,8 @@ namespace Ogar_CSharp.primitives
     public static class Misc
     {
         public const string version = "1.3.5";
+        public const float SQRT_1_3 = 1.140175425099138f;
+        public const float SQRT_2 = 1.414213562373095f;
         private static Random randomMath = new Random();
         private static int Random()
             => randomMath.Next(0, 1);
