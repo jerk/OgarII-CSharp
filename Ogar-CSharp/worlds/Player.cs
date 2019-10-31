@@ -33,7 +33,7 @@ namespace Ogar_CSharp.worlds
         //public confusion visibleCells;
         //public confusion lastVisibleCells;
         //public ViewArea viewArea = unknown;
-        private Settings Settings => handle.Settings;
+        public Settings Settings => handle.Settings;
         public Player(ServerHandle handle, short id, Router router)
         {
             this.handle = handle;

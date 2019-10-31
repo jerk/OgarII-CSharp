@@ -11,11 +11,10 @@ namespace Ogar_CSharp
 {
     public class ServerHandle
     {
-        private Settings settings;
         public Settings Settings
         {
-            get => this.settings;
-            set => this.settings = value;
+            get;
+            private set;
         }
         public ProtocolStore protocols = new ProtocolStore();
         //gamemodes = new gamemodelist(this);
@@ -26,10 +25,11 @@ namespace Ogar_CSharp
         public DateTime? startTime = default;
         public int avargateTickTime;
         public int tick;
-        public int tickDelay;
+        public short tickDelay;
+        public short stepMult;
         //stepMult = NaN;
         Ticker ticker = new Ticker(40);
-        Stopwatch stopWtach = new Stopwatch();
+        Stopwatch stopWatch = new Stopwatch();
         //logger = new Logger();
         Listener listener;
         //matchMaker = new MatchMaker(this);
@@ -43,7 +43,10 @@ namespace Ogar_CSharp
         }
         public void SetSettings(Settings settings)
         {
-
+            this.Settings = settings;
+            tickDelay = (short)(1000 / settings.serverFrequency);
+            ticker.step = tickDelay;
+            stepMult = (short)(tickDelay / 40);
         }
         public bool Start()
         {
@@ -101,7 +104,9 @@ namespace Ogar_CSharp
         }
         public void OnTick()
         {
-
+            stopWatch.Start();
+            tick++;
+            //doStuff
         }
     }
 }
