@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using Ogar_CSharp.bots;
 using Ogar_CSharp.cells;
 using Ogar_CSharp.protocols;
 using static Ogar_CSharp.sockets.Listener;
@@ -20,7 +21,7 @@ namespace Ogar_CSharp.sockets
         public bool socketDisconnected = false;
         public ushort closeCode;
         public string closeReason = null;
-        //public Minion[] minions;
+        public HashSet<Minion> minions = new HashSet<Minion>();
         public bool minionsFrozen;
         public bool controllingMinions;
         public Connection(Listener listener, ClientSocket socket) : base(listener)

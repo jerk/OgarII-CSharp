@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 namespace Ogar_CSharp.primitives
 {
+    
     public static class Misc
     {
         public const string version = "1.3.5";
@@ -42,6 +43,18 @@ namespace Ogar_CSharp.primitives
             else weight = 0x7F + ~~(Random() * 0x80);
             return (weight << 16) | (weight << 8) | weight;
         }*/
+        public static void ThrowIfBadNumber(params double[] numbers)
+        {
+            for (int i = 0; i < numbers.Length; i++)
+                if (numbers[i] == double.NaN || double.IsInfinity(numbers[i]))
+                    throw new Exception($"Bad number ({numbers[i]}, index {i}");
+        }
+        public static void ThrowIfBadOrNegativeNumber(params double[] numbers)
+        {
+            for (int i = 0; i < numbers.Length; i++)
+                if (numbers[i] == double.NaN || double.IsInfinity(numbers[i]) || numbers[i] < 0)
+                    throw new Exception($"Bad or negative number ({numbers[i]}, index {i}");
+        }
         public static bool Intersects(Rect2 a, Rect2 b)
         {
             return a.X - a.Width <= b.X + b.Width &&
@@ -73,6 +86,10 @@ namespace Ogar_CSharp.primitives
                 l: a.X - a.Width < b.X || a.X + a.Width < b.X,
                 r: a.X - a.Width > b.X || a.X + a.Width > b.X
                     );
+        }
+        public static int Sqrt(int number)
+        {
+            Math.sq
         }
     }
 }

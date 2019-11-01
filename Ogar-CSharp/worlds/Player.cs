@@ -1,19 +1,21 @@
-﻿using Ogar_CSharp.sockets;
+﻿using Ogar_CSharp.cells;
+using Ogar_CSharp.primitives;
+using Ogar_CSharp.sockets;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Ogar_CSharp.worlds
 {
+    public enum PlayerState
+    {
+        Idle = -1,
+        Alive = 0,
+        Spectating = 1,
+        Roaming = 2
+    }
     public class Player
     {
-        public enum PlayerState
-        {
-            Dead = -1,
-            Alive = 0,
-            Spectating = 1,
-            FreeRoamSpectating = 2
-        }
         public ServerHandle handle;
         public short id;
         public Router router;
@@ -24,15 +26,15 @@ namespace Ogar_CSharp.worlds
         public string cellSkin;
         public int cellColor = 0x7F7F7F;
         public int chatColor = 0x7F7F7F;
-        public PlayerState state = PlayerState.Dead;
+        public PlayerState state = PlayerState.Idle;
         public bool hasWorld;
         public World world;
-        //public Team team
+        public string team; //CHANGE THIS WHEN POSSIBLE!!
         public long score;
-        //public PlayerCell[] ownedCells;
-        //public confusion visibleCells;
-        //public confusion lastVisibleCells;
-        //public ViewArea viewArea = unknown;
+        public List<PlayerCell> ownedCells = new List<PlayerCell>();
+        public Dictionary<string, Cell> visibleCells = new Dictionary<string, Cell>();
+        public Dictionary<string, Cell> lastVisibleCells = new Dictionary<string, Cell>();
+        public ViewArea viewArea;
         public Settings Settings => handle.Settings;
         public Player(ServerHandle handle, short id, Router router)
         {
@@ -40,6 +42,7 @@ namespace Ogar_CSharp.worlds
             this.id = id;
             this.router = router;
             exists = true;
+            viewArea = new ViewArea(0, 0, 1920 / 2 * handle.Settings.playerViewScaleMult, 1080 / 2 * handle.Settings.playerViewScaleMult, 1);
         }
         public void Destroy()
         {
@@ -54,7 +57,7 @@ namespace Ogar_CSharp.worlds
             int s = 0;
             switch (state)
             {
-                case PlayerState.Dead:
+                case PlayerState.Idle:
                     this.score = 0;
                     break;
                 case PlayerState.Alive:
@@ -66,7 +69,7 @@ namespace Ogar_CSharp.worlds
                     //spectate largest player
                     //doStuff
                     break;
-                case PlayerState.FreeRoamSpectating:
+                case PlayerState.Roaming:
                     this.score = 0;
                     //doStuff
                     break;

@@ -11,15 +11,15 @@ namespace Ogar_CSharp.sockets
         public Listener listener;
         public bool disconnected;
         public float disconnectionTick;
-        public int mouseX;
-        public int mouseY;
+        public double mouseX;
+        public double mouseY;
         public string spawningName;
         public bool requestingSpectate;
         public bool isPressingQ;
         public bool hasProcessedQ;
         public long splitAttempts;
         public long ejectAttempts;
-        public float ejectTick;
+        public double ejectTick;
         public bool hasPlayer = false;
         public Player player;
         protected Router(Listener listener)
@@ -28,10 +28,11 @@ namespace Ogar_CSharp.sockets
             ejectTick = listener.handle.tick;
             listener.AddRouter(this);
         }
-        public ServerHandle Handle
-            => listener.handle;
-        public Settings Settings
-            => listener.Settings;
+        public virtual bool IsExternal => throw new Exception("Must be overriden"); 
+        public virtual string Type => throw new Exception("Must be overriden");
+        public virtual bool SeparateInTeams => throw new Exception("Must be overriden");
+        public ServerHandle Handle => listener.handle;
+        public Settings Settings => listener.Settings;
         public void CreatePlayer()
         {
             if (hasPlayer)
@@ -46,9 +47,9 @@ namespace Ogar_CSharp.sockets
             listener.handle.RemovePlayer(player.id);
             player = null;
         }
-        public abstract void OnWorldSet();
-        public abstract void OnWorldReset();
-        public abstract void OnNewOwnedCell(PlayerCell cell);
+        public virtual void OnWorldSet() { }
+        public virtual void OnWorldReset() { }
+        public virtual void OnNewOwnedCell(PlayerCell cell) { }
         public virtual void OnSpawnRequest()
         {
             if (!hasPlayer)

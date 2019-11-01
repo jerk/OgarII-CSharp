@@ -6,7 +6,7 @@ using System.Text;
 using Ogar_CSharp.cells;
 namespace Ogar_CSharp.worlds
 {
-    public class World
+    public class World : ISpawner
     {
         public class WorldStats
         {
@@ -35,7 +35,6 @@ namespace Ogar_CSharp.worlds
         public int _nextCellId = 1;
         public HashSet<cells.Cell> cells = new HashSet<Cell>();
         public HashSet<cells.Cell> boostingCells = new HashSet<Cell>();
-        public int pelletCount;
         public int motherCellCount;
         public int virusCount;
         public HashSet<cells.Cell> ejectedCells = new HashSet<cells.Cell>();
@@ -46,6 +45,9 @@ namespace Ogar_CSharp.worlds
         public Rect2 border;
         public QuadTree<cells.Cell> finder;
         public Settings Settings => handle.Settings;
+
+        public int PelletCount { get; set; }
+
         public World(ServerHandle handle, int id)
         {
             this.handle = handle;

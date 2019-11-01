@@ -31,7 +31,7 @@ namespace Ogar_CSharp
         Ticker ticker = new Ticker(40);
         Stopwatch stopWatch = new Stopwatch();
         //logger = new Logger();
-        Listener listener;
+        public Listener listener;
         //matchMaker = new MatchMaker(this);
         List<World> worlds = new List<World>();
         List<Player> players = new List<Player>();
