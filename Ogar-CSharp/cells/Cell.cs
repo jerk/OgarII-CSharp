@@ -14,7 +14,8 @@ namespace Ogar_CSharp.cells
     }
     public abstract class Cell
     {
-        public int id;
+        public QuadItem<Cell> item;
+        public float id;
         public World world;
         public int birthTick;
         public bool exists;
@@ -44,8 +45,9 @@ namespace Ogar_CSharp.cells
         public int Color { get => color; set { color = value; colorChanged = true; } }
         public string Name { get => name; set { name = value; nameChanged = true; } }
         public string Skin { get => skin; set { skin = value; skinChanged = true; } }
-        protected Cell(World world, int x, int y, short size, int color)
+        protected Cell(World world, float x, float y, short size, int color)
         {
+            item = new QuadItem<Cell>(this);
             this.world = world;
             id = world._nextCellId;
             birthTick = world.handle.tick;

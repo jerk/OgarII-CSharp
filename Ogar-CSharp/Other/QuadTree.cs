@@ -4,8 +4,10 @@ using System.Text;
 
 namespace Ogar_CSharp
 {
-    public class QuadItem<T>
+    public class QuadItem<T> 
     {
+        public QuadItem(T item) => this.item = item;
+        public T item;
         public QuadTree<T> __root;
         public Rect range;
     }
@@ -84,7 +86,7 @@ namespace Ogar_CSharp
         public void Remove(QuadItem<T> item)
         {
             var quad = item.__root;
-            quad.items.Remove(item);
+            quad.items.Remove(quad.items.fi);
             item.__root = null;
             quad.Merge();
         }

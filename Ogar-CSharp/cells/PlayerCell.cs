@@ -14,7 +14,7 @@ namespace Ogar_CSharp.cells
         public override bool IsSpiked => false;
         public override bool IsAgitated => false;
         public override bool AvoidWhenSpawning => true;
-        public PlayerCell(Player owner, int x, int y, short size) : base(owner.world, x, y, size, owner.cellColor)
+        public PlayerCell(Player owner, float x, float y, short size) : base(owner.world, x, y, size, owner.cellColor)
         {
 
         }
