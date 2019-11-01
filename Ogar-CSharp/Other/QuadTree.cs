@@ -1,14 +1,13 @@
-﻿using Spatial;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Ogar_CSharp.primitives
+namespace Ogar_CSharp
 {
     public class QuadItem<T>
     {
         public QuadTree<T> __root;
-        public Rect2 range;
+        public Rect range;
     }
     public class QuadTree<T>
     {
@@ -16,11 +15,11 @@ namespace Ogar_CSharp.primitives
         public int level;
         public int maxLevel;
         public int maxItems;
-        public Rect2 range;
+        public Rect range;
         public List<QuadItem<T>> items = new List<QuadItem<T>>();
         public List<QuadTree<T>> branches = new List<QuadTree<T>>();
         public bool hasSplit = false;
-        public QuadTree(Rect2 range, int maxLevel, int maxItems, QuadTree<T> root)
+        public QuadTree(Rect range, int maxLevel, int maxItems, QuadTree<T> root)
         {
             this.root = root;
             this.level = root != null ? root.level + 1 : 1;
@@ -113,16 +112,16 @@ namespace Ogar_CSharp.primitives
             if (hasSplit || level > maxItems || items.Count < maxItems)
                 return;
             hasSplit = true;
-            var x = range.X;
-            var y = range.Y;
-            var hw = range.Width / 2;
-            var hh = range.Height / 2;
+            var x = range.x;
+            var y = range.y;
+            var hw = range.w / 2;
+            var hh = range.h / 2;
             branches = new List<QuadTree<T>>()
             {
-                new QuadTree<T>(new Rect2(x - hw, y - hh, hw ,hh), maxLevel, maxItems, this),
-                new QuadTree<T>(new Rect2(x + hw, y - hh, hw ,hh), maxLevel, maxItems, this),
-                new QuadTree<T>(new Rect2(x - hw, y + hh, hw ,hh), maxLevel, maxItems, this),
-                new QuadTree<T>(new Rect2(x + hw, y + hh, hw ,hh), maxLevel, maxItems, this)
+                new QuadTree<T>(new Rect(x - hw, y - hh, hw ,hh), maxLevel, maxItems, this),
+                new QuadTree<T>(new Rect(x + hw, y - hh, hw ,hh), maxLevel, maxItems, this),
+                new QuadTree<T>(new Rect(x - hw, y + hh, hw ,hh), maxLevel, maxItems, this),
+                new QuadTree<T>(new Rect(x + hw, y + hh, hw ,hh), maxLevel, maxItems, this)
             };
             for (int i = 0, l = this.items.Count, quadrant; i < l; i++)
             {
@@ -135,7 +134,7 @@ namespace Ogar_CSharp.primitives
                 l--;
             }
         }
-        public int GetQuadrant(Rect2 a)
+        public int GetQuadrant(Rect a)
         {
             var quad = Misc.GetQuadFullIntersect(a, this.range);
             if (quad.t)
@@ -154,7 +153,7 @@ namespace Ogar_CSharp.primitives
             }
             return -1;
         }
-        public void Search(Rect2 range, Action<QuadItem<T>> callback)
+        public void Search(Rect range, Action<QuadItem<T>> callback)
         {
             QuadItem<T> item;
             for (int i = 0, l = this.items.Count; i < l; i++)
@@ -178,7 +177,7 @@ namespace Ogar_CSharp.primitives
                     this.branches[3].Search(range, callback);
             }
         }
-        public bool ContainsAny(Rect2 range, Func<QuadItem<T>, bool> selector)
+        public bool ContainsAny(Rect range, Func<QuadItem<T>, bool> selector)
         {
             QuadItem<T> item;
             for (int i = 0, l = this.items.Count; i < l; i++)

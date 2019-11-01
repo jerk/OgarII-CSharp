@@ -1,9 +1,18 @@
-﻿using System;
+﻿using Ogar_CSharp.protocols;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Ogar_CSharp.primitives
+namespace Ogar_CSharp
 {
+    /// <summary>
+    /// Designed for use with the modern protocol
+    /// </summary>
+    public interface ISerializeable
+    {
+        public byte[] Serialize(byte? flags);
+        public void Deserialize(byte[] buffer);
+    }
     public class Writer
     {
         public List<byte> buf = new List<byte>();

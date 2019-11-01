@@ -1,8 +1,7 @@
-﻿using Spatial;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
-namespace Ogar_CSharp.primitives
+namespace Ogar_CSharp
 {
     
     public static class Misc
@@ -55,41 +54,37 @@ namespace Ogar_CSharp.primitives
                 if (numbers[i] == double.NaN || double.IsInfinity(numbers[i]) || numbers[i] < 0)
                     throw new Exception($"Bad or negative number ({numbers[i]}, index {i}");
         }
-        public static bool Intersects(Rect2 a, Rect2 b)
+        public static bool Intersects(Rect a, Rect b)
         {
-            return a.X - a.Width <= b.X + b.Width &&
-                a.X + a.Width >= b.X - b.Width &&
-                a.Y - a.Height <= b.Y + b.Height &&
-                a.Y + a.Height >= b.Y - b.Height;
+            return a.x - a.w <= b.x + b.w &&
+            a.x + a.w >= b.x - b.w &&
+            a.y - a.h <= b.y + b.h &&
+            a.y + a.h >= b.y - b.h;
         }
-        public static bool FunnyIntersects(Rect2 a, Rect2 b)
+        public static bool FunnyIntersects(Rect a, Rect b)
         {
-            return a.X - a.Width >= b.X + b.Width &&
-               a.X + a.Width <= b.X - b.Width &&
-               a.Y - a.Height >= b.Y + b.Height &&
-               a.Y + a.Height <= b.Y - b.Height;
+            return a.x - a.w >= b.x + b.w &&
+              a.x + a.w <= b.x - b.w &&
+              a.y - a.h >= b.y + b.h &&
+              a.y + a.h <= b.y - b.h;
         }
-        public static (bool t, bool b, bool l, bool r) GetQuadFullIntersect(Rect2 a, Rect2 b) 
+        public static (bool t, bool b, bool l, bool r) GetQuadFullIntersect(Rect a, Rect b) 
         {
             return (
-            t: a.Y - a.Height < b.Y && a.Y + a.Height < b.Y,
-            b: a.Y - a.Height > b.Y && a.Y + a.Height > b.Y,
-            l: a.X- a.Width < b.X && a.X + a.Width < b.X,
-            r: a.X - a.Width > b.X && a.X + a.Width > b.X
+                t: a.y - a.h < b.y && a.y + a.h < b.y,
+                b: a.y - a.h > b.y && a.y + a.h > b.y,
+                l: a.x - a.w < b.x && a.x + a.w < b.x,
+                r: a.x - a.w > b.x && a.x + a.w > b.x
             );
         }
-        public static (bool t, bool b, bool l, bool r) GetQuadIntersect(Rect2 a, Rect2 b)
+        public static (bool t, bool b, bool l, bool r) GetQuadIntersect(Rect a, Rect b)
         {
             return (
-                t: a.Y - a.Height < b.Y || a.Y + a.Height < b.Y,
-                b: a.Y - a.Height > b.Y || a.Y + a.Height > b.Y,
-                l: a.X - a.Width < b.X || a.X + a.Width < b.X,
-                r: a.X - a.Width > b.X || a.X + a.Width > b.X
-                    );
-        }
-        public static int Sqrt(int number)
-        {
-            Math.sq
+                t: a.y - a.h < b.y || a.y + a.h < b.y,
+                b: a.y - a.h > b.y || a.y + a.h > b.y,
+                l: a.x - a.w < b.x || a.x + a.w < b.x,
+                r: a.x - a.w > b.x || a.x + a.w > b.x
+            );
         }
     }
 }

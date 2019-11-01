@@ -15,6 +15,7 @@ namespace Ogar_CSharp.sockets
         {
             private readonly Listener listener;
             public Action<CloseEventArgs> onClose;
+            public Action<MessageEventArgs> onMessage;
             public ClientSocket(Listener listener)
             {
                 this.listener = listener;
@@ -29,7 +30,7 @@ namespace Ogar_CSharp.sockets
             }
             protected override void OnMessage(MessageEventArgs e)
             {
-                //base.OnMessage(e);
+                onMessage(e);
             }
             protected override void OnOpen()
             {
@@ -39,6 +40,12 @@ namespace Ogar_CSharp.sockets
             public void Disconnect()
             {
                 this.Sessions.CloseSession(this.ID);
+            }
+            public new void Send(byte[] data)
+                => base.Send(data);
+            public void CloseSocket(ushort code, string reason)
+            {
+                base.Sessions.CloseSession(base.ID, code, reason);
             }
         }
         public WebSocketServer listenerSocket;

@@ -1,5 +1,4 @@
-﻿using Ogar_CSharp.primitives;
-using Ogar_CSharp.worlds;
+﻿using Ogar_CSharp.worlds;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -24,28 +23,28 @@ namespace Ogar_CSharp.cells
         public bool isBoosting;
         //public Boost boost;
         public Player owner;
-        private double x;
-        private double y;
-        private double size;
+        private float x;
+        private float y;
+        private short size;
         private int color;
         private string name;
         private string skin;
         public bool posChanged, sizeChanged, colorChanged, nameChanged, skinChanged;
-        public abstract short Type { get; }
+        public abstract byte Type { get; }
         public abstract bool IsSpiked { get; }
         public abstract bool IsAgitated { get; }
         public abstract bool AvoidWhenSpawning { get; }
         public virtual bool ShouldUpdate { get => posChanged || sizeChanged || colorChanged || nameChanged || skinChanged; }
         public int Age => (world.handle.tick - birthTick) * world.handle.stepMult;
-        public double X { get => x; set { x = value; posChanged = true; } }
-        public double Y { get => y; set { y = value; posChanged = true; } }
-        public double Size { get => size; set { Misc.ThrowIfBadOrNegativeNumber(value); size = value; sizeChanged = true; } }
-        public double SquareSize { get => size * size; set => Size = Math.Sqrt(100 * value); }
-        public double Mass { get => size * size / 100; set => Size = Math.Sqrt(100 * value); }
+        public float X { get => x; set { x = value; posChanged = true; } }
+        public float Y { get => y; set { y = value; posChanged = true; } }
+        public short Size { get => size; set { Misc.ThrowIfBadOrNegativeNumber(value); size = value; sizeChanged = true; } }
+        public float SquareSize { get => size * size; set => Size = (short)Math.Sqrt(100 * value); }
+        public float Mass { get => size * size / 100; set => Size = (short)Math.Sqrt(100 * value); }
         public int Color { get => color; set { color = value; colorChanged = true; } }
         public string Name { get => name; set { name = value; nameChanged = true; } }
         public string Skin { get => skin; set { skin = value; skinChanged = true; } }
-        protected Cell(World world, int x, int y, int size, int color)
+        protected Cell(World world, int x, int y, short size, int color)
         {
             this.world = world;
             id = world._nextCellId;
@@ -59,7 +58,7 @@ namespace Ogar_CSharp.cells
         public virtual void OnSpawned() { }
         public virtual void OnTick() 
         {
-            posChanged = sizeChanged = colorChanged = nameChanged = skinChanged = true;
+            posChanged = sizeChanged = colorChanged = nameChanged = skinChanged = false;
         }
         public virtual void WhenAte(Cell other)
         {

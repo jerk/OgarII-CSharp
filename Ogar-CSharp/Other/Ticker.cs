@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 
-namespace Ogar_CSharp.primitives
+namespace Ogar_CSharp
 {
     public class Ticker
     {
         public HashSet<Action> callbacks = new HashSet<Action>();
         public bool running;
-        public short step;
+        public int step;
         public Thread tickingThread;
         public long virtualTime;
-        public Ticker(short step) =>
+        public Ticker(int step) =>
             this.step = step;
         public void Add(Action callback)
         {

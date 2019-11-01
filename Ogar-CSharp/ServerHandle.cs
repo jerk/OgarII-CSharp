@@ -1,4 +1,4 @@
-﻿using Ogar_CSharp.primitives;
+﻿using Ogar_CSharp.gamemodes;
 using Ogar_CSharp.protocols;
 using Ogar_CSharp.sockets;
 using Ogar_CSharp.worlds;
@@ -18,7 +18,7 @@ namespace Ogar_CSharp
         }
         public ProtocolStore protocols = new ProtocolStore();
         //gamemodes = new gamemodelist(this);
-        //gamemode = null;
+        public GameMode gamemode = null;
         //commands = new commandlist(this);
         //chatcommnds = new commandlist(this);
         public bool running = false;
@@ -33,8 +33,9 @@ namespace Ogar_CSharp
         //logger = new Logger();
         public Listener listener;
         //matchMaker = new MatchMaker(this);
-        List<World> worlds = new List<World>();
-        List<Player> players = new List<Player>();
+        public List<World> worlds = new List<World>();
+        public List<Player> players = new List<Player>();
+        public string Version => Misc.version;
         public ServerHandle()
         {
             listener = new Listener(this);

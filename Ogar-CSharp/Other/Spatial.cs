@@ -2,35 +2,35 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Ogar_CSharp.primitives
+namespace Ogar_CSharp
 {
     public struct Rect
     {
-        public Rect(double x, double y, double w, double h)
+        public Rect(float x, float y, float w, float h)
         {
             this.x = x;
             this.y = y;
             this.w = w;
             this.h = h;
         }
-        public double x;
-        public double y;
-        public double w;
-        public double h;
+        public float x;
+        public float y;
+        public float w;
+        public float h;
     }
     public struct Point
     {
-        public Point(double x, double y)
+        public Point(float x, float y)
         {
             this.x = x;
             this.y = y;
         }
-        public double x;
-        public double y;
+        public float x;
+        public float y;
     }
     public struct ViewArea
     {
-        public ViewArea(double x, double y, double w, double h, double s)
+        public ViewArea(float x, float y, float w, float h, float s)
         {
             this.x = x;
             this.y = y;
@@ -38,10 +38,10 @@ namespace Ogar_CSharp.primitives
             this.h = h;
             this.s = s;
         }
-        public double x;
-        public double y;
-        public double w;
-        public double h;
-        public double s;
+        public float x;
+        public float y;
+        public float w;
+        public float h;
+        public float s;
     }
 }

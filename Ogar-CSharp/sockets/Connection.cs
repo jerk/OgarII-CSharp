@@ -5,6 +5,7 @@ using System.Text;
 using Ogar_CSharp.bots;
 using Ogar_CSharp.cells;
 using Ogar_CSharp.protocols;
+using WebSocketSharp;
 using static Ogar_CSharp.sockets.Listener;
 
 namespace Ogar_CSharp.sockets
@@ -21,7 +22,7 @@ namespace Ogar_CSharp.sockets
         public bool socketDisconnected = false;
         public ushort closeCode;
         public string closeReason = null;
-        public HashSet<Minion> minions = new HashSet<Minion>();
+        public List<Minion> minions = new List<Minion>();
         public bool minionsFrozen;
         public bool controllingMinions;
         public Connection(Listener listener, ClientSocket socket) : base(listener)
@@ -32,9 +33,14 @@ namespace Ogar_CSharp.sockets
             lastActivityTime = DateTime.Now;
             lastChatTime = DateTime.Now;
             webSocket.onClose = (x) => Close();
+            webSocket.onMessage = (x) => OnSocketMessage(x);
         }
 
         public override bool ShouldClose => throw new NotImplementedException();
+        public void CloseSocket(ushort errorCode, string reason)
+        {
+            webSocket.CloseSocket(errorCode, reason);
+        }
         public override void Close()
         {
             if (!socketDisconnected)
@@ -44,26 +50,79 @@ namespace Ogar_CSharp.sockets
             base.Close();
             disconnected = true;
             disconnectionTick = Handle.tick;
-            webSocket.o
+            
         }
-        public override void OnNewOwnedCell(PlayerCell cell)
+        public void Send(byte[] data)
         {
-            throw new NotImplementedException();
+            if (socketDisconnected)
+                return;
+            webSocket.Send(data);
         }
-
-        public override void OnWorldReset()
+        public void OnSocketClose(ushort code, string reason)
         {
-            throw new NotImplementedException();
+            if (socketDisconnected)
+                return;
+            Console.WriteLine($"connection from {this.remoteAddress} has disconnected");
+            socketDisconnected = true;
+            closeCode = code;
+            closeReason = reason;
         }
-
-        public override void OnWorldSet()
+        public void OnSocketMessage(MessageEventArgs data)
         {
-            throw new NotImplementedException();
+            if(data.IsText || data.IsPing)
+            {
+                CloseSocket(1003, "Unexpected message format");
+                return;
+            }
+            var bytes = data.RawData;
+            if (bytes.Length > 512 || bytes.Length == 0)
+            {
+                CloseSocket(1003, "Unexpected message size");
+                return;
+            }
+            else
+            {
+                if (protocol != null)
+                {
+                    var reader = new Reader(bytes, 0);
+                    protocol.OnSocketMessage(reader);
+                }
+                else
+                {
+                    var reader = new Reader(bytes, 0);
+                    protocol = Handle.protocols.Decide(this, reader);
+                    if(protocol == null)
+                    {
+                        CloseSocket(1003, "Ambiguous protocol");
+                        return;
+                    }
+                }
+            }
         }
-
+        public void OnChatMessage(string message)
+        {
+            return;
+            message = message?.Trim();
+            if (message == null)
+                return;
+            var globalChat = listener.globalChat;
+            var lastChatTime = this.lastChatTime;
+            this.lastChatTime = DateTime.Now;
+            if(message.Length >= 2 && message[0] == '/')
+            {
+                //if(!Handle.ch)
+                //to implement.
+            }
+        }
         public override void Update()
         {
-            throw new NotImplementedException();
+            if (!hasPlayer)
+                return;
+            if (player.hasWorld)
+            {
+                if(spawningName != null)
+                    Handle.mat
+            }
         }
     }
 }

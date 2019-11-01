@@ -4,9 +4,10 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
-namespace Ogar_CSharp.primitives
+namespace Ogar_CSharp
 {
-    public class ReflectionMisc {
+    public class ReflectionMisc
+    {
         public delegate T ObjectActivator<T>(params object[] args);
         public static ObjectActivator<T> GetActivator<T>
          (ConstructorInfo ctor)
@@ -52,3 +53,4 @@ namespace Ogar_CSharp.primitives
         }
 
     }
+}

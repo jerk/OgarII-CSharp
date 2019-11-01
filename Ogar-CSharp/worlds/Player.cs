@@ -30,7 +30,7 @@ namespace Ogar_CSharp.worlds
         public bool hasWorld;
         public World world;
         public string team; //CHANGE THIS WHEN POSSIBLE!!
-        public long score;
+        public float score;
         public List<PlayerCell> ownedCells = new List<PlayerCell>();
         public Dictionary<string, Cell> visibleCells = new Dictionary<string, Cell>();
         public Dictionary<string, Cell> lastVisibleCells = new Dictionary<string, Cell>();

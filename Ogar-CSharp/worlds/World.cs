@@ -1,6 +1,4 @@
-﻿using Ogar_CSharp.primitives;
-using Spatial;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using Ogar_CSharp.cells;
@@ -10,24 +8,15 @@ namespace Ogar_CSharp.worlds
     {
         public class WorldStats
         {
-            public int Limit;
+            public int limit;
             public int _internal;
             public int external;
             public int playing;
             public int spectating;
             public string name;
-            //public string gamemode;
-            public decimal uptime;
-        }
-        public struct Point
-        {
-            public int x;
-            public int y;
-            public Point(int x, int y)
-            {
-                this.x = x;
-                this.y = y;
-            }
+            public string gamemode;
+            public int uptime;
+            public int loadTime;
         }
         public int id;
         public ServerHandle handle;
@@ -41,8 +30,10 @@ namespace Ogar_CSharp.worlds
         public HashSet<cells.PlayerCell> playerCells = new HashSet<cells.PlayerCell>();
         public HashSet<Player> players = new HashSet<Player>();
         public Player largestPlayer;
+        public List<Player> leaderboard = new List<Player>();
         //public chatchannel worldchat
-        public Rect2 border;
+        public Rect border;
+        public WorldStats stats;
         public QuadTree<cells.Cell> finder;
         public Settings Settings => handle.Settings;
 
@@ -114,7 +105,7 @@ namespace Ogar_CSharp.worlds
             }
             return GetRandomPos(cellSize);
         }
-        public (int color, int x, int y) GetPlayerSpawn(int cellSize)
+        public (int color, float x, float y) GetPlayerSpawn(int cellSize)
         {
 
         }

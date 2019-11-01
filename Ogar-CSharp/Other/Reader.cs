@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Unicode;
 
-namespace Ogar_CSharp.primitives
+namespace Ogar_CSharp
 {
     public class Reader
     {

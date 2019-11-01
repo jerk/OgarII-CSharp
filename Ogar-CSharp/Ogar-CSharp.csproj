@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="commands\" />
-    <Folder Include="gamemodes\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Ogar_CSharp.primitives
+namespace Ogar_CSharp
 {
     public static class BitExtensions
     {
