@@ -16,8 +16,8 @@ namespace Ogar_CSharp.worlds
             public int external;
             public int playing;
             public int spectating;
-            public string name;
-            public string gamemode;
+            public string name = "";
+            public string gamemode = "";
             public int uptime;
             public int loadTime;
         }
@@ -187,7 +187,7 @@ namespace Ogar_CSharp.worlds
             var pos = GetSafeSpawnPos(cellSize);
             return (null, pos.x, pos.y);
         }
-        public void SpawnPlayer(Player player, Point pos, short size)
+        public void SpawnPlayer(Player player, Point pos, float size)
         {
             var playerCell = new PlayerCell(player, pos.x, pos.y, size);
             AddCell(playerCell);
@@ -378,29 +378,131 @@ namespace Ogar_CSharp.worlds
         }
         public bool BoostCell(Cell cell)
         {
-
+            var d = cell.boost.d / 9 * handle.stepMult;
+            cell.X += cell.boost.dx * d;
+            cell.Y += cell.boost.dy * d;
+            BounceCell(cell, true);
+            UpdateCell(cell);
+            if ((cell.boost.d -= d) >= 1) 
+                return true;
+            SetCellAsNotBoosting(cell);
+            return false;
         }
         public void BounceCell(Cell cell, bool bounce)
         {
-
+            var r = cell.Size / 2;
+            var b = border;
+            if(cell.X <= b.x - b.w + r)
+            {
+                cell.X = b.x - b.w + r;
+                if (bounce)
+                    cell.boost.dx = -cell.boost.dx;
+            }
+            if (cell.X >= b.x + b.w - r)
+            {
+                cell.X = b.x + b.w - r;
+                if (bounce)
+                    cell.boost.dx = -cell.boost.dx;
+            }
+            if (cell.Y <= b.y - b.w + r)
+            {
+                cell.Y = b.y - b.w + r;
+                if (bounce)
+                    cell.boost.dy = -cell.boost.dy;
+            }
+            if (cell.Y >= b.y + b.w - r)
+            {
+                cell.Y = b.y + b.w - r;
+                if (bounce)
+                    cell.boost.dy = -cell.boost.dy;
+            }
         }
         //public void SplitVirus(v)
         public void MovePlayerCell(PlayerCell cell)
         {
-
+            var router = cell.owner.router;
+            if (router.disconnected)
+                return;
+            var dx = router.mouseX - cell.X;
+            var dy = router.mouseY - cell.Y;
+            var d = (float)Math.Sqrt(dx * dx + dy * dy);
+            if (d < 1)
+                return;
+            dx /= d;
+            dy /= d;
+            var m = Math.Min(cell.MoveSpeed, d) * handle.stepMult;
+            cell.X += dx * m;
+            cell.Y += dy * m;
         }
         public void DecayPlayerCell(PlayerCell cell)
         {
-
+            var newSize = cell.Size - cell.Size * handle.gamemode.GetDecayMult(cell) / 50 * handle.stepMult;
+            cell.Size = Math.Max(newSize, Settings.playerMinSize);
         }
-        //public void LaunchPlayerCell
+        public void LaunchPlayerCell(PlayerCell cell, float size, Boost boost)
+        {
+            cell.SquareSize -= size * size;
+            var x = cell.X + 20 * boost.dx;
+            var y = cell.Y + 20 * boost.dy;
+            var newCell = new PlayerCell(cell.owner, x, y, size);
+            newCell.boost.dx = boost.dx;
+            newCell.boost.dy = boost.dy;
+            newCell.boost.d = boost.d;
+            AddCell(newCell);
+            SetCellAsBoosting(newCell);
+        }
         public void AutoSplitPlayerCell(PlayerCell cell)
         {
-
+            var minSplit = Settings.playerMaxSize * Settings.playerMaxSize;
+            var cellsLeft = 1 * Settings.playerMaxCells - cell.owner.ownedCells.Count;
+            var overflow = (float)Math.Ceiling(cell.SquareSize / minSplit);
+            if (overflow == 1 || cellsLeft <= 0)
+                return;
+            var splitTimes = (int)Math.Min(overflow, cellsLeft);
+            var splitSize = (float)Math.Min(Math.Sqrt(cell.SquareSize / splitTimes), Settings.playerMaxSize);
+            var random = new Random();
+            for (int i = 1; i < splitTimes; i++)
+            {
+                var angle = (float)(random.NextDouble() * 2 * Math.PI);
+                this.LaunchPlayerCell(cell, splitSize, new Boost
+                {
+                    dx = (float)Math.Sin(angle),
+                    dy = (float)Math.Cos(angle),
+                    d = Settings.playerSplitBoost
+                });
+            }
+            cell.Size = splitSize;
         }
         public void SplitPlayer(Player player)
         {
-
+            var router = player.router; var l = player.ownedCells.Count;
+            for (int i = 0; i < l; i++)
+            {
+                if (player.ownedCells.Count >= Settings.playerMaxCells)
+                    break;
+                var cell = player.ownedCells[i];
+                if (cell.Size < Settings.playerMinSplitSize)
+                    continue;
+                float dx = router.mouseX - cell.X;
+                float dy = router.mouseY - cell.Y;
+                float d = (float)Math.Sqrt(dx * dx + dy * dy);
+                if (d < 1)
+                {
+                    dx = 1;
+                    dy = 0;
+                    d = 1;
+                }
+                else
+                {
+                    dx /= d; dy /= d;
+                }
+                this.LaunchPlayerCell(cell, cell.Size / Misc.SQRT_2, new Boost
+                {
+                    dx = dx,
+                    dy = dy,
+                    d = Settings.playerSplitBoost
+                });
+            }
         }
         public void EjectFromPlayer(Player player)
         {
@@ -410,13 +512,13 @@ namespace Ogar_CSharp.worlds
         {
 
         }
-        public int[] DistributeCellMass(PlayerCell cell)
+        public float[] DistributeCellMass(PlayerCell cell)
         {
-
+            return null;
         }
         public void CompileStatistics()
         {
-
+            stats = new WorldStats();
         }
             
     }

@@ -86,7 +86,7 @@ namespace Ogar_CSharp
         public void Remove(QuadItem<T> item)
         {
             var quad = item.__root;
-            quad.items.Remove(quad.items.fi);
+            quad.items.Remove(item);
             item.__root = null;
             quad.Merge();
         }

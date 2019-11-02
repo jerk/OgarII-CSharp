@@ -1,4 +1,4 @@
-﻿using Ogar_CSharp.primitives;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -22,7 +22,7 @@ namespace Ogar_CSharp.protocols
         public Protocol Decide(Connection connection, Reader reader)
         {
 
-            var generated = new ModernProtocol(connection);
+            var generated = new LegacyProtocol(connection);
             if (generated.Distinguishes(reader))
             {
                 return generated;

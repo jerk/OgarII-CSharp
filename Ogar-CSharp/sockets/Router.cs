@@ -11,17 +11,25 @@ namespace Ogar_CSharp.sockets
         public Listener listener;
         public bool disconnected;
         public float disconnectionTick;
-        public double mouseX;
-        public double mouseY;
+        public float mouseX;
+        public float mouseY;
         public string spawningName;
         public bool requestingSpectate;
         public bool isPressingQ;
         public bool hasProcessedQ;
         public long splitAttempts;
         public long ejectAttempts;
-        public double ejectTick;
+        public float ejectTick;
         public bool hasPlayer = false;
-        public Player player;
+        private Player player;
+        private object locker = new object();
+        public Player Player { 
+            get 
+            {
+                lock (locker)
+                    return player;
+            } 
+            set => player = value; }
         protected Router(Listener listener)
         {
             this.listener = listener;
@@ -37,8 +45,10 @@ namespace Ogar_CSharp.sockets
         {
             if (hasPlayer)
                 return;
-            hasPlayer = true;
+            Console.WriteLine("creating player");
             player = listener.handle.CreatePlayer(this);
+            hasPlayer = true;
+            Console.WriteLine("is player null ? :" + (player == null));
         }
         public void DestroyPlayer()
         {
@@ -60,7 +70,7 @@ namespace Ogar_CSharp.sockets
         {
             if (!hasPlayer)
                 return;
-            player.UpdateState(Player.PlayerState.Spectating);
+            player.UpdateState(PlayerState.Spectating);
         }
         public virtual void OnQPress()
         {

@@ -9,7 +9,7 @@ namespace Ogar_CSharp.bots
     public class Minion : Bot
     {
         public Connection following;
-        public Minion(Connection following) : base(following.player.world)
+        public Minion(Connection following) : base(following.Player.world)
         {
             this.following = following;
             following.minions.Add(this);
@@ -23,19 +23,19 @@ namespace Ogar_CSharp.bots
         }
         public override void Update()
         {
-            if (player.state == PlayerState.Idle && following.player.state == PlayerState.Alive)
+            if (Player.state == PlayerState.Idle && following.Player.state == PlayerState.Alive)
             {
-                spawningName = ((listener.Settings.minionName == "*") ? $"*{following.player.leaderBoardName}" : listener.Settings.minionName);
+                spawningName = ((listener.Settings.minionName == "*") ? $"*{following.Player.leaderBoardName}" : listener.Settings.minionName);
                 OnSpawnRequest();
                 spawningName = null;
             }
-            mouseX = following.minionsFrozen ? player.viewArea.x : following.mouseX;
-            mouseY = following.minionsFrozen ? player.viewArea.y : following.mouseY;
+            mouseX = following.minionsFrozen ? Player.viewArea.x : following.mouseX;
+            mouseY = following.minionsFrozen ? Player.viewArea.y : following.mouseY;
         }
         public override bool ShouldClose => !hasPlayer 
-            || !player.exists 
-            || !player.hasWorld || following.socketDisconnected 
-            || following.disconnected || !following.hasPlayer || !following.player.exists 
-            || following.player.world != player.world;
+            || !Player.exists 
+            || !Player.hasWorld || following.socketDisconnected 
+            || following.disconnected || !following.hasPlayer || !following.Player.exists 
+            || following.Player.world != Player.world;
     }
 }

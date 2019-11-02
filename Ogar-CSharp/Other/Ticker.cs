@@ -40,10 +40,10 @@ namespace Ogar_CSharp
                     callback();
                 }
                 virtualTime += step;
-                var delta = (virtualTime + step) - DateTime.Now.Ticks;
+                long delta = ((virtualTime + step) - DateTime.Now.Ticks);
                 if (delta < 0)
                     virtualTime -= delta;
-                Thread.Sleep((int)delta);
+                Thread.Sleep((int)10);
             }
         }
         public void Stop()

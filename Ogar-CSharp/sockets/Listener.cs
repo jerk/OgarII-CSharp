@@ -13,6 +13,7 @@ namespace Ogar_CSharp.sockets
     {
         public class ClientSocket : WebSocketBehavior
         {
+            public object locker = new object(), locker1 = new object();
             private readonly Listener listener;
             public Action<CloseEventArgs> onClose;
             public Action<MessageEventArgs> onMessage;
@@ -22,7 +23,7 @@ namespace Ogar_CSharp.sockets
             }
             protected override void OnClose(CloseEventArgs e)
             {
-                onClose(e);
+                onClose?.Invoke(e);
             }
             protected override void OnError(ErrorEventArgs e)
             {
@@ -30,12 +31,15 @@ namespace Ogar_CSharp.sockets
             }
             protected override void OnMessage(MessageEventArgs e)
             {
-                onMessage(e);
+                if (onMessage == null)
+                    Console.WriteLine("this should alread be assigned");
+                onMessage?.Invoke(e);
             }
             protected override void OnOpen()
             {
-                if (listener.VerifyClient(this))
-                    listener.OnConnection(this);
+                lock (locker)
+                    if (listener.VerifyClient(this))
+                        listener.OnConnection(this);
             }
             public void Disconnect()
             {
@@ -45,6 +49,7 @@ namespace Ogar_CSharp.sockets
                 => base.Send(data);
             public void CloseSocket(ushort code, string reason)
             {
+                Console.WriteLine($"closing socket, code : {code}, reason {reason}");
                 base.Sessions.CloseSession(base.ID, code, reason);
             }
         }
@@ -67,7 +72,7 @@ namespace Ogar_CSharp.sockets
                 return false;
             Console.WriteLine($"Listener opening at {Settings.listeningPort}");
             listenerSocket = new WebSocketServer(Settings.listeningPort, false);
-            listenerSocket.AddWebSocketService("", () => new ClientSocket(this));
+            listenerSocket.AddWebSocketService("/", () => new ClientSocket(this));
             listenerSocket.Start();
             return true;
         }
@@ -126,6 +131,26 @@ namespace Ogar_CSharp.sockets
         public void OnDisconnection(Connection client, ushort code, string reason)
         {
             Console.WriteLine($"DISCONNECTION FROM {client.remoteAddress} ({code} '{reason}'");
+        }
+        public void Update()
+        {
+            int l;
+            int i;
+            for (i = 0, l = this.routers.Count; i < l; i++)
+            {
+                var router = this.routers[i];
+                if (!router.ShouldClose) continue;
+                router.Close(); i--; l--;
+            }
+            for (i = 0; i < l; i++) this.routers[i].Update();
+            for (i = 0, l = this.connections.Count; i < l; i++)
+            {
+                var connection = connections[i];
+                if (Settings.listenerForbiddenIPs.Contains(connection.remoteAddress.ToString()))
+                    connection.CloseSocket(1003, "Remote address is forbidden");
+                //else if (DateTime.Now.Ticks - connection.lastActivityTime.Ticks >= Settings.listenerMaxClientDormancy)
+                   // connection.CloseSocket(1003, "Maximum dormancy time exceeded");
+            }
         }
     }
 }

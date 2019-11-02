@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-
+using System.Linq;
 namespace Ogar_CSharp
 {
     public class ServerHandle
@@ -17,8 +17,8 @@ namespace Ogar_CSharp
             private set;
         }
         public ProtocolStore protocols = new ProtocolStore();
-        //gamemodes = new gamemodelist(this);
-        public GameMode gamemode = null;
+        //public game gamemodes = new gamemodelist(this);
+        public GameMode gamemode;
         //commands = new commandlist(this);
         //chatcommnds = new commandlist(this);
         public bool running = false;
@@ -32,15 +32,20 @@ namespace Ogar_CSharp
         Stopwatch stopWatch = new Stopwatch();
         //logger = new Logger();
         public Listener listener;
-        //matchMaker = new MatchMaker(this);
+        public MatchMaker matchMaker;
         public List<World> worlds = new List<World>();
         public List<Player> players = new List<Player>();
         public string Version => Misc.version;
         public ServerHandle()
         {
+            Settings = new Settings();
+            matchMaker = new MatchMaker(this);
             listener = new Listener(this);
             //setSettings(settings);
             ticker.Add(OnTick);
+            gamemode = new FFA(this);
+            CreateWorld();
+
         }
         public void SetSettings(Settings settings)
         {
@@ -87,27 +92,60 @@ namespace Ogar_CSharp
         public World CreateWorld()
         {
             int id = 0;
-            //stuff
+            while (this.worlds.Any(x => x.id == ++id)) ;
+            var newWorld = new World(this, id);
+            this.worlds.Add(newWorld);
+            this.gamemode.OnNewWorld(newWorld);
+            newWorld.AfterCreation();
             Console.WriteLine($"added a world with id {id}");
-            return null; // will return newWorld
+            return newWorld;
         }
         public bool RemoveWorld(short id)
         {
-            
+            if (!worlds.Any(x => x.id == id))
+                return false;
+            var world = worlds.First(x => x.id == id);
+            gamemode.OnWorldDestroy(world);
+            world.Destroy();
+            worlds.Remove(world);
+            Console.WriteLine($"removed a world with id {id}");
+            return true;
         }
         public Player CreatePlayer(Router router)
         {
-
+            int id = 0;
+            while (players.Any(x => x.id == ++id)) ;
+            var newPlayer = new Player(this, id, router);
+            players.Add(newPlayer);
+            router.Player = newPlayer;
+            gamemode.OnNewPlayer(newPlayer);
+            Console.WriteLine($"added a player with id {id}");
+            return newPlayer;
         }
-        public bool RemovePlayer(short id)
+        public bool RemovePlayer(int id)
         {
-
+            Console.WriteLine($"removed a player with id {id}");
+            if (!players.Any(x => x.id == id)) 
+                return false;
+            var player = this.players.First(x => x.id == id);
+            this.gamemode.OnPlayerDestroy(player);
+            player.Destroy();
+            player.exists = false;
+            players.Remove(player);
+            Console.WriteLine($"removed a player with id {id}");
+            return true;
         }
         public void OnTick()
         {
             stopWatch.Start();
             tick++;
-            //doStuff
+            foreach(var world in worlds)
+                world.Update();
+            listener.Update();
+            matchMaker.Update();
+            gamemode.OnHandleTick();
+            avargateTickTime = (int)stopWatch.Elapsed.Ticks;
+            stopWatch.Reset();
         }
     }
 }

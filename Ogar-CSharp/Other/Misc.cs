@@ -3,7 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 namespace Ogar_CSharp
 {
-    
+    public struct Boost
+    {
+        public float dx;
+        public float dy;
+        public float d;
+    }
     public static class Misc
     {
         public const string version = "1.3.5";

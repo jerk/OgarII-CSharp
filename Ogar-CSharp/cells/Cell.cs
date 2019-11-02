@@ -14,8 +14,9 @@ namespace Ogar_CSharp.cells
     }
     public abstract class Cell
     {
+        public Boost boost = default;
         public QuadItem<Cell> item;
-        public float id;
+        public int id;
         public World world;
         public int birthTick;
         public bool exists;
@@ -26,7 +27,7 @@ namespace Ogar_CSharp.cells
         public Player owner;
         private float x;
         private float y;
-        private short size;
+        private float size;
         private int color;
         private string name;
         private string skin;
@@ -39,17 +40,17 @@ namespace Ogar_CSharp.cells
         public int Age => (world.handle.tick - birthTick) * world.handle.stepMult;
         public float X { get => x; set { x = value; posChanged = true; } }
         public float Y { get => y; set { y = value; posChanged = true; } }
-        public short Size { get => size; set { Misc.ThrowIfBadOrNegativeNumber(value); size = value; sizeChanged = true; } }
+        public float Size { get => size; set { Misc.ThrowIfBadOrNegativeNumber(value); size = value; sizeChanged = true; } }
         public float SquareSize { get => size * size; set => Size = (short)Math.Sqrt(100 * value); }
         public float Mass { get => size * size / 100; set => Size = (short)Math.Sqrt(100 * value); }
         public int Color { get => color; set { color = value; colorChanged = true; } }
         public string Name { get => name; set { name = value; nameChanged = true; } }
         public string Skin { get => skin; set { skin = value; skinChanged = true; } }
-        protected Cell(World world, float x, float y, short size, int color)
+        protected Cell(World world, float x, float y, float size, int color)
         {
             item = new QuadItem<Cell>(this);
             this.world = world;
-            id = world._nextCellId;
+            id = (int)world._nextCellId;
             birthTick = world.handle.tick;
             this.x = x;
             this.y = y;

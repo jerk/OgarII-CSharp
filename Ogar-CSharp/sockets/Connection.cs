@@ -36,7 +36,7 @@ namespace Ogar_CSharp.sockets
             webSocket.onMessage = (x) => OnSocketMessage(x);
         }
 
-        public override bool ShouldClose => throw new NotImplementedException();
+        public override bool ShouldClose => socketDisconnected;
         public void CloseSocket(ushort errorCode, string reason)
         {
             webSocket.CloseSocket(errorCode, reason);
@@ -50,6 +50,7 @@ namespace Ogar_CSharp.sockets
             base.Close();
             disconnected = true;
             disconnectionTick = Handle.tick;
+            listener.OnDisconnection(this, closeCode, closeReason);
             
         }
         public void Send(byte[] data)
@@ -69,7 +70,7 @@ namespace Ogar_CSharp.sockets
         }
         public void OnSocketMessage(MessageEventArgs data)
         {
-            if(data.IsText || data.IsPing)
+            if (data.IsText || data.IsPing)
             {
                 CloseSocket(1003, "Unexpected message format");
                 return;
@@ -90,8 +91,9 @@ namespace Ogar_CSharp.sockets
                 else
                 {
                     var reader = new Reader(bytes, 0);
-                    protocol = Handle.protocols.Decide(this, reader);
-                    if(protocol == null)
+                    protocol = new LegacyProtocol(this);
+                    bool IsCorrect = protocol.Distinguishes(reader);
+                    if (!IsCorrect)
                     {
                         CloseSocket(1003, "Ambiguous protocol");
                         return;
@@ -118,11 +120,45 @@ namespace Ogar_CSharp.sockets
         {
             if (!hasPlayer)
                 return;
-            if (player.hasWorld)
+            if (!this.Player.hasWorld)
             {
-                if(spawningName != null)
-                    Handle.mat
+                if (spawningName != null)
+                    Handle.matchMaker.ToggleQueued(this);
+                spawningName = null;
+                splitAttempts = 0;
+                ejectAttempts = 0;
+                requestingSpectate = false;
+                isPressingQ = false;
+                isPressingQ = false;
+                hasProcessedQ = false;
+                return;
             }
+            this.Player.UpdateVisibleCells();
+            List<Cell> add = new List<Cell>(), upd = new List<Cell>(), eat = new List<Cell>(), del = new List<Cell>();
+            var player = this.Player;
+            var visible = player.visibleCells;
+            var lastVisible = player.lastVisibleCells;
+            foreach (var item in visible)
+            {
+                if (!lastVisible.ContainsKey(item.Key)) 
+                    add.Add(item.Value);
+                else if (item.Value.ShouldUpdate) 
+                    upd.Add(item.Value);
+            }
+            foreach (var item1 in visible)
+            {
+                if (visible.ContainsKey(item1.Key))
+                    continue;
+                if (item1.Value.eatenBy != null)
+                    eat.Add(item1.Value);
+                del.Add(item1.Value);
+            }
+            if (player.state == worlds.PlayerState.Spectating || player.state == worlds.PlayerState.Roaming)
+                protocol.OnSpectatePosition(player.viewArea);
+            if (Handle.tick % 4 == 0)
+                Handle.gamemode.SendLeaderboard(this);
+            protocol.OnVisibleCellUpdate(add, upd, eat, del);
         }
+
     }
 }

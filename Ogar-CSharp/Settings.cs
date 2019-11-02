@@ -11,7 +11,7 @@ namespace Ogar_CSharp
             Old,
             New
         }
-        public int listeningPort = 443;
+        public int listeningPort = 444;
         public int listenerMaxConnections;
         public int listenerMaxClientDormancy = 1000 * 60;
         public List<string> listenerAcceptedOrigins = new List<string>();

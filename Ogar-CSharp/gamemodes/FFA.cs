@@ -28,9 +28,7 @@ namespace Ogar_CSharp.gamemodes
                 return;
             int size = ((player.router.Type == "minion") ? handle.Settings.minionSpawnSize : handle.Settings.playerSpawnSize);
             var spawnInfo = player.world.GetPlayerSpawn(size);
-            int color = spawnInfo.color;
-            if (color == 0) //confused
-                color = Misc.RandomColor();
+            int color = spawnInfo.color ?? Misc.RandomColor();
             player.cellName = player.chatName = player.leaderBoardName = name;
             player.cellSkin = skin;
             player.chatColor = player.cellColor = color;
@@ -44,7 +42,7 @@ namespace Ogar_CSharp.gamemodes
         {
             if (!connection.hasPlayer)
                 return;
-            var player = connection.player;
+            var player = connection.Player;
             if (!player.hasWorld)
                 return;
             if (player.world.frozen)

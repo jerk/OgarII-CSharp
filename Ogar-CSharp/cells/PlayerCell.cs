@@ -14,9 +14,24 @@ namespace Ogar_CSharp.cells
         public override bool IsSpiked => false;
         public override bool IsAgitated => false;
         public override bool AvoidWhenSpawning => true;
-        public PlayerCell(Player owner, float x, float y, short size) : base(owner.world, x, y, size, owner.cellColor)
+        public PlayerCell(Player owner, float x, float y, float size) : base(owner.world, x, y, size, owner.cellColor)
         {
-
+            this.owner = owner;
+            Name = owner.cellName ?? "";
+            Skin = owner.cellName ?? "";
+            CanMerge = false;
+        }
+        public override void OnRemoved()
+        {
+            this.world.playerCells.Remove(this);
+            this.owner.ownedCells.Remove(this);
+            owner.UpdateState(PlayerState.Idle);
+        }
+        public override void OnSpawned()
+        {
+            this.owner.router.OnNewOwnedCell(this);
+            this.owner.ownedCells.Add(this);
+            this.world.playerCells.Insert(0, this);
         }
         public override CellEatResult GetEatResult(Cell other)
         {

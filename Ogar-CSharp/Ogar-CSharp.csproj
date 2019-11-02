@@ -11,7 +11,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WebSocketSharp" Version="1.0.3-rc11" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="websocket-sharp">
+      <HintPath>..\..\..\..\Documents\websocket-sharp\websocket-sharp\bin\Release\websocket-sharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

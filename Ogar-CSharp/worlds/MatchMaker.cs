@@ -51,11 +51,13 @@ namespace Ogar_CSharp.worlds
             var bulkSize = handle.Settings.matchMakerBulkSize;
             while (true)
             {
+                return; // remove later
                 if (queued.Count < bulkSize)
                     return;
-                var world =
+                //var world =
             }
         }
+        /*
         public World GetSuitableWorld()
         {
             World bestWorld = null;
@@ -63,6 +65,6 @@ namespace Ogar_CSharp.worlds
             {
                 if(!handle.gamemode.)
             }
-        }
+        }*/
     }
 }

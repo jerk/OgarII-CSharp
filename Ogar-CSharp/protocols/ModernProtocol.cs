@@ -12,7 +12,7 @@ namespace Ogar_CSharp.protocols
     public class ModernProtocol : Protocol
     {
         readonly byte[] pingReturn = new byte[1] { 2 };
-        public int? protocol;
+        public uint? protocol;
         public bool gotProtocol;
         public LeaderBoardEntry leaderboardSelfData;
         public List<LeaderBoardEntry> leaderboardData = new List<LeaderBoardEntry>();
@@ -44,10 +44,11 @@ namespace Ogar_CSharp.protocols
         {
             if (reader.length < 5)
                 return false;
-            if (reader.ReadByte() != 1)
+            var val = reader.ReadByte();
+            if (val != 1)
                 return false;
             gotProtocol = true;
-            protocol = (int)reader.ReadUInt();
+            Console.WriteLine("protocol "  + (protocol = reader.ReadUInt()));
             if (protocol != 3)
             {
                 Fail(1003, "Unsupported protocol version");
@@ -146,7 +147,7 @@ namespace Ogar_CSharp.protocols
                 globalFlags |= 2;
             if (serverInfoPending)
                 globalFlags |= 2;
-            if (connection.hasPlayer && connection.player.hasWorld && worldStatsPending)
+            if (connection.hasPlayer && connection.Player.hasWorld && worldStatsPending)
                 globalFlags |= 8;
             if(chatPending.Count > 0)
                 globalFlags |= 16;
@@ -194,7 +195,7 @@ namespace Ogar_CSharp.protocols
             }
             if (worldStatsPending)
             {
-                var item = connection.player.world.stats;
+                var item = connection.Player.world.stats;
                 writer.WriteUTF8String(item.name);
                 writer.WriteUTF8String(item.gamemode);
                 writer.WriteFloat((float)item.loadTime / (float)this.Handle.tickDelay);
@@ -282,7 +283,7 @@ namespace Ogar_CSharp.protocols
                     writer.WriteUShort((ushort)item.Size);
                     writer.WriteColor((uint)item.Color);
                     flags = 0;
-                    if (item.Type == 0 && item.owner == connection.player)
+                    if (item.Type == 0 && item.owner == connection.Player)
                         flags |= 0;
                     if (item.Name != null)
                         writer.WriteUTF8String(item.Name);

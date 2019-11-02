@@ -1,5 +1,4 @@
 ﻿using Ogar_CSharp.cells;
-using Ogar_CSharp.primitives;
 using Ogar_CSharp.worlds;
 using System;
 using System.Collections.Generic;
@@ -14,7 +13,7 @@ namespace Ogar_CSharp.bots
         public override string Type => "playerbot";
         public override bool SeparateInTeams => true;
         public override bool ShouldClose => !hasPlayer
-            || !player.exists || !player.hasWorld;
+            || !Player.exists || !Player.hasWorld;
         public PlayerBot(World world) : base(world) { }
         public override void Update()
         {
@@ -22,8 +21,8 @@ namespace Ogar_CSharp.bots
                 splitCooldownTicks--;
             else
                 target = null;
-            player.UpdateVisibleCells();
-            if (player.state == PlayerState.Idle)
+            Player.UpdateVisibleCells();
+            if (Player.state == PlayerState.Idle)
             {
                 var names = listener.Settings.worldPlayerBotNames;
                 var skins = listener.Settings.worldPlayerBotSkins;
@@ -35,9 +34,9 @@ namespace Ogar_CSharp.bots
                 spawningName = null;
             }
             PlayerCell cell = null;
-            for (int i = 0, l = player.ownedCells.Count; i < l; i++)
-                if (cell == null || player.ownedCells[i].Size > cell.Size)
-                    cell = player.ownedCells[i];
+            for (int i = 0, l = Player.ownedCells.Count; i < l; i++)
+                if (cell == null || Player.ownedCells[i].Size > cell.Size)
+                    cell = Player.ownedCells[i];
             if (cell == null)
                 return;
             if (target != null)
@@ -51,28 +50,28 @@ namespace Ogar_CSharp.bots
                     return;
                 }
             }
-            bool atMaxCells = player.ownedCells.Count >= listener.Settings.playerMaxCells;
-            bool willingToSplit = player.ownedCells.Count <= 2;
-            int cellCount = player.visibleCells.Count;
-            double mouseX = 0;
-            double mouseY = 0;
+            bool atMaxCells = Player.ownedCells.Count >= listener.Settings.playerMaxCells;
+            bool willingToSplit = Player.ownedCells.Count <= 2;
+            int cellCount = Player.visibleCells.Count;
+            float mouseX = 0;
+            float mouseY = 0;
             Cell bestPrey = null;
             bool splitkillObstacleNearby = false;
-            foreach (var pair in player.visibleCells)
+            foreach (var pair in Player.visibleCells)
             {
                 var check = pair.Value;
-                var truncatedInfluence = Math.Log10(cell.SquareSize);
-                var dx = check.X - cell.X;
-                var dy = check.Y - cell.Y;
-                var dSplit = Math.Max(1, Math.Sqrt(dx * dx + dy * dy));
-                var d = Math.Max(1, dSplit - cell.Size - check.Size);
-                double influence = 0;
+                float truncatedInfluence = (float)Math.Log10(cell.SquareSize);
+                float dx = check.X - cell.X;
+                float dy = check.Y - cell.Y;
+                float dSplit = (float)Math.Max(1, Math.Sqrt(dx * dx + dy * dy));
+                float d = (float)Math.Max(1, dSplit - cell.Size - check.Size);
+                float influence = 0;
                 switch (check.Type)
                 {
                     case 0:
-                        if (player.id == check.owner.id)
+                        if (Player.id == check.owner.id)
                             break;
-                        if (player.team != null && player.team == check.owner.team)
+                        if (Player.team != null && Player.team == check.owner.team)
                             break;
                         if (CanEat(cell.Size, check.Size))
                         {
@@ -135,9 +134,9 @@ namespace Ogar_CSharp.bots
             }
             else
             {
-                var d = Math.Max(1, Math.Sqrt(mouseX * mouseX + mouseY * mouseY));
-                this.mouseX = cell.X + mouseX / d * player.viewArea.w;
-                this.mouseY = cell.Y + mouseY / d * player.viewArea.h;
+                var d = (float)Math.Max(1, Math.Sqrt(mouseX * mouseX + mouseY * mouseY));
+                this.mouseX = cell.X + mouseX / d * Player.viewArea.w;
+                this.mouseY = cell.Y + mouseY / d * Player.viewArea.h;
             }
         }
         public bool CanEat(double aSize, double bSize)

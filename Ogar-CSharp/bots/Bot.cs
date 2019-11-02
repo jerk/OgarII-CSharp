@@ -11,13 +11,13 @@ namespace Ogar_CSharp.bots
         public Bot(World world) : base(world.handle.listener)
         {
             CreatePlayer();
-            world.AddPlayer(player);
+            world.AddPlayer(Player);
         }
         public override bool IsExternal => false;
         public override void Close()
         {
             base.Close();
-            listener.handle.RemovePlayer(player.id);
+            listener.handle.RemovePlayer(Player.id);
             disconnected = true;
             disconnectionTick = listener.handle.tick;
         }
