@@ -41,7 +41,7 @@ namespace Ogar_CSharp.sockets
         public virtual bool SeparateInTeams => throw new Exception("Must be overriden");
         public ServerHandle Handle => listener.handle;
         public Settings Settings => listener.Settings;
-        public void CreatePlayer()
+        public virtual void CreatePlayer()
         {
             if (hasPlayer)
                 return;
@@ -65,6 +65,8 @@ namespace Ogar_CSharp.sockets
             if (!hasPlayer)
                 return;
             string name = spawningName.Substring(0, Settings.playerMaxNameLength);
+            string skin = null;
+            listener.handle.gamemode.OnPlayerSpawnRequest(player, name, skin);
         }
         public virtual void OnSpectateRequest()
         {

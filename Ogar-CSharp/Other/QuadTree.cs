@@ -4,10 +4,10 @@ using System.Text;
 
 namespace Ogar_CSharp
 {
-    public class QuadItem<T> 
+    public abstract class QuadItem<T> 
     {
-        public QuadItem(T item) => this.item = item;
         public T item;
+        protected void SetItem(T cItem) => item = cItem;
         public QuadTree<T> __root;
         public Rect range;
     }
@@ -105,7 +105,6 @@ namespace Ogar_CSharp
                     if ((branch = quad.branches[i]).hasSplit || branch.items.Count > 0)
                         return;
                 quad.hasSplit = false;
-                quad.branches.Clear();
                 quad.branches = null;
             }
         }
@@ -188,16 +187,16 @@ namespace Ogar_CSharp
             var quad = Misc.GetQuadIntersect(range, this.range);
             if (quad.t)
             {
-                if (quad.l && this.branches[0].ContainsAny(range, selector)) 
+                if (quad.l && branches.Count >= 1 && this.branches[0].ContainsAny(range, selector)) 
                     return true;
-                if (quad.r && this.branches[1].ContainsAny(range, selector)) 
+                if (quad.r && branches.Count >= 2 && this.branches[1].ContainsAny(range, selector)) 
                     return true;
             }
             if (quad.b)
             {
-                if (quad.l && this.branches[2].ContainsAny(range, selector)) 
+                if (quad.l && branches.Count >= 3 && this.branches[2].ContainsAny(range, selector)) 
                     return true;
-                if (quad.r && this.branches[3].ContainsAny(range, selector)) 
+                if (quad.r && branches.Count == 4 && this.branches[3].ContainsAny(range, selector)) 
                     return true;
             }
             return false;

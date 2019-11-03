@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-
+using UltimateQuadTree;
 namespace Ogar_CSharp.cells
 {
     public enum CellEatResult
@@ -12,16 +12,14 @@ namespace Ogar_CSharp.cells
         Eat,
         EatInvd
     }
-    public abstract class Cell
+    public abstract class Cell : QuadItem<Cell>
     {
         public Boost boost = default;
-        public QuadItem<Cell> item;
         public int id;
         public World world;
         public int birthTick;
         public bool exists;
         public Cell eatenBy;
-        public Rect range;
         public bool isBoosting;
         //public Boost boost;
         public Player owner;
@@ -48,7 +46,7 @@ namespace Ogar_CSharp.cells
         public string Skin { get => skin; set { skin = value; skinChanged = true; } }
         protected Cell(World world, float x, float y, float size, int color)
         {
-            item = new QuadItem<Cell>(this);
+            SetItem(this);
             this.world = world;
             id = (int)world._nextCellId;
             birthTick = world.handle.tick;

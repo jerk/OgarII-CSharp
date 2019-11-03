@@ -29,7 +29,7 @@ namespace Ogar_CSharp.worlds
         public bool hasWorld;
         public World world;
         public string team; //CHANGE THIS WHEN POSSIBLE!!
-        public float score;
+        public float score = float.NaN;
         public List<PlayerCell> ownedCells = new List<PlayerCell>();
         public Dictionary<int, Cell> visibleCells = new Dictionary<int, Cell>();
         public Dictionary<int, Cell> lastVisibleCells = new Dictionary<int, Cell>();
@@ -45,8 +45,8 @@ namespace Ogar_CSharp.worlds
         }
         public void Destroy()
         {
-            //if(hasWorld)
-            //world removePlayer
+            if (hasWorld)
+                world.RemovePlayer(this);
             exists = false;
         }
         public void UpdateState(PlayerState state)
@@ -72,7 +72,7 @@ namespace Ogar_CSharp.worlds
             switch (state)
             {
                 case PlayerState.Idle:
-                    this.score = 0;
+                    this.score = float.NaN;
                     break;
                 case PlayerState.Alive:
                     float x = 0, y = 0, score = 0;
@@ -121,26 +121,37 @@ namespace Ogar_CSharp.worlds
                     break;
             }
         }
-        public void UpdateVisibleCells()
+        public void UpdateCell(Cell cell, bool isVisible)
         {
-            if (world == null)
-                return;
-            lastVisibleCells = null;
-            this.visibleCells.Clear();
-            for (int i = 0, l = this.ownedCells.Count; i < l; i++)
+            if (isVisible)
             {
-                var cell = this.ownedCells[i];
                 if (!visibleCells.ContainsKey(cell.id))
                     visibleCells.Add(cell.id, cell);
                 else
                     visibleCells[cell.id] = cell;
             }
+            else
+            {
+                if (!lastVisibleCells.ContainsKey(cell.id))
+                    lastVisibleCells.Add(cell.id, cell);
+                else
+                    lastVisibleCells[cell.id] = cell;
+            }
+        }
+        public void UpdateVisibleCells()
+        {
+            if (world == null)
+                return;
+            lastVisibleCells = visibleCells;
+            this.visibleCells.Clear();
+            for (int i = 0, l = this.ownedCells.Count; i < l; i++)
+            {
+                var cell = this.ownedCells[i];
+                UpdateCell(cell, true);
+            }
             this.world.finder.Search(new Rect(viewArea.x, viewArea.y, viewArea.w, viewArea.h), (cell) =>
             {
-                if (!visibleCells.ContainsKey(cell.item.id))
-                    visibleCells.Add(cell.item.id, cell.item);
-                else
-                    visibleCells[cell.item.id] = cell.item;
+                UpdateCell(cell.item, true);
             });
         }
         public void CheckExistence()

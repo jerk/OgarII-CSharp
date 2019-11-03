@@ -57,9 +57,9 @@ namespace Ogar_CSharp.bots
             float mouseY = 0;
             Cell bestPrey = null;
             bool splitkillObstacleNearby = false;
-            foreach (var pair in Player.visibleCells)
+            foreach (var item in Player.visibleCells)
             {
-                var check = pair.Value;
+                var check = item.Value;
                 float truncatedInfluence = (float)Math.Log10(cell.SquareSize);
                 float dx = check.X - cell.X;
                 float dy = check.Y - cell.Y;

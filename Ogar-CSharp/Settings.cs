@@ -38,7 +38,7 @@ namespace Ogar_CSharp
         public List<string> worldPlayerBotSkins = new List<string>();
         public int worldMinionsPerPlayer;
         public int worldMaxPlayers;
-        public int worldMinCount;
+        public int worldMinCount = 1;
         public int worldMaxCount = 2;
         public bool matchMakerNeedsQueueing;
         public int matchMakerBulkSize = 1;

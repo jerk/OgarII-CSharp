@@ -104,7 +104,6 @@ namespace Ogar_CSharp.protocols
 
         public override void OnSocketMessage(Reader reader)
         {
-            Console.WriteLine($"reader size :" + reader.length);
             var messageId = reader.ReadByte();
             if (!this.gotKey)
             {
@@ -115,7 +114,6 @@ namespace Ogar_CSharp.protocols
                 this.connection.CreatePlayer();
                 return;
             }
-            Console.WriteLine("messageid : " + messageId);
             switch (messageId)
             {
                 case 0:
@@ -212,7 +210,8 @@ namespace Ogar_CSharp.protocols
         public static void WriteCellData(Writer writer, Player source, uint protocol, Cell cell, bool includeType, bool includeSize,
             bool includePos, bool includeColor, bool includeName, bool includeSkin)
         {
-            if (protocol == 1 || protocol == 5)
+            Console.WriteLine(protocol);
+            if (protocol == 4 || protocol == 5)
                 WriteCellData4(writer, source, protocol, cell, includeType, includeSize, includePos, includeColor, includeName, includeSkin);
             else if(protocol <= 10)
                 WriteCellData6(writer, source, protocol, cell, includeType, includeSize, includePos, includeColor, includeName, includeSkin);
@@ -425,7 +424,7 @@ namespace Ogar_CSharp.protocols
             if (cell.IsAgitated) flags |= 0x10;
             if (cell.Type == 3) flags |= 0x20;
             writer.WriteByte(flags);
-
+            Console.WriteLine(includeColor);
             if (includeColor) writer.WriteColor((uint)cell.Color);
             if (includeSkin) writer.WriteUTF8String(cell.Skin);
             if (includeName) writer.WriteUTF8String(cell.Name);

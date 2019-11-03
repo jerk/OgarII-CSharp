@@ -6,7 +6,7 @@ namespace Ogar_CSharp
     {
         static void Main(string[] args)
         {
-            var handle = new ServerHandle();
+            var handle = new ServerHandle(new Settings());
             handle.Start();
             Console.ReadKey();
         }

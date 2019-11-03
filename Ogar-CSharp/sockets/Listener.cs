@@ -52,6 +52,11 @@ namespace Ogar_CSharp.sockets
                 Console.WriteLine($"closing socket, code : {code}, reason {reason}");
                 base.Sessions.CloseSession(base.ID, code, reason);
             }
+            public void RemoveAllListeners()
+            {
+                onClose = null;
+                onMessage = null;
+            }
         }
         public WebSocketServer listenerSocket;
         public ServerHandle handle;
@@ -88,7 +93,7 @@ namespace Ogar_CSharp.sockets
         {
             var address = socket.Context.UserEndPoint.Address.ToString();
             Console.WriteLine($"REQUEST FROM {address}, {(socket.Context.IsSecureConnection ? "" : "not ")}secure, Origin: {socket.Context.Origin}");
-            if(connections.Count > this.Settings.listenerMaxConnections)
+            if (connections.Count > Settings.listenerMaxConnections)
             {
                 Console.WriteLine("listenerMaxConnections reached, dropping new connections");
                 return false;

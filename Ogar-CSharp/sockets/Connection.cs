@@ -37,9 +37,19 @@ namespace Ogar_CSharp.sockets
         }
 
         public override bool ShouldClose => socketDisconnected;
+        public override bool IsExternal => true;
+        public override bool SeparateInTeams => true;
+        public override string Type => "connectin";
         public void CloseSocket(ushort errorCode, string reason)
         {
             webSocket.CloseSocket(errorCode, reason);
+        }
+        public override void CreatePlayer()
+        {
+            base.CreatePlayer();
+            //if(Settings.chatEnabled) chat stuff
+            //else
+                Handle.worlds[0].AddPlayer(Player);
         }
         public override void Close()
         {
@@ -51,7 +61,7 @@ namespace Ogar_CSharp.sockets
             disconnected = true;
             disconnectionTick = Handle.tick;
             listener.OnDisconnection(this, closeCode, closeReason);
-            
+            webSocket.RemoveAllListeners();
         }
         public void Send(byte[] data)
         {
@@ -145,7 +155,7 @@ namespace Ogar_CSharp.sockets
                 else if (item.Value.ShouldUpdate) 
                     upd.Add(item.Value);
             }
-            foreach (var item1 in visible)
+            foreach (var item1 in lastVisible)
             {
                 if (visible.ContainsKey(item1.Key))
                     continue;

@@ -16,7 +16,7 @@ namespace Ogar_CSharp
     public class Writer
     {
         public List<byte> buf = new List<byte>();
-        public int offset = 0;
+        public int offset { get; set; }
         public void WriteByte(byte a)
         {
             buf.Add(a);
@@ -43,20 +43,21 @@ namespace Ogar_CSharp
         {
             var tbuf = Encoding.UTF8.GetBytes(a);
             buf.AddRange(tbuf);
-            offset += tbuf.Length;
+            offset += tbuf.Length + 1;
             buf.Add(0);
         }
         public void WriteUTF16String(string a)
         {
             var tbuf = Encoding.Unicode.GetBytes(a);
             buf.AddRange(tbuf);
-            offset += tbuf.Length;
+            offset += tbuf.Length + 2;
             buf.Add(0);
             buf.Add(0);
         }
         public void WriteColor(uint a)
         {
             buf.AddRange(BitExtensions.GetBytesUInt24(((a & 0xFF) << 16) | (((a >> 8) & 0xFF) << 8) | (a >> 16)));
+            offset += 3;
         }
         public byte[] RawBuffer
             => buf.ToArray();

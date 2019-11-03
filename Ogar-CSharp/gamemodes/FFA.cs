@@ -29,8 +29,8 @@ namespace Ogar_CSharp.gamemodes
             int size = ((player.router.Type == "minion") ? handle.Settings.minionSpawnSize : handle.Settings.playerSpawnSize);
             var spawnInfo = player.world.GetPlayerSpawn(size);
             int color = spawnInfo.color ?? Misc.RandomColor();
-            player.cellName = player.chatName = player.leaderBoardName = name;
-            player.cellSkin = skin;
+            player.cellName = player.chatName = player.leaderBoardName = name ?? "";
+            player.cellSkin = skin ?? "";
             player.chatColor = player.cellColor = color;
             player.world.SpawnPlayer(player, new Point(spawnInfo.x, spawnInfo.y), size); // has two more arguments using 'name' and 'null'
         }

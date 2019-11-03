@@ -18,7 +18,7 @@ namespace Ogar_CSharp.worlds
             public int spectating;
             public string name = "";
             public string gamemode = "";
-            public int uptime;
+            public long uptime;
             public int loadTime;
         }
         public int id;
@@ -46,6 +46,7 @@ namespace Ogar_CSharp.worlds
         {
             this.handle = handle;
             this.id = id;
+            SetBorder(new Rect(Settings.worldMapX, Settings.worldMapY, Settings.worldMapW, Settings.worldMapH));
         }
         public long NextCellId => (_nextCellId >= 4294967296) ? (_nextCellId = 1) : _nextCellId++;
         public void AfterCreation()
@@ -73,7 +74,7 @@ namespace Ogar_CSharp.worlds
             {
                 if (cell.Type == 0)
                     continue;
-                finder.Insert(new QuadItem<Cell>(cell));
+                finder.Insert(cell);
                 if (!Misc.FunnyIntersects(border, cell.range))
                     RemoveCell(cell);
             }
@@ -83,7 +84,7 @@ namespace Ogar_CSharp.worlds
             cell.exists = true;
             cell.range = new Rect(cell.X, cell.Y, cell.Size, cell.Size);
             cells.Add(cell);
-            finder.Insert(new QuadItem<Cell>(cell));
+            finder.Insert(cell);
             cell.OnSpawned();
             handle.gamemode.OnNewCell(cell);
         }
@@ -308,7 +309,7 @@ namespace Ogar_CSharp.worlds
             }
             CompileStatistics();
             handle.gamemode.CompileLeaderboard(this);
-            if (stats.external <= 0 && handle.worlds.Count > Settings.worldMinCount)
+            if (stats.external <= 1 && handle.worlds.Count > Settings.worldMinCount)
                 handle.RemovePlayer((short)id);
         }
         public void FrozenUpdate()
@@ -519,6 +520,30 @@ namespace Ogar_CSharp.worlds
         public void CompileStatistics()
         {
             stats = new WorldStats();
+            int _internal = 0, external = 0, playing = 0, spectating = 0;
+            for (int i = 0, l = this.players.Count; i < l; i++)
+            {
+                var player = this.players[i];
+                if (!player.router.IsExternal) 
+                { 
+                    _internal++; 
+                    continue; 
+                }
+                external++;
+                if (player.state == 0) 
+                    playing++;
+                else if (player.state == PlayerState.Spectating || player.state == PlayerState.Roaming)
+                    spectating++;
+            }
+            this.stats.limit = Settings.listenerMaxConnections - this.handle.listener.connections.Count + external;
+            this.stats._internal = _internal;
+            this.stats.external = external;
+            this.stats.playing = playing;
+            this.stats.spectating = spectating;
+            this.stats.name = Settings.serverName;
+            this.stats.gamemode = this.handle.gamemode.Name;
+            this.stats.loadTime = this.handle.avargateTickTime / this.handle.stepMult;
+            this.stats.uptime = (long)Math.Floor((double)((DateTime.Now.Ticks - this.handle.startTime.Value.Ticks) / 1000));
         }
             
     }

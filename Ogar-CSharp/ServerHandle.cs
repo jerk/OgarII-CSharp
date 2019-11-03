@@ -36,16 +36,16 @@ namespace Ogar_CSharp
         public List<World> worlds = new List<World>();
         public List<Player> players = new List<Player>();
         public string Version => Misc.version;
-        public ServerHandle()
+        public ServerHandle(Settings settings)
         {
-            Settings = new Settings();
+            Settings = settings;
             matchMaker = new MatchMaker(this);
             listener = new Listener(this);
             //setSettings(settings);
             ticker.Add(OnTick);
             gamemode = new FFA(this);
             CreateWorld();
-
+            SetSettings(settings);
         }
         public void SetSettings(Settings settings)
         {
