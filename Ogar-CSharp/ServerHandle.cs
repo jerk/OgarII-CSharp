@@ -124,7 +124,6 @@ namespace Ogar_CSharp
         }
         public bool RemovePlayer(int id)
         {
-            Console.WriteLine($"removed a player with id {id}");
             if (!players.Any(x => x.id == id)) 
                 return false;
             var player = this.players.First(x => x.id == id);

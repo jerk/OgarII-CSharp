@@ -194,6 +194,21 @@ namespace Ogar_CSharp.worlds
             AddCell(playerCell);
             player.UpdateState(PlayerState.Alive);
         }
+        public void PopPlayerCell(PlayerCell cell)
+        {
+            var splits = DistributeCellMass(cell);
+            var random = new Random();
+            for (int i = 0, l = splits.Count; i < l; i++)
+            {
+                var angle = (float)random.NextDouble() * 2 * Math.PI;
+                LaunchPlayerCell(cell, (float)Math.Sqrt(splits[i] * 100), new Boost
+                {
+                    dx = (float)Math.Sin(angle),
+                    dy = (float)Math.Cos(angle),
+                    d = Settings.playerSplitBoost
+                });
+            }
+        }
         public void Update()
         {
             if (frozen)
@@ -213,7 +228,11 @@ namespace Ogar_CSharp.worlds
                 var pos = GetSafeSpawnPos(Settings.pelletMinSize);
                 AddCell(new Pellet(this, this, pos.x, pos.y));
              }
-
+            while (this.virusCount < Settings.virusMinCount)
+            {
+                var pos = this.GetSafeSpawnPos(Settings.virusSize);
+                this.AddCell(new Virus(this, pos.x, pos.y));
+            }
             for (int i = 0, l = this.boostingCells.Count; i < l;)
             {
                 if (!this.BoostCell(this.boostingCells[i])) l--;
@@ -418,7 +437,15 @@ namespace Ogar_CSharp.worlds
                 if (bounce) cell.boost.dy = -cell.boost.dy;
             }
         }
-        //public void SplitVirus(v)
+        public void SplitVirus(Virus virus)
+        {
+            var newVirus = new Virus(this, virus.X, virus.Y);
+            newVirus.boost.dx = (float)Math.Sin(virus.splitAngle);
+            newVirus.boost.dy = (float)Math.Cos(virus.splitAngle);
+            newVirus.boost.d = Settings.virusSplitBoost;
+            this.AddCell(newVirus);
+            this.SetCellAsBoosting(newVirus);
+        }
         public void MovePlayerCell(PlayerCell cell)
         {
             var router = cell.owner.router;
@@ -537,13 +564,64 @@ namespace Ogar_CSharp.worlds
                 this.UpdateCell(cell);
             }
         }
-        public void PopPlayerCell(PlayerCell cell)
+        public List<float> DistributeCellMass(PlayerCell cell)
         {
-
-        }
-        public float[] DistributeCellMass(PlayerCell cell)
-        {
-            return null;
+            int i = 0;
+            var player = cell.owner;
+            int cellsLeft = Settings.playerMaxCells - player.ownedCells.Count;
+            if (cellsLeft <= 0) 
+                return new List<float>();
+            int splitMin = Settings.playerMinSplitSize;
+            splitMin = splitMin * splitMin / 100;
+            var cellMass = cell.Mass;
+            if (Settings.virusMonotonePops)
+            {
+                var amount = (int)Math.Min(Math.Floor(cellMass / splitMin), cellsLeft);
+                var perPiece = cellMass / (amount + 1);
+                i = 0;
+                var floats = new List<float>();
+                while (amount > i)
+                {
+                    i++;
+                    floats.Add(perPiece);
+                }
+                return floats;
+            }
+            if (cellMass / cellsLeft < splitMin)
+            {
+                int amount = 2;
+                float perPiece;
+                while ((perPiece = cellMass / (amount + 1)) >= splitMin && amount * 2 <= cellsLeft)
+                    amount *= 2;
+                i = 0;
+                var floats = new List<float>();
+                while (amount > i)
+                {
+                    i++;
+                    floats.Add(perPiece);
+                }
+                return floats;
+            }
+            List<float> splits = new List<float>();
+            float nextMass = cellMass / 2;
+            float massLeft = cellMass / 2;
+            while (cellsLeft > 0)
+            {
+                if (nextMass / cellsLeft < splitMin) break;
+                while (nextMass >= massLeft && cellsLeft > 1)
+                    nextMass /= 2;
+                splits.Add(nextMass);
+                massLeft -= nextMass;
+                cellsLeft--;
+            }
+            nextMass = massLeft / cellsLeft;
+            i = 0;
+            while (cellsLeft > i)
+            {
+                i++;
+                splits.Add(nextMass);
+            }
+            return splits;
         }
         public void CompileStatistics()
         {

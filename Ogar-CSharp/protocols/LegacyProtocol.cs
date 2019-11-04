@@ -144,7 +144,6 @@ namespace Ogar_CSharp.protocols
                             this.connection.minions[i].splitAttempts++;
                     else if (connection.splitAttempts != byte.MaxValue)
                         this.connection.splitAttempts++;
-                    Console.WriteLine("hI");
                     break;
                 case 18: this.connection.isPressingQ = true; break;
                 case 19: this.connection.isPressingQ = this.hasProcessedQ = false; break;

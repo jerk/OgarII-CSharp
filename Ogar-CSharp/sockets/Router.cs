@@ -48,7 +48,6 @@ namespace Ogar_CSharp.sockets
             Console.WriteLine("creating player");
             player = listener.handle.CreatePlayer(this);
             hasPlayer = true;
-            Console.WriteLine("is player null ? :" + (player == null));
         }
         public void DestroyPlayer()
         {

@@ -57,7 +57,7 @@ namespace Ogar_CSharp
         public bool virusPushing;
         public int virusSplitBoost = 780;
         public int virusPushBoost = 120;
-        public bool virusMontonePops;
+        public bool virusMonotonePops;
         public int ejectedSize = 38;
         public int ejectingLoss = 43;
         public float ejectDispersion = 0.3f;
@@ -76,7 +76,7 @@ namespace Ogar_CSharp
         public short MaxNameLength = 16;
         public bool playerAllowSkinInName = true;
         public int playerMinSize = 32;
-        public int playerSpawnSize = 32;
+        public int playerSpawnSize = 122;
         public int playerMaxSize = 1500;
         public int playerMinSplitSize = 60;
         public int playerMinEjectSize = 60;
