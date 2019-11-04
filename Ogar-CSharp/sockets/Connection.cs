@@ -32,7 +32,7 @@ namespace Ogar_CSharp.sockets
             connectionTime = DateTime.Now;
             lastActivityTime = DateTime.Now;
             lastChatTime = DateTime.Now;
-            webSocket.onClose = (x) => Close();
+            webSocket.onClose = (x) => OnSocketClose(x.Code, x.Reason);
             webSocket.onMessage = (x) => OnSocketMessage(x);
         }
 
@@ -51,6 +51,10 @@ namespace Ogar_CSharp.sockets
         public override void OnWorldSet()
         {
             protocol.OnNewWorldBounds(Player.world.border, true);
+        }
+        public override void OnWorldReset()
+        {
+            protocol.OnWorldReset();
         }
         public override void CreatePlayer()
         {
@@ -175,10 +179,6 @@ namespace Ogar_CSharp.sockets
                 protocol.OnSpectatePosition(player.viewArea);
             if (Handle.tick % 4 == 0)
                 Handle.gamemode.SendLeaderboard(this);
-            Console.WriteLine("add" + add.Count);
-            Console.WriteLine("upd" + upd.Count);
-            Console.WriteLine("eat" + eat.Count);
-            Console.WriteLine("del" + del.Count);
             protocol.OnVisibleCellUpdate(add, upd, eat, del);
         }
 

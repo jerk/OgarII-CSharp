@@ -66,12 +66,12 @@ namespace Ogar_CSharp
             a.y - a.h <= b.y + b.h &&
             a.y + a.h >= b.y - b.h;
         }
-        public static bool FunnyIntersects(Rect a, Rect b)
+        public static bool FullyIntersects(Rect a, Rect b)
         {
             return a.x - a.w >= b.x + b.w &&
-              a.x + a.w <= b.x - b.w &&
-              a.y - a.h >= b.y + b.h &&
-              a.y + a.h <= b.y - b.h;
+               a.x + a.w <= b.x - b.w &&
+               a.y - a.h >= b.y + b.h &&
+               a.y + a.h <= b.y - b.h;
         }
         public static (bool t, bool b, bool l, bool r) GetQuadFullIntersect(Rect a, Rect b) 
         {
@@ -80,7 +80,7 @@ namespace Ogar_CSharp
                 b: a.y - a.h > b.y && a.y + a.h > b.y,
                 l: a.x - a.w < b.x && a.x + a.w < b.x,
                 r: a.x - a.w > b.x && a.x + a.w > b.x
-            );
+                );
         }
         public static (bool t, bool b, bool l, bool r) GetQuadIntersect(Rect a, Rect b)
         {

@@ -13,7 +13,7 @@ namespace Ogar_CSharp.protocols
     public struct Legacy
     {
         public string mode;
-        public int update;
+        public float update;
         public int playersTotal;
         public int playersAlive;
         public int playersSpect;
@@ -131,8 +131,8 @@ namespace Ogar_CSharp.protocols
                             this.connection.mouseY = reader.ReadShort();
                             break;
                         case 21:
-                            this.connection.mouseX = ~~(long)reader.ReadDouble();
-                            this.connection.mouseY = ~~(long)(reader.ReadDouble());
+                            this.connection.mouseX = ~~(long)BitConverter.DoubleToInt64Bits(reader.ReadDouble());
+                            this.connection.mouseY = ~~(long)BitConverter.DoubleToInt64Bits(reader.ReadDouble());
                             break;
                         default: this.Fail(1003, "Unexpected message format");
                             return;
@@ -231,7 +231,6 @@ namespace Ogar_CSharp.protocols
             {
                 WriteCellData(writer, source, this.protocol.Value, item,
                     true, true, true, true, true, true);
-                Console.WriteLine("uhoh");
             }
             foreach (var item in upd)
             {
@@ -408,9 +407,9 @@ namespace Ogar_CSharp.protocols
         public static void WriteCellData6(Writer writer, Player source, uint protocol, Cell cell, bool includeType, bool includeSize,
             bool includePos, bool includeColor, bool includeName, bool includeSkin)
         {
-            writer.WriteUInt((ushort)cell.id);
-            writer.WriteUInt((ushort)cell.X);
-            writer.WriteUInt((ushort)cell.Y);
+            writer.WriteUInt((uint)cell.id);
+            writer.WriteInt((int)cell.X);
+            writer.WriteInt((int)cell.Y);
             writer.WriteUShort((ushort)cell.Size);
 
             byte flags = 0;

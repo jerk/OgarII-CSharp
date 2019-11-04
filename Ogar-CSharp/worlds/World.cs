@@ -19,7 +19,7 @@ namespace Ogar_CSharp.worlds
             public string name = "";
             public string gamemode = "";
             public long uptime;
-            public int loadTime;
+            public float loadTime;
         }
         public int id;
         public ServerHandle handle;
@@ -75,7 +75,7 @@ namespace Ogar_CSharp.worlds
                 if (cell.Type == 0)
                     continue;
                 finder.Insert(cell);
-                if (!Misc.FunnyIntersects(border, cell.range))
+                if (!Misc.FullyIntersects(border, cell.range))
                     RemoveCell(cell);
             }
         }
@@ -110,13 +110,13 @@ namespace Ogar_CSharp.worlds
             cell.range.y = cell.Y;
             cell.range.w = cell.Size;
             cell.range.h = cell.Size;
-            finder.Update(cell.item);
+            finder.Update(cell);
         }
         public void RemoveCell(Cell cell)
         {
             this.handle.gamemode.OnCellRemove(cell);
             cell.OnRemoved();
-            finder.Remove(cell.item);
+            finder.Remove(cell);
             cell.range = default;
             this.SetCellAsNotBoosting(cell);
             this.cells.Remove(cell);
@@ -148,17 +148,17 @@ namespace Ogar_CSharp.worlds
             player.router.OnWorldReset();
             Console.WriteLine($"player {player.id} has been removed from world {this.id}");
         }
-        public (int x, int y) GetRandomPos(int cellSize)
+        public (float x, float y) GetRandomPos(int cellSize)
         {
-            var random = new System.Random();
-            return ((int)(border.x - border.w + cellSize + random.NextDouble() * (2 * this.border.w - cellSize)),
-                (int)(border.y - border.h + cellSize + random.NextDouble() * (2 * border.h - cellSize)));
+            var random = new Random();
+            return ((float)(border.x - border.w + cellSize + random.NextDouble() * (2 * this.border.w - cellSize)),
+                (float)(border.y - border.h + cellSize + random.NextDouble() * (2 * border.h - cellSize)));
         }
         public bool IsSafeSpawnPos(Rect range)
         {
-            return !finder.ContainsAny(range, (item) => item.item.AvoidWhenSpawning);
+            return !finder.ContainsAny(range, (item) => ((Cell)item).AvoidWhenSpawning);
         }
-        public (int x, int y) GetSafeSpawnPos(int cellSize)
+        public (float x, float y) GetSafeSpawnPos(int cellSize)
         {
             var tries = this.Settings.worldSafeSpawnTries;
             while(--tries >= 0)
@@ -175,7 +175,7 @@ namespace Ogar_CSharp.worlds
             if(Settings.worldSafeSpawnFromEjectedChange > (float)random.NextDouble() && ejectedCells.Count > 0)
             {
                 var tries = Settings.worldSafeSpawnTries;
-                while(--tries >= 0)
+                while (--tries >= 0)
                 {
                     var cell = ejectedCells[~~(int)(random.NextDouble() * ejectedCells.Count)];
                     if (IsSafeSpawnPos(new Rect(cell.X, cell.Y, cellSize, cellSize)))
@@ -223,15 +223,16 @@ namespace Ogar_CSharp.worlds
             for (int i = 0; i < this.boostingCells.Count; i++)
             {
                 var cell = this.boostingCells[i];
-                if (cell.Type != 2 && cell.Type != 3) continue;
+                if (cell.Type != 2 && cell.Type != 3) 
+                    continue;
                 this.finder.Search(cell.range, (other) =>
                 {
-                    if (cell.id == other.item.id) return;
-                    switch (cell.GetEatResult(other.item))
+                    if (cell.id == ((Cell)other).id) return;
+                    switch (cell.GetEatResult(((Cell)other)))
                     {
-                       case CellEatResult.Rigid: rigid.AddRange(new Cell[2] { cell, other.item }); break;
-                        case CellEatResult.Eat: eat.AddRange(new Cell[2] { cell, other.item }); break;
-                        case CellEatResult.EatInvd: eat.AddRange(new Cell[2] { other.item, cell }); break;
+                       case CellEatResult.Rigid: rigid.AddRange(new Cell[2] { cell, ((Cell)other) }); break;
+                        case CellEatResult.Eat: eat.AddRange(new Cell[2] { cell, ((Cell)other) }); break;
+                        case CellEatResult.EatInvd: eat.AddRange(new Cell[2] { ((Cell)other), cell }); break;
                     }
                 });
             }
@@ -248,12 +249,15 @@ namespace Ogar_CSharp.worlds
             {
                 var cell = this.playerCells[i];
                 this.finder.Search(cell.range, (other) => {
-                    if (cell.id == other.item.id) return;
-                    switch (cell.GetEatResult(other.item))
+                    if (cell.id == ((Cell)other).id) return;
+                    switch (cell.GetEatResult(((Cell)other)))
                     {
-                        case CellEatResult.Rigid: rigid.AddRange(new Cell[2] { cell, other.item }); break;
-                        case CellEatResult.Eat: eat.AddRange(new Cell[2] { cell, other.item }); break;
-                        case CellEatResult.EatInvd: eat.AddRange(new Cell[2] { other.item, cell }); break;
+                        case CellEatResult.Rigid: 
+                            rigid.AddRange(new Cell[2] { cell, ((Cell)other) }); break;
+                        case CellEatResult.Eat: 
+                            eat.AddRange(new Cell[2] { cell, ((Cell)other) }); break;
+                        case CellEatResult.EatInvd: 
+                            eat.AddRange(new Cell[2] { ((Cell)other), cell }); break;
                     }
                 });
             }
@@ -393,29 +397,25 @@ namespace Ogar_CSharp.worlds
         {
             var r = cell.Size / 2;
             var b = border;
-            if(cell.X <= b.x - b.w + r)
+            if (cell.X <= b.x - b.w + r)
             {
                 cell.X = b.x - b.w + r;
-                if (bounce)
-                    cell.boost.dx = -cell.boost.dx;
+                if (bounce) cell.boost.dx = -cell.boost.dx;
             }
             if (cell.X >= b.x + b.w - r)
             {
                 cell.X = b.x + b.w - r;
-                if (bounce)
-                    cell.boost.dx = -cell.boost.dx;
+                if (bounce) cell.boost.dx = -cell.boost.dx;
             }
-            if (cell.Y <= b.y - b.w + r)
+            if (cell.Y <= b.y - b.h + r)
             {
-                cell.Y = b.y - b.w + r;
-                if (bounce)
-                    cell.boost.dy = -cell.boost.dy;
+                cell.Y = b.y - b.h + r;
+                if (bounce) cell.boost.dy = -cell.boost.dy;
             }
-            if (cell.Y >= b.y + b.w - r)
+            if (cell.Y >= b.y + b.h - r)
             {
-                cell.Y = b.y + b.w - r;
-                if (bounce)
-                    cell.boost.dy = -cell.boost.dy;
+                cell.Y = b.y + b.h - r;
+                if (bounce) cell.boost.dy = -cell.boost.dy;
             }
         }
         //public void SplitVirus(v)

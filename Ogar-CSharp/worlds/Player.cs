@@ -49,17 +49,17 @@ namespace Ogar_CSharp.worlds
                 world.RemovePlayer(this);
             exists = false;
         }
-        public void UpdateState(PlayerState state)
+        public void UpdateState(PlayerState targetState)
         {
             if (world == null)
                 this.state = PlayerState.Idle;
             else if (ownedCells.Count > 0)
                 this.state = PlayerState.Alive;
-            else if (state == PlayerState.Idle)
+            else if (targetState == PlayerState.Idle)
                 this.state = PlayerState.Idle;
             else if (this.world.largestPlayer == null)
                 this.state = PlayerState.Roaming;
-            else if (this.state == PlayerState.Spectating && state == PlayerState.Roaming)
+            else if (this.state == PlayerState.Spectating && targetState == PlayerState.Roaming)
                 this.state = PlayerState.Roaming;
             else
                 this.state = PlayerState.Spectating;
@@ -68,7 +68,7 @@ namespace Ogar_CSharp.worlds
         {
             if (world == null)
                 return;
-            float s = 0;
+            float s;
             switch (state)
             {
                 case PlayerState.Idle:
@@ -87,14 +87,14 @@ namespace Ogar_CSharp.worlds
                         score += cell.Mass;
                     }
                     viewArea.x = x / l;
-                    viewArea.y = y / 2;
+                    viewArea.y = y / l;
                     this.score = score;
                     s = viewArea.s = (float)Math.Pow(Math.Min(64 / s, 1), 0.4);
                     viewArea.w = 1920 / s / 2 * Settings.playerViewScaleMult;
                     viewArea.h = 1080 / s / 2 * Settings.playerViewScaleMult;
                     break;
                 case PlayerState.Spectating:
-                    score = float.NaN;
+                    this.score = float.NaN;
                     var spectating = world.largestPlayer;
                     viewArea.x = spectating.viewArea.x;
                     viewArea.y = spectating.viewArea.y;
@@ -109,7 +109,6 @@ namespace Ogar_CSharp.worlds
                     float d = (float)Math.Sqrt(dx * dx + dy * dy);
                     float D = (float)Math.Min(d, Settings.playerRoamSpeed);
                     if (D < 1) break; 
-                    if (D < 1) break; 
                     dx /= d; 
                     dy /= d;
                     var border = this.world.border;
@@ -123,6 +122,7 @@ namespace Ogar_CSharp.worlds
         }
         public void UpdateCell(Cell cell, bool isVisible)
         {
+            Console.WriteLine(cell.id);
             if (isVisible)
             {
                 if (!visibleCells.ContainsKey(cell.id))
@@ -143,15 +143,14 @@ namespace Ogar_CSharp.worlds
             if (world == null)
                 return;
             lastVisibleCells = visibleCells;
-            this.visibleCells = new Dictionary<int, Cell>();
-            for (int i = 0, l = this.ownedCells.Count; i < l; i++)
+            visibleCells = new Dictionary<int, Cell>();
+            foreach(var cell in ownedCells)
             {
-                var cell = this.ownedCells[i];
                 UpdateCell(cell, true);
             }
             this.world.finder.Search(new Rect(viewArea.x, viewArea.y, viewArea.w, viewArea.h), (cell) =>
             {
-                UpdateCell(cell.item, true);
+                UpdateCell((Cell)cell, true);
             });
         }
         public void CheckExistence()

@@ -43,10 +43,13 @@ namespace Ogar_CSharp.sockets
             }
             public void Disconnect()
             {
-                this.Sessions.CloseSession(this.ID);
+                Sessions.CloseSession(this.ID);
             }
             public new void Send(byte[] data)
-                => base.Send(data);
+            {
+                if (this.ConnectionState == WebSocketState.Open)
+                    base.Send(data);
+            }
             public void CloseSocket(ushort code, string reason)
             {
                 Console.WriteLine($"closing socket, code : {code}, reason {reason}");
@@ -136,6 +139,7 @@ namespace Ogar_CSharp.sockets
         public void OnDisconnection(Connection client, ushort code, string reason)
         {
             Console.WriteLine($"DISCONNECTION FROM {client.remoteAddress} ({code} '{reason}'");
+            connections.Remove(client);
         }
         public void Update()
         {

@@ -12,7 +12,7 @@ namespace Ogar_CSharp
             New
         }
         public int listeningPort = 444;
-        public int listenerMaxConnections;
+        public int listenerMaxConnections = 100;
         public int listenerMaxClientDormancy = 1000 * 60;
         public List<string> listenerAcceptedOrigins = new List<string>();
         public List<string> listenerForbiddenIPs = new List<string>();
@@ -24,10 +24,10 @@ namespace Ogar_CSharp
         public bool chatEnabled = true;
         public List<string> chatFilteredPhrases = new List<string>();
         public int chatCoolDown = 1000;
-        public int worldMapX;
-        public int worldMapY;
-        public int worldMapW = 7071;
-        public int worldMapH = 7071;
+        public float worldMapX;
+        public float worldMapY;
+        public float worldMapW = 7071;
+        public float worldMapH = 7071;
         public short worldFinderMaxLevel = 16;
         public short worldFinderMaxItems = 16;
         public short worldSafeSpawnTries = 16;

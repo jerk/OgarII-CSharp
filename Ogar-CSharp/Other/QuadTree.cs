@@ -6,8 +6,7 @@ namespace Ogar_CSharp
 {
     public abstract class QuadItem<T> 
     {
-        public T item;
-        protected void SetItem(T cItem) => item = cItem;
+        public T Item { get; protected set; }
         public QuadTree<T> __root;
         public Rect range;
     }
@@ -19,7 +18,7 @@ namespace Ogar_CSharp
         public int maxItems;
         public Rect range;
         public List<QuadItem<T>> items = new List<QuadItem<T>>();
-        public List<QuadTree<T>> branches = new List<QuadTree<T>>();
+        public QuadTree<T>[] branches = new QuadTree<T>[4];
         public bool hasSplit = false;
         public QuadTree(Rect range, int maxLevel, int maxItems, QuadTree<T> root)
         {
@@ -63,7 +62,7 @@ namespace Ogar_CSharp
                 if (newQuad.root == null)
                     break;
                 newQuad = newQuad.root;
-                if (Misc.FunnyIntersects(newQuad.range, item.range))
+                if (Misc.FullyIntersects(newQuad.range, item.range))
                     break;
 
             }
@@ -100,7 +99,7 @@ namespace Ogar_CSharp
                     quad = quad.root;
                     continue;
                 }
-                QuadTree<T> branch = null;
+                QuadTree<T> branch;
                 for (int i = 0; i < 4; i++)
                     if ((branch = quad.branches[i]).hasSplit || branch.items.Count > 0)
                         return;
@@ -110,28 +109,25 @@ namespace Ogar_CSharp
         }
         public void Split()
         {
-            if (hasSplit || level > maxItems || items.Count < maxItems)
+            if (hasSplit || level > maxLevel || items.Count < maxItems)
                 return;
             hasSplit = true;
             var x = range.x;
             var y = range.y;
             var hw = range.w / 2;
             var hh = range.h / 2;
-            branches = new List<QuadTree<T>>()
-            {
-                new QuadTree<T>(new Rect(x - hw, y - hh, hw ,hh), maxLevel, maxItems, this),
-                new QuadTree<T>(new Rect(x + hw, y - hh, hw ,hh), maxLevel, maxItems, this),
-                new QuadTree<T>(new Rect(x - hw, y + hh, hw ,hh), maxLevel, maxItems, this),
-                new QuadTree<T>(new Rect(x + hw, y + hh, hw ,hh), maxLevel, maxItems, this)
-            };
+            branches[0] = new QuadTree<T>(new Rect(x - hw, y - hh, hw, hh), maxLevel, maxItems, this);
+            branches[1] = new QuadTree<T>(new Rect(x + hw, y - hh, hw, hh), maxLevel, maxItems, this);
+            branches[2] = new QuadTree<T>(new Rect(x - hw, y + hh, hw, hh), maxLevel, maxItems, this);
+            branches[3] = new QuadTree<T>(new Rect(x + hw, y + hh, hw, hh), maxLevel, maxItems, this);
             for (int i = 0, l = this.items.Count, quadrant; i < l; i++)
             {
                 quadrant = this.GetQuadrant(this.items[i].range);
                 if (quadrant == -1) continue;
                 this.items[i].__root = null;
                 this.branches[quadrant].Insert(this.items[i]);
-                this.items.RemoveAt(i); 
-                i--; 
+                this.items.RemoveAt(i);
+                i--;
                 l--;
             }
         }
@@ -184,19 +180,20 @@ namespace Ogar_CSharp
             for (int i = 0, l = this.items.Count; i < l; i++)
                 if (Misc.Intersects(range, (item = this.items[i]).range) && (selector == null || selector(item)))
                     return true;
+            if (!this.hasSplit) return false;
             var quad = Misc.GetQuadIntersect(range, this.range);
             if (quad.t)
             {
-                if (quad.l && branches.Count >= 1 && this.branches[0].ContainsAny(range, selector)) 
+                if (quad.l && branches[0] != null && this.branches[0].ContainsAny(range, selector))
                     return true;
-                if (quad.r && branches.Count >= 2 && this.branches[1].ContainsAny(range, selector)) 
+                if (quad.r && branches[1] != null && this.branches[1].ContainsAny(range, selector))
                     return true;
             }
             if (quad.b)
             {
-                if (quad.l && branches.Count >= 3 && this.branches[2].ContainsAny(range, selector)) 
+                if (quad.l && branches[2] != null && this.branches[2].ContainsAny(range, selector))
                     return true;
-                if (quad.r && branches.Count == 4 && this.branches[3].ContainsAny(range, selector)) 
+                if (quad.r && branches[3] != null && this.branches[3].ContainsAny(range, selector))
                     return true;
             }
             return false;

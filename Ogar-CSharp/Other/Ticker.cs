@@ -9,7 +9,7 @@ namespace Ogar_CSharp
     {
         public HashSet<Action> callbacks = new HashSet<Action>();
         public bool running;
-        public int step;
+        public float step;
         public Thread tickingThread;
         public long virtualTime;
         public Ticker(int step) =>
@@ -39,11 +39,11 @@ namespace Ogar_CSharp
                 {
                     callback();
                 }
-                virtualTime += step;
-                long delta = ((virtualTime + step) - DateTime.Now.Ticks);
+                virtualTime += (int)step;
+                long delta = ((virtualTime + (int)step) - DateTime.Now.Ticks);
                 if (delta < 0)
                     virtualTime -= delta;
-                Thread.Sleep((int)100);
+                Thread.Sleep((int)10);
             }
         }
         public void Stop()

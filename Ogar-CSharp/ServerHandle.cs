@@ -23,10 +23,10 @@ namespace Ogar_CSharp
         //chatcommnds = new commandlist(this);
         public bool running = false;
         public DateTime? startTime = default;
-        public int avargateTickTime;
+        public float avargateTickTime;
         public int tick;
-        public short tickDelay;
-        public short stepMult;
+        public float tickDelay;
+        public float stepMult;
         //stepMult = NaN;
         Ticker ticker = new Ticker(40);
         Stopwatch stopWatch = new Stopwatch();
@@ -52,7 +52,7 @@ namespace Ogar_CSharp
             this.Settings = settings;
             tickDelay = (short)(1000 / settings.serverFrequency);
             ticker.step = tickDelay;
-            stepMult = (short)(tickDelay / 40);
+            stepMult = (float)(tickDelay / 40);
         }
         public bool Start()
         {
@@ -113,7 +113,7 @@ namespace Ogar_CSharp
         }
         public Player CreatePlayer(Router router)
         {
-            int id = 0;
+            int id = 1;
             while (players.Any(x => x.id == ++id)) ;
             var newPlayer = new Player(this, id, router);
             players.Add(newPlayer);
