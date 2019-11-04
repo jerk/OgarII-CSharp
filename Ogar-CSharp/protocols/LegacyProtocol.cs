@@ -220,9 +220,7 @@ namespace Ogar_CSharp.protocols
             var source = this.connection.Player;
             var writer = new Writer();
             writer.WriteByte(16);
-            int i, l;
-            l = eat.Count();
-            writer.WriteUShort((ushort)l);
+            writer.WriteUShort((ushort)eat.Count());
             foreach(var item in eat)
             {
                 writer.WriteUInt((uint)item.eatenBy.id);
@@ -240,10 +238,10 @@ namespace Ogar_CSharp.protocols
             }
             writer.WriteUInt(0);
             if (protocol.Value < 6)
-                writer.WriteUInt((uint)l);
+                writer.WriteUInt((uint)del.Count());
             else
-                writer.WriteUShort((ushort)l);
-           foreach(var item in del) 
+                writer.WriteUShort((ushort)del.Count());
+           foreach (var item in del) 
                 writer.WriteUInt((uint)item.id);
             this.Send(writer.RawBuffer);
         }

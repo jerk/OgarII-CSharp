@@ -173,6 +173,7 @@ namespace Ogar_CSharp.sockets
                     continue;
                 if (item1.Value.eatenBy != null)
                     eat.Add(item1.Value);
+                Console.WriteLine("yeah");
                 del.Add(item1.Value);
             }
             if (player.state == worlds.PlayerState.Spectating || player.state == worlds.PlayerState.Roaming)

@@ -141,6 +141,7 @@ namespace Ogar_CSharp.worlds
         {
             if (world == null)
                 return;
+            lastVisibleCells.Clear();
             lastVisibleCells = visibleCells;
             visibleCells = new Dictionary<int, Cell>();
             foreach(var cell in ownedCells)
@@ -149,7 +150,7 @@ namespace Ogar_CSharp.worlds
             }
             this.world.finder.Search(new Rect(viewArea.x, viewArea.y, viewArea.w, viewArea.h), (cell) =>
             {
-                UpdateCell((Cell)cell, true);
+                UpdateCell(cell, true);
             });
         }
         public void CheckExistence()
