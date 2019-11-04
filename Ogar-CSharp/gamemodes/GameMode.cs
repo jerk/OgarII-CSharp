@@ -26,9 +26,24 @@ namespace Ogar_CSharp.gamemodes
         public abstract void SendLeaderboard(Connection connection);
         public virtual void OnWorldDestroy(World world) { }
         public virtual void OnNewPlayer(Player player) { }
-        public virtual void WhenPlayerPressQ(Player player) { }
-        public virtual void WhenPlayerEject(Player player) { }
-        public virtual void WhenPlayerSlit(Player player) { }
+        public virtual void WhenPlayerPressQ(Player player) 
+        {
+            if (!player.hasWorld)
+                return;
+            player.UpdateState(PlayerState.Roaming);
+        }
+        public virtual void WhenPlayerEject(Player player) 
+        {
+            if (!player.hasWorld)
+                return;
+            player.world.EjectFromPlayer(player);
+        }
+        public virtual void WhenPlayerSplit(Player player) 
+        {
+            if (!player.hasWorld)
+                return;
+            player.world.SplitPlayer(player);
+        }
         public abstract void OnPlayerSpawnRequest(Player player, string name, string skin);
         public virtual void OnPlayerDestroy(Player player) { }
         public virtual void OnNewCell(Cell cell) { }

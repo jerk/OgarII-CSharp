@@ -38,8 +38,8 @@ namespace Ogar_CSharp.cells
         public float X { get => x; set { x = value; posChanged = true; } }
         public float Y { get => y; set { y = value; posChanged = true; } }
         public float Size { get => size; set { Misc.ThrowIfBadOrNegativeNumber(value); size = value; sizeChanged = true; } }
-        public float SquareSize { get => size * size; set => Size = (short)Math.Sqrt(100 * value); }
-        public float Mass { get => size * size / 100; set => Size = (short)Math.Sqrt(100 * value); }
+        public float SquareSize { get => Size * Size; set => Size = (float)Math.Sqrt(value); }
+        public float Mass { get => Size * Size / 100; set => Size = (float)Math.Sqrt(100 * value); }
         public int Color { get => color; set { color = value; colorChanged = true; } }
         public string Name { get => name; set { name = value; nameChanged = true; } }
         public string Skin { get => skin; set { skin = value; skinChanged = true; } }

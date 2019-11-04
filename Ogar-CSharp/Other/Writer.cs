@@ -41,7 +41,7 @@ namespace Ogar_CSharp
             => buf.AddRange(BitConverter.GetBytes(a));
         public void WriteUTF8String(string a)
         {
-            var tbuf = Encoding.UTF8.GetBytes(a);
+            var tbuf = Encoding.UTF8.GetBytes(a ?? "");
             buf.AddRange(tbuf);
             offset += tbuf.Length + 1;
             buf.Add(0);

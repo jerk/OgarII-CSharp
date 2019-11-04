@@ -27,9 +27,13 @@ namespace Ogar_CSharp.bots
                 var names = listener.Settings.worldPlayerBotNames;
                 var skins = listener.Settings.worldPlayerBotSkins;
                 var random = new Random();
-                spawningName = names[~~(int)Math.Round(random.NextDouble() * names.Count)] ?? "Player bot";
+                if (names.Count > 0)
+                    spawningName = names[new Random().Next(0, names.Count - 1)] ?? "Player bot";
+                spawningName = "Player bot";
                 if (spawningName.Contains("<*>"))
+                {
                     spawningName = spawningName.Replace("<*>", $"<{skins[~~(int)Math.Round(random.NextDouble() * skins.Count)]}>");
+                }
                 OnSpawnRequest();
                 spawningName = null;
             }

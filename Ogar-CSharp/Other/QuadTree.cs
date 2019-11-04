@@ -18,7 +18,7 @@ namespace Ogar_CSharp
         public int maxItems;
         public Rect range;
         public List<QuadItem<T>> items = new List<QuadItem<T>>();
-        public QuadTree<T>[] branches = new QuadTree<T>[4];
+        public readonly QuadTree<T>[] branches = new QuadTree<T>[4];
         public bool hasSplit = false;
         public QuadTree(Rect range, int maxLevel, int maxItems, QuadTree<T> root)
         {
@@ -104,7 +104,10 @@ namespace Ogar_CSharp
                     if ((branch = quad.branches[i]).hasSplit || branch.items.Count > 0)
                         return;
                 quad.hasSplit = false;
-                quad.branches = null;
+                quad.branches[0] = null;
+                quad.branches[1] = null;
+                quad.branches[2] = null;
+                quad.branches[3] = null;
             }
         }
         public void Split()
@@ -150,12 +153,12 @@ namespace Ogar_CSharp
             }
             return -1;
         }
-        public void Search(Rect range, Action<QuadItem<T>> callback)
+        public void Search(Rect range, Action<T> callback)
         {
             QuadItem<T> item;
             for (int i = 0, l = this.items.Count; i < l; i++)
                 if (Misc.Intersects(range, (item = this.items[i]).range)) 
-                    callback(item);
+                    callback(item.Item);
             if (!hasSplit)
                 return;
             var quad = Misc.GetQuadIntersect(range, this.range);
@@ -174,11 +177,11 @@ namespace Ogar_CSharp
                     this.branches[3].Search(range, callback);
             }
         }
-        public bool ContainsAny(Rect range, Func<QuadItem<T>, bool> selector)
+        public bool ContainsAny(Rect range, Func<T, bool> selector)
         {
             QuadItem<T> item;
             for (int i = 0, l = this.items.Count; i < l; i++)
-                if (Misc.Intersects(range, (item = this.items[i]).range) && (selector == null || selector(item)))
+                if (Misc.Intersects(range, (item = this.items[i]).range) && (selector == null || selector(item.Item)))
                     return true;
             if (!this.hasSplit) return false;
             var quad = Misc.GetQuadIntersect(range, this.range);

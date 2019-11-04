@@ -7,11 +7,10 @@ namespace Ogar_CSharp
 {
     public class Ticker
     {
-        public HashSet<Action> callbacks = new HashSet<Action>();
+        private HashSet<Action> callbacks = new HashSet<Action>();
         public bool running;
-        public float step;
+        public int step;
         public Thread tickingThread;
-        public long virtualTime;
         public Ticker(int step) =>
             this.step = step;
         public void Add(Action callback)
@@ -27,7 +26,6 @@ namespace Ogar_CSharp
             if (running)
                 throw new Exception("The ticker has already been started");
             running = true;
-            virtualTime = DateTime.Now.Ticks;
             tickingThread = new Thread(TickThread) { IsBackground = true };
             tickingThread.Start();
         }
@@ -39,11 +37,7 @@ namespace Ogar_CSharp
                 {
                     callback();
                 }
-                virtualTime += (int)step;
-                long delta = ((virtualTime + (int)step) - DateTime.Now.Ticks);
-                if (delta < 0)
-                    virtualTime -= delta;
-                Thread.Sleep((int)10);
+                Thread.Sleep(1);
             }
         }
         public void Stop()

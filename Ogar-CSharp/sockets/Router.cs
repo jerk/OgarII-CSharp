@@ -17,8 +17,8 @@ namespace Ogar_CSharp.sockets
         public bool requestingSpectate;
         public bool isPressingQ;
         public bool hasProcessedQ;
-        public long splitAttempts;
-        public long ejectAttempts;
+        public int splitAttempts;
+        public byte ejectAttempts;
         public float ejectTick;
         public bool hasPlayer = false;
         private Player player;
@@ -78,19 +78,19 @@ namespace Ogar_CSharp.sockets
         {
             if (!hasPlayer)
                 return;
-            //doStuff
+            listener.handle.gamemode.WhenPlayerPressQ(player);
         }
         public virtual void AttemptSplit()
         {
             if (!hasPlayer)
                 return;
-            //dostuff
+            listener.handle.gamemode.WhenPlayerSplit(player);
         }
         public virtual void AttemptEject()
         {
             if (!hasPlayer)
                 return;
-            //doStuff
+            listener.handle.gamemode.WhenPlayerEject(player);
         }
         public virtual void Close() => listener.RemoveRouter(this);
         public abstract bool ShouldClose { get; }

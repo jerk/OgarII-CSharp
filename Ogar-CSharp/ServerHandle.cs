@@ -25,7 +25,7 @@ namespace Ogar_CSharp
         public DateTime? startTime = default;
         public float avargateTickTime;
         public int tick;
-        public float tickDelay;
+        public int tickDelay;
         public float stepMult;
         //stepMult = NaN;
         Ticker ticker = new Ticker(40);
@@ -50,9 +50,9 @@ namespace Ogar_CSharp
         public void SetSettings(Settings settings)
         {
             this.Settings = settings;
-            tickDelay = (short)(1000 / settings.serverFrequency);
+            tickDelay = (1000 / settings.serverFrequency);
             ticker.step = tickDelay;
-            stepMult = (float)(tickDelay / 40);
+            stepMult = tickDelay / 40;
         }
         public bool Start()
         {

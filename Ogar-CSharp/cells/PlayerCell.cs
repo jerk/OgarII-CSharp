@@ -42,21 +42,21 @@ namespace Ogar_CSharp.cells
                 if(otherPlayer.owner.id == owner.id)
                 {
                     if (otherPlayer.Age < delay || Age < delay)
-                        return (CellEatResult)0;
+                        return CellEatResult.None;
                     if (CanMerge && otherPlayer.CanMerge)
-                        return (CellEatResult)2;
-                    return (CellEatResult)1;
+                        return CellEatResult.Eat;
+                    return CellEatResult.Rigid;
                 }
                 if (other.owner.team == owner.team && owner.team != null)
-                    return (CellEatResult)((other.Age < delay || Age < delay) ? 0 : 1);
+                    return ((other.Age < delay || Age < delay) ? CellEatResult.None : CellEatResult.Rigid);
             }
             if (other.Type == 4 && other.Size > Size * Misc.SQRT_1_3)
-                return (CellEatResult)3;
+                return CellEatResult.EatInvd;
             if (other.Type == 1)
-                return (CellEatResult)2;
+                return CellEatResult.Eat;
             return GetDefaultEatResult(other);
         }
-        public CellEatResult GetDefaultEatResult(Cell other) => (CellEatResult)(other.Size * Misc.SQRT_1_3 > Size ? 0 : 2);
+        public CellEatResult GetDefaultEatResult(Cell other) => (other.Size * Misc.SQRT_1_3 > Size ? CellEatResult.None : CellEatResult.Eat);
         public override void OnTick()
         {
             base.OnTick();

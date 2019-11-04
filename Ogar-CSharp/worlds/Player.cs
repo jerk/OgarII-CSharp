@@ -122,7 +122,6 @@ namespace Ogar_CSharp.worlds
         }
         public void UpdateCell(Cell cell, bool isVisible)
         {
-            Console.WriteLine(cell.id);
             if (isVisible)
             {
                 if (!visibleCells.ContainsKey(cell.id))

@@ -61,7 +61,7 @@ namespace Ogar_CSharp.sockets
             base.CreatePlayer();
             //if(Settings.chatEnabled) chat stuff
             //else
-                Handle.worlds[0].AddPlayer(Player);
+            Handle.worlds[0].AddPlayer(Player);
         }
         public override void Close()
         {

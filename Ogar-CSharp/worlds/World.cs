@@ -29,7 +29,7 @@ namespace Ogar_CSharp.worlds
         public List<Cell> boostingCells = new List<Cell>();
         public int motherCellCount;
         public int virusCount;
-        public List<Cell> ejectedCells = new List<cells.Cell>();
+        public List<EjectedCell> ejectedCells = new List<EjectedCell>();
         public List<PlayerCell> playerCells = new List<cells.PlayerCell>();
         public List<Player> players = new List<Player>();
         public Player largestPlayer;
@@ -208,13 +208,12 @@ namespace Ogar_CSharp.worlds
             List<Cell> eat = new List<Cell>(), rigid = new List<Cell>();
             foreach (var _cell in cells)
                 _cell.OnTick();
-            /*while(PelletCount < Settings.pelletCount)
+            while (PelletCount < Settings.pelletCount)
             {
-                var post = GetSafeSpawnPos(Settings.pelletMinSize);
-                //AddCell(new p)
-            }*/
-            //viruses
-            //mothercells
+                var pos = GetSafeSpawnPos(Settings.pelletMinSize);
+                AddCell(new Pellet(this, this, pos.x, pos.y));
+             }
+
             for (int i = 0, l = this.boostingCells.Count; i < l;)
             {
                 if (!this.BoostCell(this.boostingCells[i])) l--;
@@ -227,7 +226,8 @@ namespace Ogar_CSharp.worlds
                     continue;
                 this.finder.Search(cell.range, (other) =>
                 {
-                    if (cell.id == ((Cell)other).id) return;
+                    if (cell.id == ((Cell)other).id) 
+                        return;
                     switch (cell.GetEatResult(((Cell)other)))
                     {
                        case CellEatResult.Rigid: rigid.AddRange(new Cell[2] { cell, ((Cell)other) }); break;
@@ -337,12 +337,12 @@ namespace Ogar_CSharp.worlds
         public void ResolveRigidCheck(Cell a, Cell b)
         {
             float dx = b.X - a.X;
-            float dy = b.X - a.Y;
+            float dy = b.Y - a.Y;
             int d = (int)Math.Sqrt(dx * dx + dy * dy);
             var m = a.Size + b.Size - d;
             if (m <= 0)
                 return;
-            if(d == 0)
+            if (d == 0)
             {
                 d = 1;
                 dx = 1;
@@ -476,7 +476,8 @@ namespace Ogar_CSharp.worlds
         }
         public void SplitPlayer(Player player)
         {
-            var router = player.router; var l = player.ownedCells.Count;
+            var router = player.router; 
+            var l = player.ownedCells.Count;
             for (int i = 0; i < l; i++)
             {
                 if (player.ownedCells.Count >= Settings.playerMaxCells)
@@ -495,7 +496,8 @@ namespace Ogar_CSharp.worlds
                 }
                 else
                 {
-                    dx /= d; dy /= d;
+                    dx /= d; 
+                    dy /= d;
                 }
                 this.LaunchPlayerCell(cell, cell.Size / Misc.SQRT_2, new Boost
                 {
@@ -507,7 +509,33 @@ namespace Ogar_CSharp.worlds
         }
         public void EjectFromPlayer(Player player)
         {
-
+            var dispersion = Settings.ejectDispersion;
+            var loss = Settings.ejectingLoss * Settings.ejectingLoss;
+            var router = player.router;
+            var l = player.ownedCells.Count;
+            for (int i = 0; i < l; i++)
+            {
+                var cell = player.ownedCells[i];
+                if (cell.Size < Settings.playerMinEjectSize)
+                    continue;
+                var dx = router.mouseX - cell.X;
+                var dy = router.mouseY - cell.Y;
+                var d = (float)Math.Sqrt(dx * dx + dy * dy);
+                if (d < 1) { dx = 1; dy = 0; d = 1; }
+                else { dx /= d; dy /= d; }
+                var sx = cell.X + dx * cell.Size;
+                var sy = cell.Y + dy * cell.Size;
+                var random = new Random();
+                var newCell = new EjectedCell(this, player, sx, sy, cell.Color);
+                var a = (float)Math.Atan2(dx, dy) - dispersion + random.NextDouble() * 2 * dispersion;
+                newCell.boost.dx = (float)Math.Sin(a);
+                newCell.boost.dy = (float)Math.Cos(a);
+                newCell.boost.d = Settings.ejectedCellBoost;
+                this.AddCell(newCell);
+                this.SetCellAsBoosting(newCell);
+                cell.SquareSize -= loss;
+                this.UpdateCell(cell);
+            }
         }
         public void PopPlayerCell(PlayerCell cell)
         {

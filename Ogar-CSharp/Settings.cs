@@ -17,7 +17,7 @@ namespace Ogar_CSharp
         public List<string> listenerAcceptedOrigins = new List<string>();
         public List<string> listenerForbiddenIPs = new List<string>();
         public short listenerMaxConnectionsPerIP = -1;
-        public short serverFrequency = 25;
+        public int serverFrequency = 25;
         public byte playerMaxNameLength;
         public string serverName = "An unnamed server";
         public string serverGamemode = "FFA";
@@ -49,7 +49,7 @@ namespace Ogar_CSharp
         public int pelletMinSize = 10;
         public int pelletMaxSize = 20;
         public int pelletGrowTicks = 25 * 60;
-        public int pelletCount;
+        public int pelletCount = 10000;
         public int virusMinCount = 30;
         public int virusMaxCount = 90;
         public int virusSize = 100;
@@ -61,7 +61,7 @@ namespace Ogar_CSharp
         public int ejectedSize = 38;
         public int ejectingLoss = 43;
         public float ejectDispersion = 0.3f;
-        public int ejectedCellBost = 780;
+        public int ejectedCellBoost = 780;
         public int motherCellSize = 149;
         public int motherCellCount;
         public float motherCellPassiveSpawnChance = 0.05f;
