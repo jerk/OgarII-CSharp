@@ -43,7 +43,7 @@ namespace Ogar_CSharp
                 long delta = ((virtualTime + step) - DateTime.Now.Ticks);
                 if (delta < 0)
                     virtualTime -= delta;
-                Thread.Sleep((int)10);
+                Thread.Sleep((int)100);
             }
         }
         public void Stop()

@@ -39,10 +39,18 @@ namespace Ogar_CSharp.sockets
         public override bool ShouldClose => socketDisconnected;
         public override bool IsExternal => true;
         public override bool SeparateInTeams => true;
-        public override string Type => "connectin";
+        public override string Type => "connection";
         public void CloseSocket(ushort errorCode, string reason)
         {
             webSocket.CloseSocket(errorCode, reason);
+        }
+        public override void OnNewOwnedCell(PlayerCell cell)
+        {
+            protocol.OnNewOwnedCell(cell);
+        }
+        public override void OnWorldSet()
+        {
+            protocol.OnNewWorldBounds(Player.world.border, true);
         }
         public override void CreatePlayer()
         {
@@ -167,6 +175,10 @@ namespace Ogar_CSharp.sockets
                 protocol.OnSpectatePosition(player.viewArea);
             if (Handle.tick % 4 == 0)
                 Handle.gamemode.SendLeaderboard(this);
+            Console.WriteLine("add" + add.Count);
+            Console.WriteLine("upd" + upd.Count);
+            Console.WriteLine("eat" + eat.Count);
+            Console.WriteLine("del" + del.Count);
             protocol.OnVisibleCellUpdate(add, upd, eat, del);
         }
 

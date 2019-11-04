@@ -49,14 +49,11 @@ namespace Ogar_CSharp.protocols
         }
         public override bool Distinguishes(Reader reader)
         {
-            Console.WriteLine($"length : " + reader.length);
             if (reader.length < 5) return false;
             var byt = reader.ReadByte();
-            Console.WriteLine($"size : " + byt);
             if (byt != 254) return false;
             this.gotProtocol = true;
             this.protocol = reader.ReadUInt();
-            Console.WriteLine("protocl : " + protocol);
             if (this.protocol < 4)
             {
                 this.protocol = 4;
@@ -210,7 +207,6 @@ namespace Ogar_CSharp.protocols
         public static void WriteCellData(Writer writer, Player source, uint protocol, Cell cell, bool includeType, bool includeSize,
             bool includePos, bool includeColor, bool includeName, bool includeSkin)
         {
-            Console.WriteLine(protocol);
             if (protocol == 4 || protocol == 5)
                 WriteCellData4(writer, source, protocol, cell, includeType, includeSize, includePos, includeColor, includeName, includeSkin);
             else if(protocol <= 10)
@@ -235,6 +231,7 @@ namespace Ogar_CSharp.protocols
             {
                 WriteCellData(writer, source, this.protocol.Value, item,
                     true, true, true, true, true, true);
+                Console.WriteLine("uhoh");
             }
             foreach (var item in upd)
             {
@@ -424,7 +421,6 @@ namespace Ogar_CSharp.protocols
             if (cell.IsAgitated) flags |= 0x10;
             if (cell.Type == 3) flags |= 0x20;
             writer.WriteByte(flags);
-            Console.WriteLine(includeColor);
             if (includeColor) writer.WriteColor((uint)cell.Color);
             if (includeSkin) writer.WriteUTF8String(cell.Skin);
             if (includeName) writer.WriteUTF8String(cell.Name);

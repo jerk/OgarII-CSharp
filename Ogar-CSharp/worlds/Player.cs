@@ -143,7 +143,7 @@ namespace Ogar_CSharp.worlds
             if (world == null)
                 return;
             lastVisibleCells = visibleCells;
-            this.visibleCells.Clear();
+            this.visibleCells = new Dictionary<int, Cell>();
             for (int i = 0, l = this.ownedCells.Count; i < l; i++)
             {
                 var cell = this.ownedCells[i];
