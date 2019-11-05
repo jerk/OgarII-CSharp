@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using UltimateQuadTree;
 namespace Ogar_CSharp.cells
 {
     public enum CellEatResult

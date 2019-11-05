@@ -30,9 +30,6 @@ namespace Ogar_CSharp.protocols
         public abstract void OnVisibleCellUpdate(IEnumerable<Cell> add, IEnumerable<Cell> upd, IEnumerable<Cell> eat, IEnumerable<Cell> del);
         public abstract void OnLeaderboardUpdate(LeaderboardType type, List<LeaderBoardEntry> data, LeaderBoardEntry selfData);
         public void Send(byte[] data) => connection.Send(data);
-        public void Fail(ushort code, string reason)
-        {
-            connection.CloseSocket(code, reason);
-        }
+        public void Fail(ushort code, string reason) => connection.CloseSocket(code, reason);
     }
 }

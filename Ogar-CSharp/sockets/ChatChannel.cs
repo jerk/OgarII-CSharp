@@ -6,6 +6,11 @@ namespace Ogar_CSharp.sockets
 {
     public class ChatChannel
     {
+        public struct ChatEntry
+        {
+            public readonly ChatSource Source;
+            public readonly string Message;
+        }
         public class ChatSource
         {
             public string name;

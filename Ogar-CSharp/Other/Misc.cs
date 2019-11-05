@@ -15,27 +15,22 @@ namespace Ogar_CSharp
         public const float SQRT_1_3 = 1.140175425099138f;
         public const float SQRT_2 = 1.414213562373095f;
         private static Random randomMath = new Random();
-        private static int Random()
-            => randomMath.Next(0, 1);
-
-        private static double RandomDobule()
-            => randomMath.NextDouble();
         public static int RandomColor()
         {
-            switch(~~(Random()) * 6)
+            switch(Math.Floor(randomMath.NextDouble() * 6))
             {
                 case 0:
-                    return (~~(Random() * 0x100) << 16) | (0xFF << 8) | 0x10;
+                    return ((int)Math.Floor(randomMath.NextDouble() * 0x100) << 16) | (0xFF << 8) | 0x10;
                 case 1: 
-                    return (~~(Random() * 0x100) << 16) | (0x10 << 8) | 0xFF;
+                    return ((int)Math.Floor(randomMath.NextDouble() * 0x100) << 16) | (0x10 << 8) | 0xFF;
                 case 2: 
-                    return (0xFF << 16) | (~~(Random() * 0x100) << 8) | 0x10;
+                    return (0xFF << 16) | ((int)Math.Floor(randomMath.NextDouble() * 0x100) << 8) | 0x10;
                 case 3: 
-                    return (0x10 << 16) | (~~(Random() * 0x100) << 8) | 0xFF;
+                    return (0x10 << 16) | ((int)Math.Floor(randomMath.NextDouble() * 0x100) << 8) | 0xFF;
                 case 4: 
-                    return (0x10 << 16) | (0xFF << 8) | ~~(Random() * 0x100);
+                    return (0x10 << 16) | (0xFF << 8) | (int)Math.Floor(randomMath.NextDouble() * 0x100);
                 case 5: 
-                    return (0xFF << 16) | (0x10 << 8) | ~~(Random() * 0x100);
+                    return (0xFF << 16) | (0x10 << 8) | (int)Math.Floor(randomMath.NextDouble() * 0x100);
                 default:
                     throw new Exception("This is not suppose to happen");
             }

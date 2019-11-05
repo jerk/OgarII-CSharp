@@ -233,6 +233,12 @@ namespace Ogar_CSharp.worlds
                 var pos = this.GetSafeSpawnPos(Settings.virusSize);
                 this.AddCell(new Virus(this, pos.x, pos.y));
             }
+            /*while (motherCellCount < Settings.motherCellCount)
+            {
+                var pos = this.GetSafeSpawnPos(Settings.motherCellSize);
+                AddCell(new MotherCell(this, pos.x, pos.y));
+            }*/
+
             for (int i = 0, l = this.boostingCells.Count; i < l;)
             {
                 if (!this.BoostCell(this.boostingCells[i])) l--;

@@ -7,28 +7,35 @@ namespace Ogar_CSharp
 {
     public static class BitExtensions
     {
-        public enum Endian : int
+        public static int ToInt24(byte[] buffer, int startIndex)
         {
-            Little,
-            Big
+            int integer = (buffer[startIndex++]) << 16;
+            integer |= (buffer[startIndex++]) << 8;
+            integer |= buffer[startIndex++];
+            return integer;
         }
-        public static int ToInt24(byte[] buffer, int startIndex, Endian endian = Endian.Little)
+        public static uint ToUInt24(byte[] buffer, int startIndex)
         {
-            return ((endian == Endian.Little) ? (buffer[startIndex] | buffer[startIndex + 1] << 8 | (sbyte)buffer[startIndex + 2] << 16) : 
-                ((sbyte)buffer[startIndex] << 16 | buffer[startIndex + 1] << 8 | buffer[startIndex + 2]));
-        }
-        public static int ToUInt24(byte[] buffer, int startIndex, Endian endian = Endian.Little)
-        {
-            return ((endian == Endian.Little) ? (buffer[startIndex] | buffer[startIndex + 1] << 8 | buffer[startIndex + 2] << 16) : 
-                (buffer[startIndex] << 16 | buffer[startIndex + 1] << 8 | buffer[startIndex + 2]));
+            uint integer = (uint)(buffer[startIndex++]) << 16;
+            integer |= (uint)(buffer[startIndex++]) << 8;
+            integer |= buffer[startIndex++];
+            return integer;
         }
         public static byte[] GetBytesInt24(int value)
         {
-            return new byte[3] { (byte)value, (byte)(value >> 8), (byte)(value >> 0x10) };
+            var bytes = new byte[3];
+            bytes[0] = (byte)(value & 0xff);
+            bytes[1] = (byte)((value >> 8) & 0xff);
+            bytes[2] = (byte)((value >> 16) & 0xff);
+            return bytes;
         }
         public static byte[] GetBytesUInt24(uint value)
         {
-            return new byte[3] { (byte)value, (byte)(value >> 8), (byte)(value >> 0x10) };
+            var bytes = new byte[3];
+            bytes[0] = (byte)(value & 0xff);
+            bytes[1] = (byte)((value >> 8) & 0xff);
+            bytes[2] = (byte)((value >> 16) & 0xff);
+            return bytes;
         }
     }
 }

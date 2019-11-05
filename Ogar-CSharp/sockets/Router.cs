@@ -21,40 +21,31 @@ namespace Ogar_CSharp.sockets
         public byte ejectAttempts;
         public float ejectTick;
         public bool hasPlayer = false;
-        private Player player;
-        private object locker = new object();
-        public Player Player { 
-            get 
-            {
-                lock (locker)
-                    return player;
-            } 
-            set => player = value; }
+        public Player Player { get; set; }
         protected Router(Listener listener)
         {
             this.listener = listener;
             ejectTick = listener.handle.tick;
             listener.AddRouter(this);
         }
-        public virtual bool IsExternal => throw new Exception("Must be overriden"); 
-        public virtual string Type => throw new Exception("Must be overriden");
-        public virtual bool SeparateInTeams => throw new Exception("Must be overriden");
+        public abstract bool IsExternal { get; }
+        public abstract string Type { get; }
+        public abstract bool SeparateInTeams { get; }
         public ServerHandle Handle => listener.handle;
         public Settings Settings => listener.Settings;
         public virtual void CreatePlayer()
         {
             if (hasPlayer)
                 return;
-            Console.WriteLine("creating player");
-            player = listener.handle.CreatePlayer(this);
+            Player = listener.handle.CreatePlayer(this);
             hasPlayer = true;
         }
         public void DestroyPlayer()
         {
             if (!hasPlayer)
                 return;
-            listener.handle.RemovePlayer(player.id);
-            player = null;
+            listener.handle.RemovePlayer(Player.id);
+            Player = null;
         }
         public virtual void OnWorldSet() { }
         public virtual void OnWorldReset() { }
@@ -63,33 +54,33 @@ namespace Ogar_CSharp.sockets
         {
             if (!hasPlayer)
                 return;
-            string name = spawningName.Substring(0, Settings.playerMaxNameLength);
+            string name;
+            if (spawningName.Length > Settings.playerMaxNameLength)
+                name = spawningName.Substring(0, Settings.playerMaxNameLength);
+            else
+                name = spawningName;
             string skin = null;
-            listener.handle.gamemode.OnPlayerSpawnRequest(player, name, skin);
+            listener.handle.gamemode.OnPlayerSpawnRequest(Player, name, skin);
         }
         public virtual void OnSpectateRequest()
         {
-            if (!hasPlayer)
-                return;
-            player.UpdateState(PlayerState.Spectating);
+            if (hasPlayer)
+                Player.UpdateState(PlayerState.Spectating);
         }
         public virtual void OnQPress()
         {
-            if (!hasPlayer)
-                return;
-            listener.handle.gamemode.WhenPlayerPressQ(player);
+            if (hasPlayer)
+                listener.handle.gamemode.WhenPlayerPressQ(Player);
         }
         public virtual void AttemptSplit()
         {
-            if (!hasPlayer)
-                return;
-            listener.handle.gamemode.WhenPlayerSplit(player);
+            if (hasPlayer)
+                listener.handle.gamemode.WhenPlayerSplit(Player);
         }
         public virtual void AttemptEject()
         {
-            if (!hasPlayer)
-                return;
-            listener.handle.gamemode.WhenPlayerEject(player);
+            if (hasPlayer)
+                listener.handle.gamemode.WhenPlayerEject(Player);
         }
         public virtual void Close() => listener.RemoveRouter(this);
         public abstract bool ShouldClose { get; }

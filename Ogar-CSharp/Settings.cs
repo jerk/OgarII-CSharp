@@ -18,7 +18,7 @@ namespace Ogar_CSharp
         public List<string> listenerForbiddenIPs = new List<string>();
         public short listenerMaxConnectionsPerIP = -1;
         public int serverFrequency = 25;
-        public byte playerMaxNameLength;
+        public byte playerMaxNameLength = 16;
         public string serverName = "An unnamed server";
         public string serverGamemode = "FFA";
         public bool chatEnabled = true;
@@ -63,10 +63,10 @@ namespace Ogar_CSharp
         public float ejectDispersion = 0.3f;
         public int ejectedCellBoost = 780;
         public int motherCellSize = 149;
-        public int motherCellCount;
+        public int motherCellCount = 100;
         public float motherCellPassiveSpawnChance = 0.05f;
         public float motherCellActiveSpawnSpeed = 1f;
-        public float motherCellActivePelletBoost = 90;
+        public float motherCellPelletBoost = 90;
         public int motherCellMaxPellets = 96;
         public int motherCellMaxSize = 65535;
         public float playerRoamSpeed;

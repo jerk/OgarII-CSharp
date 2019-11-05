@@ -65,7 +65,7 @@ namespace Ogar_CSharp
             offset += 3;
             return a;
         }
-        public int ReadUInt24()
+        public uint ReadUInt24()
         {
             var a = BitExtensions.ToUInt24(data, offset);
             offset += 3;
@@ -91,7 +91,7 @@ namespace Ogar_CSharp
         }
         public int ReadColor()
         {
-            var a = ReadUInt24();
+            var a = (int)ReadUInt24();
             return (a & 0xFF) | ((a >> 8) & 0xFF) | (a >> 16);
         }
     }

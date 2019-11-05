@@ -114,7 +114,7 @@ namespace Ogar_CSharp.protocols
             switch (messageId)
             {
                 case 0:
-                    this.connection.spawningName = ReadZTString(reader, protocol.Value);
+                    Console.WriteLine(this.connection.spawningName = ReadZTString(reader, protocol.Value));
                     break;
                 case 1:
                     this.connection.requestingSpectate = true;
@@ -131,8 +131,8 @@ namespace Ogar_CSharp.protocols
                             this.connection.mouseY = reader.ReadShort();
                             break;
                         case 21:
-                            this.connection.mouseX = ~~(long)BitConverter.DoubleToInt64Bits(reader.ReadDouble());
-                            this.connection.mouseY = ~~(long)BitConverter.DoubleToInt64Bits(reader.ReadDouble());
+                            this.connection.mouseX = (float)Math.Floor(reader.ReadDouble());
+                            this.connection.mouseY = (float)Math.Floor(reader.ReadDouble());
                             break;
                         default: this.Fail(1003, "Unexpected message format");
                             return;
@@ -221,7 +221,7 @@ namespace Ogar_CSharp.protocols
             var writer = new Writer();
             writer.WriteByte(16);
             writer.WriteUShort((ushort)eat.Count());
-            foreach(var item in eat)
+            foreach (var item in eat)
             {
                 writer.WriteUInt((uint)item.eatenBy.id);
                 writer.WriteUInt((uint)item.id);
@@ -241,7 +241,7 @@ namespace Ogar_CSharp.protocols
                 writer.WriteUInt((uint)del.Count());
             else
                 writer.WriteUShort((ushort)del.Count());
-           foreach (var item in del) 
+            foreach (var item in del)
                 writer.WriteUInt((uint)item.id);
             this.Send(writer.RawBuffer);
         }
