@@ -1,12 +1,13 @@
-﻿using Ogar_CSharp.gamemodes;
-using Ogar_CSharp.protocols;
-using Ogar_CSharp.sockets;
-using Ogar_CSharp.worlds;
+﻿using Ogar_CSharp.Protocols;
+using Ogar_CSharp.Sockets;
+using Ogar_CSharp.Worlds;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Linq;
+using Ogar_CSharp.Gamemodes;
+
 namespace Ogar_CSharp
 {
     public class ServerHandle
@@ -18,7 +19,7 @@ namespace Ogar_CSharp
         }
         public ProtocolStore protocols = new ProtocolStore();
         //public game gamemodes = new gamemodelist(this);
-        public GameMode gamemode;
+        public Gamemode gamemode;
         //commands = new commandlist(this);
         //chatcommnds = new commandlist(this);
         public bool running = false;
@@ -143,7 +144,7 @@ namespace Ogar_CSharp
             listener.Update();
             matchMaker.Update();
             gamemode.OnHandleTick();
-            avargateTickTime = (int)stopWatch.Elapsed.Ticks;
+            avargateTickTime = stopWatch.ElapsedMilliseconds;
             stopWatch.Reset();
         }
     }

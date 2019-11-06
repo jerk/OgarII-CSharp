@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
-using Ogar_CSharp.bots;
-using Ogar_CSharp.cells;
-using Ogar_CSharp.protocols;
+using Ogar_CSharp.Bots;
+using Ogar_CSharp.Cells;
+using Ogar_CSharp.Protocols;
+using Ogar_CSharp.Worlds;
 using WebSocketSharp;
-using static Ogar_CSharp.sockets.Listener;
+using static Ogar_CSharp.Sockets.Listener;
 
-namespace Ogar_CSharp.sockets
+namespace Ogar_CSharp.Sockets
 {
     public class Connection : Router 
     {
@@ -175,7 +176,7 @@ namespace Ogar_CSharp.sockets
                     eat.Add(item1.Value);
                 del.Add(item1.Value);
             }
-            if (player.state == worlds.PlayerState.Spectating || player.state == worlds.PlayerState.Roaming)
+            if (player.state == PlayerState.Spectating || player.state == PlayerState.Roaming)
                 protocol.OnSpectatePosition(player.viewArea);
             if (Handle.tick % 4 == 0)
                 Handle.gamemode.SendLeaderboard(this);

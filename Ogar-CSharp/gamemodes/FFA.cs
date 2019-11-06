@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
-using Ogar_CSharp.sockets;
-using Ogar_CSharp.worlds;
+using Ogar_CSharp.Sockets;
+using Ogar_CSharp.Worlds;
 using Ogar_CSharp.Other;
 
-namespace Ogar_CSharp.gamemodes
+namespace Ogar_CSharp.Gamemodes
 {
 
-    public class FFA : GameMode
+    public class FFA : Gamemode
     {
         public static FFALeaderboardEntry GetLeaderboardData(Player player, Player requesting, short index)
         {

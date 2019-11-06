@@ -1,9 +1,9 @@
-﻿using Ogar_CSharp.worlds;
+﻿using Ogar_CSharp.Worlds;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Ogar_CSharp.cells
+namespace Ogar_CSharp.Cells
 {
     public class MotherCell : Cell, ISpawner
     {
@@ -20,7 +20,6 @@ namespace Ogar_CSharp.cells
         public override bool IsAgitated => false;
 
         public override bool AvoidWhenSpawning => true;
-
         public int PelletCount { get; set; }
 
         public override CellEatResult GetEatResult(Cell other)

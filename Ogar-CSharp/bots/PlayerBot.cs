@@ -1,10 +1,10 @@
-﻿using Ogar_CSharp.cells;
-using Ogar_CSharp.worlds;
+﻿using Ogar_CSharp.Cells;
+using Ogar_CSharp.Worlds;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Ogar_CSharp.bots
+namespace Ogar_CSharp.Bots
 {
     public class PlayerBot : Bot
     {

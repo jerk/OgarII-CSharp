@@ -1,9 +1,9 @@
-﻿using Ogar_CSharp.worlds;
+﻿using Ogar_CSharp.Worlds;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Ogar_CSharp.cells
+namespace Ogar_CSharp.Cells
 {
     public class Pellet : Cell
     {
@@ -21,7 +21,6 @@ namespace Ogar_CSharp.cells
         public override bool IsAgitated => false;
 
         public override bool AvoidWhenSpawning => false;
-
         public override CellEatResult GetEatResult(Cell other) => CellEatResult.None;
         public int lastGrowTick;
         public override void OnTick()
@@ -29,7 +28,7 @@ namespace Ogar_CSharp.cells
             base.OnTick();
             if (Size >= world.Settings.pelletMaxSize)
                 return;
-            if(world.handle.tick - lastGrowTick > world.Settings.pelletGrowTicks / world.handle.stepMult)
+            if (world.handle.tick - lastGrowTick > world.Settings.pelletGrowTicks / world.handle.stepMult)
             {
                 lastGrowTick = world.handle.tick;
                 Mass++;
@@ -43,5 +42,6 @@ namespace Ogar_CSharp.cells
         {
             spawner.PelletCount++;
         }
+
     }
 }

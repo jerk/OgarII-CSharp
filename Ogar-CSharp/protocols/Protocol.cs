@@ -1,12 +1,12 @@
-﻿using Ogar_CSharp.cells;
+﻿using Ogar_CSharp.Cells;
 using Ogar_CSharp.Other;
-using Ogar_CSharp.sockets;
-using Ogar_CSharp.worlds;
+using Ogar_CSharp.Sockets;
+using Ogar_CSharp.Worlds;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Ogar_CSharp.protocols
+namespace Ogar_CSharp.Protocols
 {
     public abstract class Protocol
     {

@@ -1,9 +1,9 @@
-﻿using Ogar_CSharp.sockets;
+﻿using Ogar_CSharp.Sockets;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Ogar_CSharp.worlds
+namespace Ogar_CSharp.Worlds
 {
     public class MatchMaker
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Ogar_CSharp.sockets
+namespace Ogar_CSharp.Sockets
 {
     public class ChatChannel
     {

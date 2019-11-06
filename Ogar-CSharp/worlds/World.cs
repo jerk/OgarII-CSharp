@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Ogar_CSharp.cells;
-using Ogar_CSharp.bots;
-using Ogar_CSharp.sockets;
-
-namespace Ogar_CSharp.worlds
+using Ogar_CSharp.Cells;
+using Ogar_CSharp.Bots;
+using Ogar_CSharp.Sockets;
+using System.Threading.Tasks;
+using System.Linq;
+namespace Ogar_CSharp.Worlds
 {
     public class World : ISpawner
     {
@@ -25,19 +26,19 @@ namespace Ogar_CSharp.worlds
         public ServerHandle handle;
         public bool frozen;
         public long _nextCellId = 1;
-        public List<Cell> cells = new List<Cell>();
+        public HashSet<Cell> cells = new HashSet<Cell>();
         public List<Cell> boostingCells = new List<Cell>();
         public int motherCellCount;
         public int virusCount;
         public List<EjectedCell> ejectedCells = new List<EjectedCell>();
-        public List<PlayerCell> playerCells = new List<cells.PlayerCell>();
+        public List<PlayerCell> playerCells = new List<PlayerCell>();
         public List<Player> players = new List<Player>();
         public Player largestPlayer;
         public List<Player> leaderboard = new List<Player>();
         //public chatchannel worldchat
         public Rect border;
         public WorldStats stats;
-        public QuadTree<cells.Cell> finder;
+        public QuadTree<Cell> finder;
         public Settings Settings => handle.Settings;
 
         public int PelletCount { get; set; }
@@ -57,9 +58,9 @@ namespace Ogar_CSharp.worlds
         public void Destroy()
         {
             while (players.Count > 0)
-                RemovePlayer(players[0]);
+                RemovePlayer(players.First());
             while (cells.Count > 0)
-                RemoveCell(cells[0]);
+                RemoveCell(cells.First());
         }
         public void SetBorder(Rect range)
         {
@@ -177,7 +178,7 @@ namespace Ogar_CSharp.worlds
                 var tries = Settings.worldSafeSpawnTries;
                 while (--tries >= 0)
                 {
-                    var cell = ejectedCells[~~(int)(random.NextDouble() * ejectedCells.Count)];
+                    var cell = ejectedCells[(int)Math.Floor(random.NextDouble() * ejectedCells.Count)];
                     if (IsSafeSpawnPos(new Rect(cell.X, cell.Y, cellSize, cellSize)))
                     {
                         RemoveCell(cell);

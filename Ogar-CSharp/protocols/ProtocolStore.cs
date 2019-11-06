@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
-using Ogar_CSharp.sockets;
+using Ogar_CSharp.Sockets;
 using System.Linq.Expressions;
 
-namespace Ogar_CSharp.protocols
+namespace Ogar_CSharp.Protocols
 {
     public class ProtocolStore
     {

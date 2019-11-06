@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Ogar_CSharp.sockets;
-using Ogar_CSharp.worlds;
-using Ogar_CSharp.cells;
-namespace Ogar_CSharp.gamemodes
+using Ogar_CSharp.Sockets;
+using Ogar_CSharp.Worlds;
+using Ogar_CSharp.Cells;
+namespace Ogar_CSharp.Gamemodes
 {
-    public abstract class GameMode
+    public abstract class Gamemode
     {
         public ServerHandle handle;
-        public GameMode(ServerHandle handle) => this.handle = handle;
+        public Gamemode(ServerHandle handle) => this.handle = handle;
         public abstract byte Type { get; }
         public abstract string Name { get; }
         public virtual void OnHandleStart() { }

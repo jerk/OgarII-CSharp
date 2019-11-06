@@ -49,7 +49,7 @@ namespace Ogar_CSharp
         public int pelletMinSize = 10;
         public int pelletMaxSize = 20;
         public int pelletGrowTicks = 25 * 60;
-        public int pelletCount = 10000;
+        public int pelletCount = 100000;
         public int virusMinCount = 30;
         public int virusMaxCount = 90;
         public int virusSize = 100;

@@ -7,7 +7,7 @@ using WebSocketSharp.Server;
 using System.Threading.Tasks;
 using WebSocketSharp;
 
-namespace Ogar_CSharp.sockets
+namespace Ogar_CSharp.Sockets
 {
     public class Listener
     {
