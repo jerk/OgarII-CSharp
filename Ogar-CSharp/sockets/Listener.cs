@@ -13,47 +13,32 @@ namespace Ogar_CSharp.Sockets
     {
         public class ClientSocket : WebSocketBehavior
         {
-            public object locker = new object(), locker1 = new object();
             private readonly Listener listener;
             public Action<CloseEventArgs> onClose;
             public Action<MessageEventArgs> onMessage;
-            public ClientSocket(Listener listener)
-            {
-                this.listener = listener;
-            }
-            protected override void OnClose(CloseEventArgs e)
-            {
-                onClose?.Invoke(e);
-            }
-            protected override void OnError(ErrorEventArgs e)
-            {
-                //base.OnError(e);
-            }
-            protected override void OnMessage(MessageEventArgs e)
-            {
-                if (onMessage == null)
-                    Console.WriteLine("this should alread be assigned");
-                onMessage?.Invoke(e);
-            }
+            public ClientSocket(Listener listener) => this.listener = listener;
+            protected override void OnClose(CloseEventArgs e) 
+                => onClose?.Invoke(e);
+            protected override void OnError(ErrorEventArgs e) { /*base.OnError(e);*/ }
+            protected override void OnMessage(MessageEventArgs e) 
+                => onMessage?.Invoke(e);
             protected override void OnOpen()
             {
-                lock (locker)
-                    if (listener.VerifyClient(this))
-                        listener.OnConnection(this);
+                if (listener.VerifyClient(this))
+                    listener.OnConnection(this);
             }
             public void Disconnect()
-            {
-                Sessions.CloseSession(this.ID);
-            }
+                => Sessions.CloseSession(this.ID);
+
             public new void Send(byte[] data)
             {
-                if (this.ConnectionState == WebSocketState.Open)
+                if (ConnectionState == WebSocketState.Open)
                     base.Send(data);
             }
             public void CloseSocket(ushort code, string reason)
             {
                 Console.WriteLine($"closing socket, code : {code}, reason {reason}");
-                base.Sessions.CloseSession(base.ID, code, reason);
+                Sessions.CloseSession(base.ID, code, reason);
             }
             public void RemoveAllListeners()
             {
@@ -112,10 +97,10 @@ namespace Ogar_CSharp.Sockets
                 Console.WriteLine($"listenerForbiddenIPs contains {address}, dropping connection");
                 return false;
             }
-            if(Settings.listenerMaxConnectionsPerIP > 0)
+            if (Settings.listenerMaxConnectionsPerIP > 0)
             {
                 var count = ConnectionCountForIP(address);
-                if(count != 0 && count >= Settings.listenerMaxConnectionsPerIP)
+                if (count != 0 && count >= Settings.listenerMaxConnectionsPerIP)
                 {
                     Console.WriteLine($"listenerMaxConnectionsPerIP reached for '{address}', dropping its new connections");
                     return false;
@@ -151,7 +136,8 @@ namespace Ogar_CSharp.Sockets
                 if (!router.ShouldClose) continue;
                 router.Close(); i--; l--;
             }
-            for (i = 0; i < l; i++) this.routers[i].Update();
+            for (i = 0; i < l; i++) 
+                this.routers[i].Update();
             for (i = 0, l = this.connections.Count; i < l; i++)
             {
                 var connection = connections[i];

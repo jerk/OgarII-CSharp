@@ -42,21 +42,13 @@ namespace Ogar_CSharp.Sockets
         public override bool SeparateInTeams => true;
         public override string Type => "connection";
         public void CloseSocket(ushort errorCode, string reason)
-        {
-            webSocket.CloseSocket(errorCode, reason);
-        }
+            => webSocket.CloseSocket(errorCode, reason);
         public override void OnNewOwnedCell(PlayerCell cell)
-        {
-            protocol.OnNewOwnedCell(cell);
-        }
+            => protocol.OnNewOwnedCell(cell);
         public override void OnWorldSet()
-        {
-            protocol.OnNewWorldBounds(Player.world.border, true);
-        }
-        public override void OnWorldReset()
-        {
-            protocol.OnWorldReset();
-        }
+            => protocol.OnNewWorldBounds(Player.world.border, true);
+        public override void OnWorldReset() 
+            => protocol.OnWorldReset();
         public override void CreatePlayer()
         {
             base.CreatePlayer();
@@ -67,9 +59,7 @@ namespace Ogar_CSharp.Sockets
         public override void Close()
         {
             if (!socketDisconnected)
-            {
                 return;
-            }
             base.Close();
             disconnected = true;
             disconnectionTick = Handle.tick;
@@ -86,7 +76,7 @@ namespace Ogar_CSharp.Sockets
         {
             if (socketDisconnected)
                 return;
-            Console.WriteLine($"connection from {this.remoteAddress} has disconnected");
+            Console.WriteLine($"connection from {remoteAddress} has disconnected");
             socketDisconnected = true;
             closeCode = code;
             closeReason = reason;
@@ -107,16 +97,11 @@ namespace Ogar_CSharp.Sockets
             else
             {
                 if (protocol != null)
-                {
-                    var reader = new Reader(bytes, 0);
-                    protocol.OnSocketMessage(reader);
-                }
+                    protocol.OnSocketMessage(new Reader(bytes, 0));
                 else
                 {
-                    var reader = new Reader(bytes, 0);
                     protocol = new LegacyProtocol(this);
-                    bool IsCorrect = protocol.Distinguishes(reader);
-                    if (!IsCorrect)
+                    if (!protocol.Distinguishes(new Reader(bytes, 0)))
                     {
                         CloseSocket(1003, "Ambiguous protocol");
                         return;

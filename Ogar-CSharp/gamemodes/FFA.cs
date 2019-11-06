@@ -24,7 +24,6 @@ namespace Ogar_CSharp.Gamemodes
 
         public override void OnPlayerSpawnRequest(Player player, string name, string skin)
         {
-            Console.WriteLine(name);
             if (player.state == 0 || !player.hasWorld)
                 return;
             int size = ((player.router.Type == "minion") ? handle.Settings.minionSpawnSize : handle.Settings.playerSpawnSize);

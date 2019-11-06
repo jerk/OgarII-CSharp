@@ -25,12 +25,8 @@ namespace Ogar_CSharp.Protocols
         public bool gotKey = false;
         public uint? Key;
         public LeaderboardType? LastleaderboardType;
-        readonly byte[] PingReturn = new byte[1] { 2 };
         public bool hasProcessedQ;
-        public LegacyProtocol(Connection connection) : base(connection)
-        {
-
-        }
+        public LegacyProtocol(Connection connection) : base(connection) { }
         public override string Type => "legacy";
 
         public override string SubType
@@ -39,20 +35,18 @@ namespace Ogar_CSharp.Protocols
             {
                 var str = "//";
                 if (protocol != null)
-                {
-                    str = "00" + protocol.Value;
-                    str = str[0..^2];
-                }
+                    str = ("00" + protocol.Value)[0..^2];
                 return str;
             }
         }
         public override bool Distinguishes(Reader reader)
         {
-            if (reader.length < 5) return false;
-            var byt = reader.ReadByte();
-            if (byt != 254) return false;
+            if (reader.length < 5) 
+                return false;
+            if (reader.Read<byte>() != 254) 
+                return false;
             this.gotProtocol = true;
-            this.protocol = reader.ReadUInt();
+            this.protocol = reader.Read<uint>();
             if (this.protocol < 4)
             {
                 this.protocol = 4;
@@ -67,53 +61,51 @@ namespace Ogar_CSharp.Protocols
             var writer = new Writer();
             switch (type)
             {
-                case LeaderboardType.FFA: FFALeaderboard(writer, data.Cast<FFALeaderboardEntry>().ToList(), (FFALeaderboardEntry)selfData, (uint)this.protocol); break;
-                case LeaderboardType.Pie: PieLeaderboard(writer, data.Cast<PieLeaderboardEntry>().ToList(), (PieLeaderboardEntry)selfData, (uint)this.protocol); break;
-                case LeaderboardType.Text: TextBoard(writer, data.Cast<TextLeaderBoardEntry>().ToList(), (uint)this.protocol); break;
+                case LeaderboardType.FFA: 
+                    FFALeaderboard(writer, data.Cast<FFALeaderboardEntry>().ToList(), (FFALeaderboardEntry)selfData, (uint)protocol); 
+                    break;
+                case LeaderboardType.Pie: 
+                    PieLeaderboard(writer, data.Cast<PieLeaderboardEntry>().ToList(), (PieLeaderboardEntry)selfData, (uint)protocol); 
+                    break;
+                case LeaderboardType.Text: 
+                    TextBoard(writer, data.Cast<TextLeaderBoardEntry>().ToList(), (uint)protocol);
+                    break;
             }
             this.Send(writer.RawBuffer);
         }
 
-        public override void OnNewOwnedCell(PlayerCell cell)
-        {
-            var writer = new Writer();
-            writer.WriteByte(32);
-            writer.WriteUInt((uint)cell.id);
-            this.Send(writer.RawBuffer);
-        }
+        public override void OnNewOwnedCell(PlayerCell cell) 
+            => Send(new Writer() { (byte)32, (uint)cell.id }.RawBuffer);
+   
 
         public override void OnNewWorldBounds(Rect range, bool includeServerInfo)
         {
-            var writer = new Writer();
-            writer.WriteByte(64);
-            writer.WriteDouble(range.x - range.w);
-            writer.WriteDouble(range.y - range.h);
-            writer.WriteDouble(range.x + range.w);
-            writer.WriteDouble(range.y + range.h);
+            var writer = new Writer() 
+            { (byte)64, (double)(range.x - range.w), (double)(range.y - range.h), (double)(range.x + range.w), (double)(range.y + range.h) };
             if (includeServerInfo)
             {
                 writer.WriteUInt(Handle.gamemode.Type);
-                WriteZTString(writer, $"OgarII {Handle.Version}", (uint)protocol);
+                WriteZTString(writer, $"OgarII-CSharp {Handle.Version}", (uint)protocol);
             }
             this.Send(writer.RawBuffer);
         }
 
         public override void OnSocketMessage(Reader reader)
         {
-            var messageId = reader.ReadByte();
+            var messageId = reader.Read<byte>();
             if (!this.gotKey)
             {
                 if (messageId != 255) return;
                 if (reader.length < 5) { this.Fail(0, "Unexpected message format"); return; };
                 this.gotKey = true;
-                this.Key = reader.ReadUInt();
+                this.Key = reader.Read<uint>();
                 this.connection.CreatePlayer();
                 return;
             }
             switch (messageId)
             {
                 case 0:
-                    Console.WriteLine(this.connection.spawningName = ReadZTString(reader, protocol.Value));
+                    Console.WriteLine(connection.spawningName = ReadZTString(reader, protocol.Value));
                     break;
                 case 1:
                     this.connection.requestingSpectate = true;
@@ -122,16 +114,16 @@ namespace Ogar_CSharp.Protocols
                     switch (reader.length)
                     {
                         case 13:
-                            this.connection.mouseX = reader.ReadInt();
-                            this.connection.mouseY = reader.ReadInt();
+                            this.connection.mouseX = reader.Read<int>();
+                            this.connection.mouseY = reader.Read<int>();
                             break;
                         case 9:
-                            this.connection.mouseX = reader.ReadShort();
-                            this.connection.mouseY = reader.ReadShort();
+                            this.connection.mouseX = reader.Read<short>();
+                            this.connection.mouseY = reader.Read<short>();
                             break;
                         case 21:
-                            this.connection.mouseX = (float)Math.Floor(reader.ReadDouble());
-                            this.connection.mouseY = (float)Math.Floor(reader.ReadDouble());
+                            this.connection.mouseX = (float)Math.Floor(reader.Read<double>());
+                            this.connection.mouseY = (float)Math.Floor(reader.Read<double>());
                             break;
                         default: this.Fail(1003, "Unexpected message format");
                             return;
@@ -172,7 +164,7 @@ namespace Ogar_CSharp.Protocols
                         this.Fail(1003, "Bad message format");
                         return;
                     }
-                    var flags = reader.ReadByte();
+                    var flags = reader.Read<byte>();
                     var skipLen = 2 * ((flags & 2) + (flags & 4) + (flags & 8));
                     if (reader.length < 2 + skipLen) {
                         Fail(1003, "Unexpected message format");
@@ -196,30 +188,21 @@ namespace Ogar_CSharp.Protocols
         }
 
         public override void OnSpectatePosition(ViewArea area)
-        {
-            var writer = new Writer();
-            writer.WriteByte(17);
-            writer.WriteFloat(area.x);
-            writer.WriteFloat(area.y);
-            writer.WriteFloat(area.s);
-            this.Send(writer.RawBuffer);
-        }
+            => Send(new Writer() { (byte)17, area.x, area.y, area.s }.RawBuffer);
         public static void WriteCellData(Writer writer, Player source, uint protocol, Cell cell, bool includeType, bool includeSize,
             bool includePos, bool includeColor, bool includeName, bool includeSkin)
         {
             if (protocol == 4 || protocol == 5)
                 WriteCellData4(writer, source, protocol, cell, includeType, includeSize, includePos, includeColor, includeName, includeSkin);
-            else if(protocol <= 10)
+            else if (protocol <= 10)
                 WriteCellData6(writer, source, protocol, cell, includeType, includeSize, includePos, includeColor, includeName, includeSkin);
-            else if(protocol <= 21)
+            else if (protocol <= 21)
                 WriteCellData11(writer, source, protocol, cell, includeType, includeSize, includePos, includeColor, includeName, includeSkin);
         }
         public override void OnVisibleCellUpdate(IEnumerable<Cell> add, IEnumerable<Cell> upd, IEnumerable<Cell> eat, IEnumerable<Cell> del)
         {
             var source = this.connection.Player;
-            var writer = new Writer();
-            writer.WriteByte(16);
-            writer.WriteUShort((ushort)eat.Count());
+            var writer = new Writer() { (byte)16, (ushort)eat.Count() };
             foreach (var item in eat)
             {
                 writer.WriteUInt((uint)item.eatenBy.id);
@@ -247,10 +230,8 @@ namespace Ogar_CSharp.Protocols
 
         public override void OnWorldReset()
         {
-            var writer = new Writer();
-            writer.WriteByte(18);
-            this.Send(writer.RawBuffer);
-            if (this.LastleaderboardType != null)
+            this.Send(new Writer() { (byte)18 }.RawBuffer);
+            if (LastleaderboardType != null)
             {
                 this.OnLeaderboardUpdate(LastleaderboardType.Value, new List<LeaderBoardEntry>(), null);
                 this.LastleaderboardType = null;
@@ -258,8 +239,7 @@ namespace Ogar_CSharp.Protocols
         }
         public void OnStatsRequest()
         {
-            var writer = new Writer();
-            writer.WriteByte(254);
+            var writer = new Writer() { (byte)254 };
             var stats = connection.Player.world.stats;
             var legacy = new Legacy { mode = stats.gamemode, update = stats.loadTime, playersTotal = stats.external, 
                 playersAlive = stats.playing, playersSpect = stats.spectating, playersLimit = stats.limit };
@@ -425,9 +405,9 @@ namespace Ogar_CSharp.Protocols
         private static string ReadZTString(Reader reader, uint protocol)
         {
             if (protocol < 6)
-                return reader.ReadUTF16String();
+                return reader.Read<string>(null, true);
             else
-                return reader.ReadUTF8String();
+                return reader.Read<string>(null, false);
         }
         private static void WriteZTString(Writer writer, string value, uint protocol)
         {

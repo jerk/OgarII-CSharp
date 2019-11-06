@@ -16,6 +16,35 @@ namespace Ogar_CSharp
             this.offset = offset;
             this.length = data.Length;
         }
+        public T Read<T>(bool? isColor = null, bool? isUTF16 = null)
+        {
+            object data = null;
+            var type = typeof(T);
+            if (type == typeof(byte))
+                data = ReadByte();
+            else if (type == typeof(sbyte))
+                data = ReadSByte();
+            else if (type == typeof(ushort))
+                data = ReadUShort();
+            else if (type == typeof(short))
+                data = ReadShort();
+            else if (type == typeof(uint))
+                data = ReadUInt();
+            else if (type == typeof(int))
+                data = ReadInt();
+            else if (type == typeof(float))
+                data = ReadFloat();
+            else if (type == typeof(double))
+                data = ReadDouble();
+            else if (isColor != null && isColor.Value)
+                data = ReadColor();
+            else if (type == typeof(string))
+                if (isUTF16 != null && isUTF16.Value)
+                    data = ReadUTF16String();
+                else
+                    data = ReadUTF8String();
+            return (T)data;
+        }
         public byte ReadByte()
             => data[offset++];
         public sbyte ReadSByte()

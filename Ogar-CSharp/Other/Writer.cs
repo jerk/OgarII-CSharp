@@ -1,26 +1,16 @@
 ﻿using Ogar_CSharp.Protocols;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Ogar_CSharp
 {
-    /// <summary>
-    /// Designed for use with the modern protocol
-    /// </summary>
-    public interface ISerializeable
+    public class Writer : IEnumerable
     {
-        public byte[] Serialize(byte? flags);
-        public void Deserialize(byte[] buffer);
-    }
-    public class Writer
-    {
-        public List<byte> buf = new List<byte>();
-        public int offset { get; set; }
-        public void WriteByte(byte a)
-        {
-            buf.Add(a);
-        }
+        private List<byte> buf = new List<byte>();
+        public byte[] RawBuffer => buf.ToArray();
+        public void WriteByte(byte a) => buf.Add(a);
         public void WriteSByte(sbyte a)
             => buf.Add((byte)a);
         public void WriteUShort(ushort a)
@@ -42,24 +32,46 @@ namespace Ogar_CSharp
         public void WriteUTF8String(string a)
         {
             var tbuf = Encoding.UTF8.GetBytes(a ?? "");
-            buf.AddRange(tbuf);
-            offset += tbuf.Length + 1;
-            buf.Add(0);
+            buf.AddRange(tbuf); buf.Add(0);
         }
         public void WriteUTF16String(string a)
         {
             var tbuf = Encoding.Unicode.GetBytes(a);
-            buf.AddRange(tbuf);
-            offset += tbuf.Length + 2;
-            buf.Add(0);
-            buf.Add(0);
+            buf.AddRange(tbuf); buf.Add(0); buf.Add(0);
         }
-        public void WriteColor(uint a)
+        public void WriteColor(uint a) 
+            => buf.AddRange(BitExtensions.GetBytesUInt24(((a & 0xFF) << 16) | (((a >> 8) & 0xFF) << 8) | (a >> 16)));
+
+
+        public void Add(object obj, bool? shouldUseUTF16 = null)
         {
-            buf.AddRange(BitExtensions.GetBytesUInt24(((a & 0xFF) << 16) | (((a >> 8) & 0xFF) << 8) | (a >> 16)));
-            offset += 3;
+            Type objType = obj.GetType();
+            if (objType == typeof(sbyte))
+                WriteSByte((sbyte)obj);
+            else if (objType == typeof(byte))
+                WriteByte((byte)obj);
+            else if (objType == typeof(ushort))
+                WriteUShort((ushort)obj);
+            else if (objType == typeof(short))
+                WriteShort((short)obj);
+            else if (objType == typeof(uint))
+                WriteUInt((uint)obj);
+            else if (objType == typeof(int))
+                WriteInt((int)obj);
+            else if (objType == typeof(float))
+                WriteFloat((float)obj);
+            else if (objType == typeof(double))
+                WriteDouble((double)obj);
+            else if (objType == typeof(string))
+                if (shouldUseUTF16 != null && shouldUseUTF16.Value)
+                    WriteUTF16String((string)obj);
+                else 
+                    WriteUTF8String((string)obj);
         }
-        public byte[] RawBuffer
-            => buf.ToArray();
+
+        public IEnumerator GetEnumerator()
+        {
+            return null;
+        }
     }
 }
