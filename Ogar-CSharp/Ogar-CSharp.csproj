@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <Reference Include="websocket-sharp">
-      <HintPath>..\..\..\..\Documents\websocket-sharp\websocket-sharp\bin\Release\websocket-sharp.dll</HintPath>
+      <HintPath>References\websocket-sharp.dll</HintPath>
     </Reference>
   </ItemGroup>
 
