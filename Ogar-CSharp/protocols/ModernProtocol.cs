@@ -15,7 +15,7 @@ namespace Ogar_CSharp.Protocols
         public uint? protocol;
         public bool gotProtocol;
         public LeaderBoardEntry leaderboardSelfData;
-        public List<LeaderBoardEntry> leaderboardData = new List<LeaderBoardEntry>();
+        public IEnumerable<LeaderBoardEntry> leaderboardData;
         public LeaderboardType? leaderboardType;
         public Queue<(ChatChannel.ChatSource source, string message)> chatPending = new Queue<(ChatChannel.ChatSource source, string message)>();
         public Rect? worldBorderPending;
@@ -222,7 +222,7 @@ namespace Ogar_CSharp.Protocols
             }
             if (leaderboardPending)
             {
-                l = leaderboardData.Count;
+                l = leaderboardData.Count();
                 switch (leaderboardType.Value)
                 {
                     case LeaderboardType.FFA:
@@ -350,7 +350,7 @@ namespace Ogar_CSharp.Protocols
             var empty = new List<Cell>();
             OnVisibleCellUpdate(empty, empty, empty, empty);
         }
-        public override void OnLeaderboardUpdate(LeaderboardType type, List<LeaderBoardEntry> data, LeaderBoardEntry selfData)
+        public override void OnLeaderboardUpdate(LeaderboardType type, IEnumerable<LeaderBoardEntry> data, LeaderBoardEntry selfData)
         {
             leaderboardPending = true;
             leaderboardType = type;

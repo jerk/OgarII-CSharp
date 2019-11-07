@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 
@@ -33,7 +34,7 @@ namespace Ogar_CSharp
         {
             while (running)
             {
-                foreach(var callback in callbacks)
+                foreach (var callback in callbacks)
                 {
                     callback();
                 }

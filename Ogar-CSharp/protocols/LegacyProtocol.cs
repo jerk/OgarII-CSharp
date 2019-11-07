@@ -6,13 +6,16 @@ using Ogar_CSharp.Other;
 using Ogar_CSharp.Sockets;
 using System.Linq;
 using Ogar_CSharp.Worlds;
+using System.Threading.Tasks;
 
 namespace Ogar_CSharp.Protocols
 {
     public struct Legacy
     {
         public string mode;
-        public float update;
+        public string name;
+        public double update;
+        public double uptime;
         public int playersTotal;
         public int playersAlive;
         public int playersSpect;
@@ -55,7 +58,7 @@ namespace Ogar_CSharp.Protocols
             return true;
         }
 
-        public override void OnLeaderboardUpdate(LeaderboardType type, List<LeaderBoardEntry> data, LeaderBoardEntry selfData)
+        public override void OnLeaderboardUpdate(LeaderboardType type, IEnumerable<LeaderBoardEntry> data, LeaderBoardEntry selfData)
         {
             this.LastleaderboardType = type;
             var writer = new Writer();
@@ -105,7 +108,7 @@ namespace Ogar_CSharp.Protocols
             switch (messageId)
             {
                 case 0:
-                    Console.WriteLine(connection.spawningName = ReadZTString(reader, protocol.Value));
+                    connection.spawningName = ReadZTString(reader, protocol.Value);
                     break;
                 case 1:
                     this.connection.requestingSpectate = true;
@@ -237,14 +240,32 @@ namespace Ogar_CSharp.Protocols
                 this.LastleaderboardType = null;
             }
         }
+        private bool isCompilingStats;
         public void OnStatsRequest()
         {
-            var writer = new Writer() { (byte)254 };
-            var stats = connection.Player.world.stats;
-            var legacy = new Legacy { mode = stats.gamemode, update = stats.loadTime, playersTotal = stats.external, 
-                playersAlive = stats.playing, playersSpect = stats.spectating, playersLimit = stats.limit };
-            WriteZTString(writer, Newtonsoft.Json.JsonConvert.SerializeObject(legacy), (uint)protocol);
-            Send(writer.RawBuffer);
+            if (!isCompilingStats)
+            {
+                isCompilingStats = true;
+                var writer = new Writer() { (byte)254 };
+                var stats = connection.Player.world.stats;
+                var legacy = new Legacy
+                {
+                    name = stats.name,
+                    mode = stats.gamemode,
+                    update = stats.loadTime,
+                    playersTotal = stats.external,
+                    playersAlive = stats.playing,
+                    playersSpect = stats.spectating,
+                    playersLimit = stats.limit,
+                    uptime = stats.uptime
+                };
+                Task.Run(() =>
+                {
+                    WriteZTString(writer, Newtonsoft.Json.JsonConvert.SerializeObject(legacy), (uint)protocol);
+                    Send(writer.RawBuffer);
+                    isCompilingStats = false;
+                });
+            }
         }
         public static void PieLeaderboard(Writer writer, List<PieLeaderboardEntry> data, PieLeaderboardEntry selfData, uint protocol)
         {

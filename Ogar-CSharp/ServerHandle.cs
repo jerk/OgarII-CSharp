@@ -23,8 +23,8 @@ namespace Ogar_CSharp
         //commands = new commandlist(this);
         //chatcommnds = new commandlist(this);
         public bool running = false;
-        public DateTime? startTime = default;
-        public float avargateTickTime;
+        public DateTimeOffset startTime;
+        public double avargateTickTime;
         public int tick;
         public int tickDelay;
         public float stepMult;
@@ -46,7 +46,7 @@ namespace Ogar_CSharp
             ticker.Add(OnTick);
             gamemode = new FFA(this);
             CreateWorld();
-            SetSettings(settings);
+            SetSettings(settings);           
         }
         public void SetSettings(Settings settings)
         {
@@ -61,7 +61,7 @@ namespace Ogar_CSharp
                 return false;
             Console.WriteLine("Starting");
             //GameMode.setGaMEMODE(SERVER SETTINGS GAMEMODE);
-            startTime = DateTime.Now;
+            startTime = DateTimeOffset.Now;
             avargateTickTime = tick = 0;
             running = true;
             listener.Open();
@@ -84,7 +84,6 @@ namespace Ogar_CSharp
             //foreach router = close
             //gamemode stop handle
             listener.Close();
-            startTime = null;
             avargateTickTime = tick = 0;
             running = false;
             Console.WriteLine("Ticker stop");
@@ -135,6 +134,7 @@ namespace Ogar_CSharp
             Console.WriteLine($"removed a player with id {id}");
             return true;
         }
+        Stopwatch timer = Stopwatch.StartNew();
         public void OnTick()
         {
             stopWatch.Start();
@@ -144,7 +144,7 @@ namespace Ogar_CSharp
             listener.Update();
             matchMaker.Update();
             gamemode.OnHandleTick();
-            avargateTickTime = stopWatch.ElapsedMilliseconds;
+            avargateTickTime = stopWatch.Elapsed.TotalMilliseconds;
             stopWatch.Reset();
         }
     }

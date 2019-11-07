@@ -11,7 +11,7 @@ namespace Ogar_CSharp
             Old,
             New
         }
-        public int listeningPort = 444;
+        public int listeningPort = 443;
         public int listenerMaxConnections = 100;
         public int listenerMaxClientDormancy = 1000 * 60;
         public List<string> listenerAcceptedOrigins = new List<string>();
@@ -76,7 +76,7 @@ namespace Ogar_CSharp
         public short MaxNameLength = 16;
         public bool playerAllowSkinInName = true;
         public int playerMinSize = 32;
-        public int playerSpawnSize = 122;
+        public int playerSpawnSize = 32;
         public int playerMaxSize = 1500;
         public int playerMinSplitSize = 60;
         public int playerMinEjectSize = 60;

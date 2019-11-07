@@ -3,6 +3,7 @@ using Ogar_CSharp.Worlds;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Ogar_CSharp.Sockets
 {
@@ -60,6 +61,17 @@ namespace Ogar_CSharp.Sockets
             else
                 name = spawningName;
             string skin = null;
+            if (Settings.playerAllowSkinInName)
+            {
+                Console.WriteLine(name);
+                var regex = new Regex(@"\{(.*)\}(.*)");
+                var split = regex.Split(name, 2);
+                if(split != null && split.Length != 0)
+                {
+                    name = split[2];
+                    skin = split[1];
+                }
+            }
             listener.handle.gamemode.OnPlayerSpawnRequest(Player, name, skin);
         }
         public virtual void OnSpectateRequest()

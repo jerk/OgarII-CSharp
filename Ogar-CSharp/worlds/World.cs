@@ -19,8 +19,8 @@ namespace Ogar_CSharp.Worlds
             public int spectating;
             public string name = "";
             public string gamemode = "";
-            public long uptime;
-            public float loadTime;
+            public double uptime;
+            public double loadTime;
         }
         public int id;
         public ServerHandle handle;
@@ -34,7 +34,7 @@ namespace Ogar_CSharp.Worlds
         public List<PlayerCell> playerCells = new List<PlayerCell>();
         public List<Player> players = new List<Player>();
         public Player largestPlayer;
-        public List<Player> leaderboard = new List<Player>();
+        public List<Player> leaderboard = new List<Player>(10);
         //public chatchannel worldchat
         public Rect border;
         public WorldStats stats;
@@ -659,7 +659,7 @@ namespace Ogar_CSharp.Worlds
             this.stats.name = Settings.serverName;
             this.stats.gamemode = this.handle.gamemode.Name;
             this.stats.loadTime = this.handle.avargateTickTime / this.handle.stepMult;
-            this.stats.uptime = (long)Math.Floor((double)((DateTime.Now.Ticks - this.handle.startTime.Value.Ticks) / 1000));
+            this.stats.uptime = Math.Floor((double)((DateTimeOffset.Now.ToUnixTimeMilliseconds() - this.handle.startTime.ToUnixTimeMilliseconds()) / 1000));
         }
             
     }

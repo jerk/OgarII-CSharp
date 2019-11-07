@@ -36,7 +36,8 @@ namespace Ogar_CSharp.Gamemodes
         }
         public override void CompileLeaderboard(World world)
         {
-            world.leaderboard = world.players.Where(x => !float.IsNaN(x.score)).OrderBy(x => x.score).ToList();
+            world.leaderboard.Clear();
+            world.leaderboard.AddRange(world.players.Where(x => !float.IsNaN(x.score)).OrderByDescending(x => x.score).Take(10));
         }
         public override void SendLeaderboard(Connection connection)
         {
@@ -49,9 +50,9 @@ namespace Ogar_CSharp.Gamemodes
                 return;
             var leaderboard = player.world.leaderboard;
             short index = 0;
-            var data = leaderboard.Select((x) => GetLeaderboardData(x, player, index++)).Cast<LeaderBoardEntry>().ToList();
-            var selfData = float.IsNaN(player.score) ? null : data[leaderboard.IndexOf(player)];
-            connection.protocol.OnLeaderboardUpdate(LeaderboardType.FFA, data, selfData);
+            var data = leaderboard.Select((x) => GetLeaderboardData(x, player, index++));
+            var selfData = data.FirstOrDefault(x => x.highlighted);
+            connection.protocol.OnLeaderboardUpdate(LeaderboardType.FFA, data.Cast<LeaderBoardEntry>(), selfData);
         }
     }
 }

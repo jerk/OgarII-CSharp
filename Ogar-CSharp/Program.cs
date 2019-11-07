@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+using System.IO;
 
 namespace Ogar_CSharp
 {
@@ -6,7 +8,12 @@ namespace Ogar_CSharp
     {
         static void Main(string[] args)
         {
-            var handle = new ServerHandle(new Settings());
+            Settings settings;
+            if (!File.Exists("settings.json"))
+                File.WriteAllText("settings.json", JsonConvert.SerializeObject(settings = new Settings(), Formatting.Indented));
+            else
+                settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText("settings.json"));
+            var handle = new ServerHandle(settings);
             handle.Start();
             Console.ReadKey();
         }
