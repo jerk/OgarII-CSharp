@@ -22,7 +22,7 @@ namespace Ogar_CSharp.Bots
             else
                 target = null;
             Player.UpdateVisibleCells();
-            if (Player.state == PlayerState.Idle)
+            if (Player.currentState == PlayerState.Idle)
             {
                 var names = listener.Settings.worldPlayerBotNames;
                 var skins = listener.Settings.worldPlayerBotSkins;

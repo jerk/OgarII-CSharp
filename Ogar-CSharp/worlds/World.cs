@@ -306,7 +306,7 @@ namespace Ogar_CSharp.Worlds
                     i--; l--; 
                     continue; 
                 }
-                if (player.state == PlayerState.Spectating && this.largestPlayer == null)
+                if (player.currentState == PlayerState.Spectating && this.largestPlayer == null)
                     player.UpdateState(PlayerState.Roaming);
                 var router = player.router;
                 for (int j = 0, k = this.Settings.playerSplitCap; j < k && router.splitAttempts > 0; j++)
@@ -646,9 +646,9 @@ namespace Ogar_CSharp.Worlds
                     continue; 
                 }
                 external++;
-                if (player.state == 0) 
+                if (player.currentState == 0) 
                     playing++;
-                else if (player.state == PlayerState.Spectating || player.state == PlayerState.Roaming)
+                else if (player.currentState == PlayerState.Spectating || player.currentState == PlayerState.Roaming)
                     spectating++;
             }
             this.stats.limit = Settings.listenerMaxConnections - this.handle.listener.connections.Count + external;

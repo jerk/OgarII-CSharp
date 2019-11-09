@@ -100,8 +100,8 @@ namespace Ogar_CSharp.Sockets
                     protocol.OnSocketMessage(new Reader(bytes, 0));
                 else
                 {
-                    protocol = new LegacyProtocol(this);
-                    if (!protocol.Distinguishes(new Reader(bytes, 0)))
+                    protocol = ProtocolStore.Decide(this, new Reader(bytes, 0));
+                    if (protocol == null)
                     {
                         CloseSocket(1003, "Ambiguous protocol");
                         return;
@@ -161,7 +161,7 @@ namespace Ogar_CSharp.Sockets
                     eat.Add(item1.Value);
                 del.Add(item1.Value);
             }
-            if (player.state == PlayerState.Spectating || player.state == PlayerState.Roaming)
+            if (player.currentState == PlayerState.Spectating || player.currentState == PlayerState.Roaming)
                 protocol.OnSpectatePosition(player.viewArea);
             if (Handle.tick % 4 == 0)
                 Handle.gamemode.SendLeaderboard(this);

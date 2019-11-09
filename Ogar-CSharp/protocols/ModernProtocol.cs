@@ -12,7 +12,7 @@ namespace Ogar_CSharp.Protocols
     public class ModernProtocol : Protocol
     {
         readonly byte[] pingReturn = new byte[1] { 2 };
-        public uint? protocol;
+        public uint protocolVersion;
         public bool gotProtocol;
         public LeaderBoardEntry leaderboardSelfData;
         public IEnumerable<LeaderBoardEntry> leaderboardData;
@@ -21,7 +21,7 @@ namespace Ogar_CSharp.Protocols
         public Rect? worldBorderPending;
         public ViewArea? spectateAreaPending;
         public bool serverInfoPending, worldStatsPending, clearCellsPending, leaderboardPending;
-        public ModernProtocol(Connection connection) : base(connection)
+        private ModernProtocol(Connection connection) : base(connection)
         {
 
         }
@@ -32,30 +32,29 @@ namespace Ogar_CSharp.Protocols
             get
             {
                 var str = "//";
-                if(protocol != null)
+                if(gotProtocol)
                 {
-                    str = "00" + protocol.Value;
+                    str = "00" + protocolVersion;
                     str = str[0..^2];
                 }
                 return str;
             }
         }
-        public override bool Distinguishes(Reader reader)
+
+        internal static Protocol Decider(Reader reader, Connection connection)
         {
             if (reader.length < 5)
-                return false;
-            var val = reader.ReadByte();
+                return null;
+            var val = reader.Read<byte>();
             if (val != 1)
-                return false;
-            gotProtocol = true;
-            Console.WriteLine("protocol "  + (protocol = reader.ReadUInt()));
-            if (protocol != 3)
+                return null;
+            uint ver = reader.Read<uint>();
+            if (ver != 3)
             {
-                Fail(1003, "Unsupported protocol version");
-                return false;
+                connection.CloseSocket(1003, "Unsupported protocol version");
+                return null;
             }
-            connection.CreatePlayer();
-            return true;
+            return new ModernProtocol(connection) { gotProtocol = true, protocolVersion = ver };
         }
         public override void OnSpectatePosition(ViewArea area)
         {

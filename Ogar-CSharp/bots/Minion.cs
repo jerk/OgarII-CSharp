@@ -23,7 +23,7 @@ namespace Ogar_CSharp.Bots
         }
         public override void Update()
         {
-            if (Player.state == PlayerState.Idle && following.Player.state == PlayerState.Alive)
+            if (Player.currentState == PlayerState.Idle && following.Player.currentState == PlayerState.Alive)
             {
                 spawningName = ((listener.Settings.minionName == "*") ? $"*{following.Player.leaderBoardName}" : listener.Settings.minionName);
                 OnSpawnRequest();

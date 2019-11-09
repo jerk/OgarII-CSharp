@@ -10,22 +10,20 @@ namespace Ogar_CSharp.Protocols
 {
     public class ProtocolStore
     {
-        /*public void Register(params Type[] protocols)
+        public delegate Protocol Decider(Reader reader, Connection connection);
+        public static void RegisterProtocols(params Decider[] deciders)
         {
-            foreach(var protocol in protocols)
-            {
-                if (deciders.ContainsKey(protocol))
-                    continue;
-                deciders.Add(protocol, GetActivator<Protocol>(protocol.GetConstructor(new Type[] { typeof(Connection) })));
-            }
-        }*/
-        public Protocol Decide(Connection connection, Reader reader)
+            currentDeciders.AddRange(deciders);
+        }
+        private static List<Decider> currentDeciders = new List<Decider>() { LegacyProtocol.Decider, ModernProtocol.Decider };
+        public static Protocol Decide(Connection connection, Reader reader)
         {
-
-            var generated = new LegacyProtocol(connection);
-            if (generated.Distinguishes(reader))
+            foreach (var decider in currentDeciders)
             {
-                return generated;
+                Protocol protocol = decider(reader, connection);
+                reader.offset = 0;
+                if(protocol != null)
+                    return protocol;
             }
             return null;
         }

@@ -24,12 +24,12 @@ namespace Ogar_CSharp.Protocols
     public class LegacyProtocol : Protocol
     {
         public bool gotProtocol = false;
-        public uint? protocol;
+        public uint protocolVersion;
         public bool gotKey = false;
         public uint? Key;
         public LeaderboardType? LastleaderboardType;
         public bool hasProcessedQ;
-        public LegacyProtocol(Connection connection) : base(connection) { }
+        private LegacyProtocol(Connection connection) : base(connection) { }
         public override string Type => "legacy";
 
         public override string SubType
@@ -37,27 +37,19 @@ namespace Ogar_CSharp.Protocols
             get
             {
                 var str = "//";
-                if (protocol != null)
-                    str = ("00" + protocol.Value)[0..^2];
+                if (gotProtocol)
+                    str = ("00" + protocolVersion)[0..^2];
                 return str;
             }
         }
-        public override bool Distinguishes(Reader reader)
+        internal static Protocol Decider(Reader reader, Connection connection)
         {
-            if (reader.length < 5) 
-                return false;
-            if (reader.Read<byte>() != 254) 
-                return false;
-            this.gotProtocol = true;
-            this.protocol = reader.Read<uint>();
-            if (this.protocol < 4)
-            {
-                this.protocol = 4;
-                Console.WriteLine($"legacy protocol: got version {this.protocol}, which is lower than 4");
-            }
-            return true;
+            if (reader.length < 5)
+                return null;
+            if (reader.Read<byte>() != 254)
+                return null;
+            return new LegacyProtocol(connection) { gotProtocol = true, protocolVersion = reader.Read<uint>() };
         }
-
         public override void OnLeaderboardUpdate(LeaderboardType type, IEnumerable<LeaderBoardEntry> data, LeaderBoardEntry selfData)
         {
             this.LastleaderboardType = type;
@@ -65,13 +57,13 @@ namespace Ogar_CSharp.Protocols
             switch (type)
             {
                 case LeaderboardType.FFA: 
-                    FFALeaderboard(writer, data.Cast<FFALeaderboardEntry>().ToList(), (FFALeaderboardEntry)selfData, (uint)protocol); 
+                    FFALeaderboard(writer, data.Cast<FFALeaderboardEntry>().ToList(), (FFALeaderboardEntry)selfData, protocolVersion); 
                     break;
                 case LeaderboardType.Pie: 
-                    PieLeaderboard(writer, data.Cast<PieLeaderboardEntry>().ToList(), (PieLeaderboardEntry)selfData, (uint)protocol); 
+                    PieLeaderboard(writer, data.Cast<PieLeaderboardEntry>().ToList(), (PieLeaderboardEntry)selfData, protocolVersion); 
                     break;
                 case LeaderboardType.Text: 
-                    TextBoard(writer, data.Cast<TextLeaderBoardEntry>().ToList(), (uint)protocol);
+                    TextBoard(writer, data.Cast<TextLeaderBoardEntry>().ToList(), protocolVersion);
                     break;
             }
             this.Send(writer.RawBuffer);
@@ -88,7 +80,7 @@ namespace Ogar_CSharp.Protocols
             if (includeServerInfo)
             {
                 writer.WriteUInt(Handle.gamemode.Type);
-                WriteZTString(writer, $"OgarII-CSharp {Handle.Version}", (uint)protocol);
+                WriteZTString(writer, $"OgarII-CSharp {Handle.Version}", protocolVersion);
             }
             this.Send(writer.RawBuffer);
         }
@@ -108,7 +100,7 @@ namespace Ogar_CSharp.Protocols
             switch (messageId)
             {
                 case 0:
-                    connection.spawningName = ReadZTString(reader, protocol.Value);
+                    connection.spawningName = ReadZTString(reader, protocolVersion);
                     break;
                 case 1:
                     this.connection.requestingSpectate = true;
@@ -174,7 +166,7 @@ namespace Ogar_CSharp.Protocols
                         return;
                     }
                     reader.Skip(skipLen);
-                    var message = ReadZTString(reader, this.protocol.Value);
+                    var message = ReadZTString(reader, protocolVersion);
                     this.connection.OnChatMessage(message);
                     break;
                 case 254:
@@ -213,16 +205,16 @@ namespace Ogar_CSharp.Protocols
             }
             foreach (var item in add)
             {
-                WriteCellData(writer, source, this.protocol.Value, item,
+                WriteCellData(writer, source, protocolVersion, item,
                     true, true, true, true, true, true);
             }
             foreach (var item in upd)
             {
-                WriteCellData(writer, source, this.protocol.Value, item,
+                WriteCellData(writer, source, protocolVersion, item,
                     false, item.sizeChanged, item.posChanged, item.colorChanged, item.nameChanged, item.skinChanged);
             }
             writer.WriteUInt(0);
-            if (protocol.Value < 6)
+            if (protocolVersion < 6)
                 writer.WriteUInt((uint)del.Count());
             else
                 writer.WriteUShort((ushort)del.Count());
@@ -261,7 +253,7 @@ namespace Ogar_CSharp.Protocols
                 };
                 Task.Run(() =>
                 {
-                    WriteZTString(writer, Newtonsoft.Json.JsonConvert.SerializeObject(legacy), (uint)protocol);
+                    WriteZTString(writer, Newtonsoft.Json.JsonConvert.SerializeObject(legacy), protocolVersion);
                     Send(writer.RawBuffer);
                     isCompilingStats = false;
                 });

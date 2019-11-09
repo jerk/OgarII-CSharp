@@ -63,10 +63,9 @@ namespace Ogar_CSharp.Sockets
             string skin = null;
             if (Settings.playerAllowSkinInName)
             {
-                Console.WriteLine(name);
                 var regex = new Regex(@"\{(.*)\}(.*)");
-                var split = regex.Split(name, 2);
-                if(split != null && split.Length != 0)
+                var split = regex.Split(name);
+                if(split != null && split.Length > 2)
                 {
                     name = split[2];
                     skin = split[1];

@@ -25,7 +25,7 @@ namespace Ogar_CSharp.Worlds
         public string cellSkin;
         public int cellColor = 0x7F7F7F;
         public int chatColor = 0x7F7F7F;
-        public PlayerState state = PlayerState.Idle;
+        public PlayerState currentState = PlayerState.Idle;
         public bool hasWorld;
         public World world;
         public string team; //CHANGE THIS WHEN POSSIBLE!!
@@ -52,24 +52,24 @@ namespace Ogar_CSharp.Worlds
         public void UpdateState(PlayerState targetState)
         {
             if (world == null)
-                this.state = PlayerState.Idle;
+                currentState = PlayerState.Idle;
             else if (ownedCells.Count > 0)
-                this.state = PlayerState.Alive;
+                currentState = PlayerState.Alive;
             else if (targetState == PlayerState.Idle)
-                this.state = PlayerState.Idle;
-            else if (this.world.largestPlayer == null)
-                this.state = PlayerState.Roaming;
-            else if (this.state == PlayerState.Spectating && targetState == PlayerState.Roaming)
-                this.state = PlayerState.Roaming;
+                currentState = PlayerState.Idle;
+            else if (world.largestPlayer == null)
+                currentState = PlayerState.Roaming;
+            else if (currentState == PlayerState.Spectating && targetState == PlayerState.Roaming)
+                currentState = PlayerState.Roaming;
             else
-                this.state = PlayerState.Spectating;
+                currentState = PlayerState.Spectating;
         }
         public void UpdateViewArea()
         {
             if (world == null)
                 return;
             float s;
-            switch (state)
+            switch (currentState)
             {
                 case PlayerState.Idle:
                     this.score = float.NaN;
@@ -108,8 +108,8 @@ namespace Ogar_CSharp.Worlds
                     float dy = this.router.mouseY - this.viewArea.y;
                     float d = (float)Math.Sqrt(dx * dx + dy * dy);
                     float D = (float)Math.Min(d, Settings.playerRoamSpeed);
-                    if (D < 1) break; 
-                    dx /= d; 
+                    if (D < 1) break;
+                    dx /= d;
                     dy /= d;
                     var border = this.world.border;
                     viewArea.x = Math.Max(border.x - border.w, Math.Min(this.viewArea.x + dx * D, border.x + border.w));
@@ -124,40 +124,29 @@ namespace Ogar_CSharp.Worlds
         {
             if (isVisible)
             {
-                if (!visibleCells.ContainsKey(cell.id))
-                    visibleCells.Add(cell.id, cell);
-                else
-                    visibleCells[cell.id] = cell;
+                visibleCells[cell.id] = cell;
             }
             else
             {
-                if (!lastVisibleCells.ContainsKey(cell.id))
-                    lastVisibleCells.Add(cell.id, cell);
-                else
-                    lastVisibleCells[cell.id] = cell;
+                lastVisibleCells[cell.id] = cell;
             }
         }
         public void UpdateVisibleCells()
         {
             if (world == null)
                 return;
-            lastVisibleCells.Clear();
             lastVisibleCells = visibleCells;
-            visibleCells = new Dictionary<int, Cell>();
-            foreach(var cell in ownedCells)
-            {
+            visibleCells = new Dictionary<int, Cell>(500); //have an initial capacity for better perfomance.
+            foreach (var cell in ownedCells)
                 UpdateCell(cell, true);
-            }
-            this.world.finder.Search(new Rect(viewArea.x, viewArea.y, viewArea.w, viewArea.h), (cell) =>
-            {
-                UpdateCell(cell, true);
-            });
+            world.finder.Search(new Rect(viewArea.x, viewArea.y, viewArea.w, viewArea.h), 
+                (cell) => visibleCells[cell.id] = cell);
         }
         public void CheckExistence()
         {
             if (!router.disconnected)
                 return;
-            if(state != PlayerState.Alive)
+            if(currentState != PlayerState.Alive)
             {
                 handle.RemovePlayer(id);
                 return;

@@ -19,8 +19,6 @@ namespace Ogar_CSharp.Protocols
         public ServerHandle Handle => connection.listener.handle;
         //logger() { return this.connection.listener.handle.logger; }
         public Settings Settings => connection.listener.handle.Settings;
-
-        public abstract bool Distinguishes(Reader reader);
         public abstract void OnSocketMessage(Reader reader);
         //public abstract void OnChatMessage(ChatSource source, string message);
         public abstract void OnNewOwnedCell(PlayerCell cell);
