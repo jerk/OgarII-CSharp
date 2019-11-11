@@ -6,6 +6,7 @@ using Ogar_CSharp.Other;
 using Ogar_CSharp.Sockets;
 using Ogar_CSharp.Worlds;
 using System.Linq;
+using System.Drawing;
 
 namespace Ogar_CSharp.Protocols
 {
@@ -18,7 +19,7 @@ namespace Ogar_CSharp.Protocols
         public IEnumerable<LeaderBoardEntry> leaderboardData;
         public LeaderboardType? leaderboardType;
         public Queue<(ChatChannel.ChatSource source, string message)> chatPending = new Queue<(ChatChannel.ChatSource source, string message)>();
-        public Rect? worldBorderPending;
+        public RectangleF? worldBorderPending;
         public ViewArea? spectateAreaPending;
         public bool serverInfoPending, worldStatsPending, clearCellsPending, leaderboardPending;
         private ModernProtocol(Connection connection) : base(connection)
@@ -129,7 +130,7 @@ namespace Ogar_CSharp.Protocols
         {
             //Ignored
         }
-        public override void OnNewWorldBounds(Rect range, bool includeServerInfo)
+        public override void OnNewWorldBounds(RectangleF range, bool includeServerInfo)
         {
             worldBorderPending = range;
             serverInfoPending = includeServerInfo;
@@ -177,10 +178,10 @@ namespace Ogar_CSharp.Protocols
             if(worldBorderPending != null)
             {
                 var item = worldBorderPending.Value;
-                writer.WriteFloat(item.x - item.w);
-                writer.WriteFloat(item.x + item.w);
-                writer.WriteFloat(item.y - item.h);
-                writer.WriteFloat(item.y + item.h);
+                writer.WriteFloat(item.X - item.Width);
+                writer.WriteFloat(item.X + item.Width);
+                writer.WriteFloat(item.Y - item.Height);
+                writer.WriteFloat(item.Y + item.Height);
                 worldBorderPending = null;
             }
             if (serverInfoPending)

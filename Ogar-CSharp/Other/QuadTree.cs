@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ogar_CSharp
 {
@@ -8,7 +10,7 @@ namespace Ogar_CSharp
     {
         public T Item { get; protected set; }
         public QuadTree<T> __root;
-        public Rect range;
+        public RectangleF range;
     }
     public class QuadTree<T>
     {
@@ -16,26 +18,26 @@ namespace Ogar_CSharp
         public int level;
         public int maxLevel;
         public int maxItems;
-        public Rect range;
-        public List<QuadItem<T>> items = new List<QuadItem<T>>();
+        public RectangleF range;
+        public List<QuadItem<T>> items;
         public readonly QuadTree<T>[] branches = new QuadTree<T>[4];
         public bool hasSplit = false;
-        public QuadTree(Rect range, int maxLevel, int maxItems, QuadTree<T> root)
+        public QuadTree(RectangleF range, int maxLevel, int maxItems, QuadTree<T> root)
         {
             this.root = root;
             this.level = root != null ? root.level + 1 : 1;
             this.maxLevel = maxLevel;
             this.maxItems = maxItems;
             this.range = range;
+            items = new List<QuadItem<T>>(this.maxItems);
         }
         public void Destroy()
         {
             for (int i = 0, l = this.items.Count; i < l; i++)
                 this.items[i].__root = null;
-            if (!this.hasSplit)
-                return;
-            for (int i = 0; i < 4; i++) 
-                this.branches[i].Destroy();
+            if (this.hasSplit)
+                for (int i = 0; i < 4; i++)
+                    this.branches[i].Destroy();
         }
         public void Insert(QuadItem<T> item)
         {
@@ -68,7 +70,8 @@ namespace Ogar_CSharp
             }
             while (true)
             {
-                if (!newQuad.hasSplit) break;
+                if (!newQuad.hasSplit) 
+                    break;
                 var quadrant = newQuad.GetQuadrant(item.range);
                 if (quadrant == -1) 
                     break;
@@ -115,14 +118,14 @@ namespace Ogar_CSharp
             if (hasSplit || level > maxLevel || items.Count < maxItems)
                 return;
             hasSplit = true;
-            var x = range.x;
-            var y = range.y;
-            var hw = range.w / 2;
-            var hh = range.h / 2;
-            branches[0] = new QuadTree<T>(new Rect(x - hw, y - hh, hw, hh), maxLevel, maxItems, this);
-            branches[1] = new QuadTree<T>(new Rect(x + hw, y - hh, hw, hh), maxLevel, maxItems, this);
-            branches[2] = new QuadTree<T>(new Rect(x - hw, y + hh, hw, hh), maxLevel, maxItems, this);
-            branches[3] = new QuadTree<T>(new Rect(x + hw, y + hh, hw, hh), maxLevel, maxItems, this);
+            var x = range.X;
+            var y = range.Y;
+            var hw = range.Width / 2;
+            var hh = range.Height / 2;
+            branches[0] = new QuadTree<T>(new RectangleF(x - hw, y - hh, hw, hh), maxLevel, maxItems, this);
+            branches[1] = new QuadTree<T>(new RectangleF(x + hw, y - hh, hw, hh), maxLevel, maxItems, this);
+            branches[2] = new QuadTree<T>(new RectangleF(x - hw, y + hh, hw, hh), maxLevel, maxItems, this);
+            branches[3] = new QuadTree<T>(new RectangleF(x + hw, y + hh, hw, hh), maxLevel, maxItems, this);
             for (int i = 0, l = this.items.Count, quadrant; i < l; i++)
             {
                 quadrant = this.GetQuadrant(this.items[i].range);
@@ -134,7 +137,7 @@ namespace Ogar_CSharp
                 l--;
             }
         }
-        public int GetQuadrant(Rect a)
+        public int GetQuadrant(RectangleF a)
         {
             var quad = Misc.GetQuadFullIntersect(a, this.range);
             if (quad.t)
@@ -153,11 +156,11 @@ namespace Ogar_CSharp
             }
             return -1;
         }
-        public void Search(Rect range, Action<T> callback)
+        public void Search(RectangleF range, Action<T> callback)
         {
             QuadItem<T> item;
-            for (int i = 0, l = this.items.Count; i < l; i++)
-                if (Misc.Intersects(range, (item = this.items[i]).range)) 
+            for (int i = 0, l = items.Count; i < l; i++)
+                if (Misc.Intersects(range, (item = this.items[i]).range))
                     callback(item.Item);
             if (!hasSplit)
                 return;
@@ -171,13 +174,13 @@ namespace Ogar_CSharp
             }
             if (quad.b)
             {
-                if (quad.l) 
-                    this.branches[2].Search(range, callback);
-                if (quad.r) 
-                    this.branches[3].Search(range, callback);
+                if (quad.l)
+                    branches[2].Search(range, callback);
+                if (quad.r)
+                    branches[3].Search(range, callback);
             }
         }
-        public bool ContainsAny(Rect range, Func<T, bool> selector)
+        public bool ContainsAny(RectangleF range, Func<T, bool> selector)
         {
             QuadItem<T> item;
             for (int i = 0, l = this.items.Count; i < l; i++)

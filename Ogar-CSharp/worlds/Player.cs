@@ -1,8 +1,12 @@
 ﻿using Ogar_CSharp.Cells;
 using Ogar_CSharp.Sockets;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ogar_CSharp.Worlds
 {
@@ -31,8 +35,8 @@ namespace Ogar_CSharp.Worlds
         public string team; //CHANGE THIS WHEN POSSIBLE!!
         public float score = float.NaN;
         public List<PlayerCell> ownedCells = new List<PlayerCell>();
-        public Dictionary<int, Cell> visibleCells = new Dictionary<int, Cell>();
-        public Dictionary<int, Cell> lastVisibleCells = new Dictionary<int, Cell>();
+        public Dictionary<int, Cell> visibleCells = new Dictionary<int, Cell>(150);
+        public Dictionary<int, Cell> lastVisibleCells = new Dictionary<int, Cell>(150);
         public ViewArea viewArea;
         public Settings Settings => handle.Settings;
         public Player(ServerHandle handle, int id, Router router)
@@ -112,8 +116,8 @@ namespace Ogar_CSharp.Worlds
                     dx /= d;
                     dy /= d;
                     var border = this.world.border;
-                    viewArea.x = Math.Max(border.x - border.w, Math.Min(this.viewArea.x + dx * D, border.x + border.w));
-                    viewArea.y = Math.Max(border.y - border.h, Math.Min(this.viewArea.y + dy * D, border.y + border.h));
+                    viewArea.x = Math.Max(border.X - border.Width, Math.Min(this.viewArea.x + dx * D, border.X + border.Width));
+                    viewArea.y = Math.Max(border.Y - border.Height, Math.Min(this.viewArea.y + dy * D, border.Y + border.Height));
                     s = this.viewArea.s = Settings.playerRoamViewScale;
                     this.viewArea.w = 1920 / s / 2 * Settings.playerViewScaleMult;
                     this.viewArea.h = 1080 / s / 2 * Settings.playerViewScaleMult;
@@ -136,11 +140,14 @@ namespace Ogar_CSharp.Worlds
             if (world == null)
                 return;
             lastVisibleCells = visibleCells;
-            visibleCells = new Dictionary<int, Cell>(500); //have an initial capacity for better perfomance.
+            visibleCells = new Dictionary<int, Cell>(150); //have an initial capacity for better perfomance.
             foreach (var cell in ownedCells)
                 UpdateCell(cell, true);
-            world.finder.Search(new Rect(viewArea.x, viewArea.y, viewArea.w, viewArea.h), 
-                (cell) => visibleCells[cell.id] = cell);
+            world.finder.Search(new RectangleF(viewArea.x, viewArea.y, viewArea.w, viewArea.h),
+                (cell) =>
+                {
+                    visibleCells[cell.id] = cell;
+                });
         }
         public void CheckExistence()
         {

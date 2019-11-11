@@ -3,6 +3,7 @@ using Ogar_CSharp.Worlds;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ogar_CSharp.Bots
 {
@@ -15,13 +16,17 @@ namespace Ogar_CSharp.Bots
         public override bool ShouldClose => !hasPlayer
             || !Player.exists || !Player.hasWorld;
         public PlayerBot(World world) : base(world) { }
+        public override async Task PerformAsyncTick()
+        {        
+            Player.UpdateVisibleCells();
+        }
         public override void Update()
         {
             if (splitCooldownTicks > 0)
                 splitCooldownTicks--;
             else
                 target = null;
-            Player.UpdateVisibleCells();
+            //Player.UpdateVisibleCells();
             if (Player.currentState == PlayerState.Idle)
             {
                 var names = listener.Settings.worldPlayerBotNames;

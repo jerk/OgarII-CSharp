@@ -10,11 +10,18 @@
 	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>false</Optimize>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Remove="Ogar-CSharp.exe" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="LinqOptimizer.CSharp" Version="0.7.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
 

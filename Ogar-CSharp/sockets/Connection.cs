@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using Ogar_CSharp.Bots;
 using Ogar_CSharp.Cells;
 using Ogar_CSharp.Protocols;
@@ -124,6 +125,11 @@ namespace Ogar_CSharp.Sockets
                 //to implement.
             }
         }
+        public override async Task PerformAsyncTick()
+        {
+            Player.UpdateVisibleCells();
+            //Update();
+        }
         public override void Update()
         {
             if (!hasPlayer)
@@ -141,7 +147,7 @@ namespace Ogar_CSharp.Sockets
                 hasProcessedQ = false;
                 return;
             }
-            this.Player.UpdateVisibleCells();
+            //this.Player.UpdateVisibleCells();
             List<Cell> add = new List<Cell>(), upd = new List<Cell>(), eat = new List<Cell>(), del = new List<Cell>();
             var player = this.Player;
             var visible = player.visibleCells;

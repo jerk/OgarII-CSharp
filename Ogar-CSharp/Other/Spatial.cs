@@ -4,20 +4,6 @@ using System.Text;
 
 namespace Ogar_CSharp
 {
-    public struct Rect
-    {
-        public Rect(float x, float y, float w, float h)
-        {
-            this.x = x;
-            this.y = y;
-            this.w = w;
-            this.h = h;
-        }
-        public float x;
-        public float y;
-        public float w;
-        public float h;
-    }
     public struct Point
     {
         public Point(float x, float y)

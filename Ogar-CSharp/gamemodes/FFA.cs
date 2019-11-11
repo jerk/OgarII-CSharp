@@ -32,7 +32,7 @@ namespace Ogar_CSharp.Gamemodes
             player.cellName = player.chatName = player.leaderBoardName = name ?? "";
             player.cellSkin = skin ?? "";
             player.chatColor = player.cellColor = color;
-            player.world.SpawnPlayer(player, new Point(spawnInfo.x, spawnInfo.y), size); // has two more arguments using 'name' and 'null'
+            player.world.SpawnPlayer(player, spawnInfo.pos, size); // has two more arguments using 'name' and 'null'
         }
         public override void CompileLeaderboard(World world)
         {

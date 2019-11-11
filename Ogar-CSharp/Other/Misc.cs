@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
+using System.Threading.Tasks;
+
 namespace Ogar_CSharp
 {
     public struct Boost
@@ -54,36 +57,36 @@ namespace Ogar_CSharp
                 if (numbers[i] == double.NaN || double.IsInfinity(numbers[i]) || numbers[i] < 0)
                     throw new Exception($"Bad or negative number ({numbers[i]}, index {i}");
         }
-        public static bool Intersects(Rect a, Rect b)
+        public static bool Intersects(RectangleF a, RectangleF b)
         {
-            return a.x - a.w <= b.x + b.w &&
-            a.x + a.w >= b.x - b.w &&
-            a.y - a.h <= b.y + b.h &&
-            a.y + a.h >= b.y - b.h;
+            return a.X - a.Width <= b.X + b.Width &&
+            a.X + a.Width >= b.X - b.Width &&
+            a.Y - a.Height <= b.Y + b.Height &&
+            a.Y + a.Height >= b.Y - b.Height;
         }
-        public static bool FullyIntersects(Rect a, Rect b)
+        public static bool FullyIntersects(RectangleF a, RectangleF b)
         {
-            return a.x - a.w >= b.x + b.w &&
-               a.x + a.w <= b.x - b.w &&
-               a.y - a.h >= b.y + b.h &&
-               a.y + a.h <= b.y - b.h;
+            return a.X - a.Width >= b.X + b.Width &&
+               a.X + a.Width <= b.X - b.Width &&
+               a.Y - a.Height >= b.Y + b.Height &&
+               a.Y + a.Height <= b.Y - b.Height;
         }
-        public static (bool t, bool b, bool l, bool r) GetQuadFullIntersect(Rect a, Rect b) 
+        public static (bool t, bool b, bool l, bool r) GetQuadFullIntersect(RectangleF a, RectangleF b) 
         {
             return (
-                t: a.y - a.h < b.y && a.y + a.h < b.y,
-                b: a.y - a.h > b.y && a.y + a.h > b.y,
-                l: a.x - a.w < b.x && a.x + a.w < b.x,
-                r: a.x - a.w > b.x && a.x + a.w > b.x
+                t: a.Y - a.Height < b.Y && a.Y + a.Height < b.Y,
+                b: a.Y - a.Height > b.Y && a.Y + a.Height > b.Y,
+                l: a.X - a.Width < b.X && a.X + a.Width < b.X,
+                r: a.X - a.Width > b.X && a.X + a.Width > b.X
                 );
         }
-        public static (bool t, bool b, bool l, bool r) GetQuadIntersect(Rect a, Rect b)
+        public static (bool t, bool b, bool l, bool r) GetQuadIntersect(RectangleF a, RectangleF b)
         {
             return (
-                t: a.y - a.h < b.y || a.y + a.h < b.y,
-                b: a.y - a.h > b.y || a.y + a.h > b.y,
-                l: a.x - a.w < b.x || a.x + a.w < b.x,
-                r: a.x - a.w > b.x || a.x + a.w > b.x
+                t: a.Y - a.Height < b.Y || a.Y + a.Height < b.Y,
+                b: a.Y - a.Height > b.Y || a.Y + a.Height > b.Y,
+                l: a.X - a.Width < b.X || a.X + a.Width < b.X,
+                r: a.X - a.Width > b.X || a.X + a.Width > b.X
             );
         }
     }

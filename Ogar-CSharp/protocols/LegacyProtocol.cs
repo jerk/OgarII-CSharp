@@ -7,6 +7,7 @@ using Ogar_CSharp.Sockets;
 using System.Linq;
 using Ogar_CSharp.Worlds;
 using System.Threading.Tasks;
+using System.Drawing;
 
 namespace Ogar_CSharp.Protocols
 {
@@ -73,10 +74,10 @@ namespace Ogar_CSharp.Protocols
             => Send(new Writer() { (byte)32, (uint)cell.id }.RawBuffer);
    
 
-        public override void OnNewWorldBounds(Rect range, bool includeServerInfo)
+        public override void OnNewWorldBounds(RectangleF range, bool includeServerInfo)
         {
             var writer = new Writer() 
-            { (byte)64, (double)(range.x - range.w), (double)(range.y - range.h), (double)(range.x + range.w), (double)(range.y + range.h) };
+            { (byte)64, (double)(range.X - range.Width), (double)(range.Y - range.Height), (double)(range.X + range.Width), (double)(range.Y + range.Height) };
             if (includeServerInfo)
             {
                 writer.WriteUInt(Handle.gamemode.Type);

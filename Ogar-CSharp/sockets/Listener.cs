@@ -136,6 +136,10 @@ namespace Ogar_CSharp.Sockets
                 if (!router.ShouldClose) continue;
                 router.Close(); i--; l--;
             }
+            Task[] awaitedTasks = new Task[l];
+            /*for (i = 0; i < l; i++)
+                this.routers[i].Player?.up();*/
+            Parallel.ForEach(routers, async (x) => await x.PerformAsyncTick()); //Perfomance
             for (i = 0; i < l; i++) 
                 this.routers[i].Update();
             for (i = 0, l = this.connections.Count; i < l; i++)

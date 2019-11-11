@@ -6,6 +6,7 @@ using System.Threading;
 
 namespace Ogar_CSharp
 {
+
     public class Ticker
     {
         private HashSet<Action> callbacks = new HashSet<Action>();

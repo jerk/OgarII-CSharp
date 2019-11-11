@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Ogar_CSharp.Sockets
 {
@@ -29,6 +30,7 @@ namespace Ogar_CSharp.Sockets
             ejectTick = listener.handle.tick;
             listener.AddRouter(this);
         }
+        public virtual async Task PerformAsyncTick() { }
         public abstract bool IsExternal { get; }
         public abstract string Type { get; }
         public abstract bool SeparateInTeams { get; }
