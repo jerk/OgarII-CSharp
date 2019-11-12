@@ -301,7 +301,6 @@ namespace Ogar_CSharp.Protocols
         public static void TextBoard14(Writer writer, List<TextLeaderBoardEntry> data, uint protocol)
         {
             writer.WriteByte(53);
-            writer.WriteUInt((uint)data.Count);
             for (int i = 0, l = data.Count; i < l; i++)
             {
                 writer.WriteByte(2);
@@ -324,7 +323,8 @@ namespace Ogar_CSharp.Protocols
                 var item = data[i];
                 if (protocol == 6)
                     writer.WriteUInt((uint)(item.highlighted ? 1 : 0));
-                else writer.WriteUInt((uint)item.cellId);
+                else 
+                    writer.WriteUInt((uint)item.cellId);
                 WriteZTString(writer, item.name, protocol);
             }
         }
@@ -372,29 +372,41 @@ namespace Ogar_CSharp.Protocols
             if (includeName) writer.WriteUTF16String(cell.Name);
             else writer.WriteUShort(0);
         }
-        public static void WriteCellData11(Writer writer, Player source, uint protocol, Cell cell, bool includeType, bool includeSize, 
+        public static void WriteCellData11(Writer writer, Player source, uint protocol, Cell cell, bool includeType, bool includeSize,
             bool includePos, bool includeColor, bool includeName, bool includeSkin)
         {
             writer.WriteUInt((uint)cell.id);
-            writer.WriteUInt((uint)cell.Y);
-            writer.WriteUInt((uint)cell.Y);
+            writer.WriteInt((int)cell.X);
+            writer.WriteInt((int)cell.Y);
             writer.WriteUShort((ushort)cell.Size);
 
             byte flags = 0;
-            if (cell.IsSpiked) flags |= 0x01;
-            if (includeColor) flags |= 0x02;
-            if (includeSkin) flags |= 0x04;
-            if (includeName) flags |= 0x08;
-            if (cell.IsAgitated) flags |= 0x10;
-            if (cell.Type == 3) flags |= 0x20;
-            if (cell.Type == 3 && cell.owner != source) flags |= 0x40;
-            if (includeType && cell.Type == 1) flags |= 0x80;
+            if (cell.IsSpiked) 
+                flags |= 0x01;
+            if (includeColor) 
+                flags |= 0x02;
+            if (includeSkin) 
+                flags |= 0x04;
+            if (includeName) 
+                flags |= 0x08;
+            if (cell.IsAgitated) 
+                flags |= 0x10;
+            if (cell.Type == 3) 
+                flags |= 0x20;
+            if (cell.Type == 3 && cell.owner != source) 
+                flags |= 0x40;
+            if (includeType && cell.Type == 1) 
+                flags |= 0x80;
             writer.WriteByte(flags);
-            if (includeType && cell.Type == 1) writer.WriteByte(1);
+            if (includeType && cell.Type == 1)
+                writer.WriteByte(1);
 
-            if (includeColor) writer.WriteColor((uint)cell.Color);
-            if (includeSkin) writer.WriteUTF8String(cell.Skin);
-            if (includeName) writer.WriteUTF8String(cell.Name);
+            if (includeColor) 
+                writer.WriteColor((uint)cell.Color);
+            if (includeSkin) 
+                writer.WriteUTF8String(cell.Skin);
+            if (includeName) 
+                writer.WriteUTF8String(cell.Name);
         }
         public static void WriteCellData6(Writer writer, Player source, uint protocol, Cell cell, bool includeType, bool includeSize,
             bool includePos, bool includeColor, bool includeName, bool includeSkin)
