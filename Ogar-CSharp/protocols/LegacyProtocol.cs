@@ -192,7 +192,7 @@ namespace Ogar_CSharp.Protocols
                 WriteCellData4(writer, source, protocol, cell, includeType, includeSize, includePos, includeColor, includeName, includeSkin);
             else if (protocol <= 10)
                 WriteCellData6(writer, source, protocol, cell, includeType, includeSize, includePos, includeColor, includeName, includeSkin);
-            else if (protocol <= 21)
+            else if (protocol <= 22)
                 WriteCellData11(writer, source, protocol, cell, includeType, includeSize, includePos, includeColor, includeName, includeSkin);
         }
         public override void OnVisibleCellUpdate(IEnumerable<Cell> add, IEnumerable<Cell> upd, IEnumerable<Cell> eat, IEnumerable<Cell> del)
@@ -264,7 +264,7 @@ namespace Ogar_CSharp.Protocols
         {
             if (protocol <= 20)
                 PieLeaderboard4(writer, data, selfData, protocol);
-            else if(protocol == 21)
+            else if (protocol <= 22)
                 PieLeaderboard21(writer, data, selfData, protocol);
         }
         public static void PieLeaderboard4(Writer writer, List<PieLeaderboardEntry> data, PieLeaderboardEntry selfData, uint protocol)
@@ -288,7 +288,7 @@ namespace Ogar_CSharp.Protocols
         {
             if (protocol <= 13)
                 TextBoard4(writer, data, protocol);
-            else if (protocol <= 21)
+            else if (protocol <= 22)
                 TextBoard14(writer, data, protocol);
         }
         public static void TextBoard4(Writer writer, List<TextLeaderBoardEntry> data, uint protocol)
@@ -312,7 +312,7 @@ namespace Ogar_CSharp.Protocols
         {
             if (protocol <= 10)
                 FFALeaderBoard4(writer, data, selfdata, protocol);
-            else if (protocol <= 21)
+            else if (protocol <= 22)
                 FFALeaderBoard11(writer, data, selfdata, protocol);
         }
         public static void FFALeaderBoard4(Writer writer, List<FFALeaderboardEntry> data, FFALeaderboardEntry selfdata, uint protocol)
