@@ -32,7 +32,7 @@ namespace Ogar_CSharp.Worlds
         public PlayerState currentState = PlayerState.Idle;
         public bool hasWorld;
         public World world;
-        public string team; //CHANGE THIS WHEN POSSIBLE!!
+        public int? team;
         public float score = float.NaN;
         public List<PlayerCell> ownedCells = new List<PlayerCell>();
         public Dictionary<int, Cell> visibleCells = new Dictionary<int, Cell>(150);

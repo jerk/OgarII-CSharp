@@ -7,6 +7,7 @@ using Ogar_CSharp.Sockets;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Drawing;
+using Ogar_CSharp.Other;
 
 namespace Ogar_CSharp.Worlds
 {
@@ -28,6 +29,7 @@ namespace Ogar_CSharp.Worlds
         public ServerHandle handle;
         public bool frozen;
         public long _nextCellId = 1;
+        public readonly List<List<Player>> teams = new List<List<Player>>();
         public HashSet<Cell> cells = new HashSet<Cell>();
         public List<Cell> boostingCells = new List<Cell>();
         public int motherCellCount;
@@ -37,6 +39,7 @@ namespace Ogar_CSharp.Worlds
         public List<Player> players = new List<Player>();
         public Player largestPlayer;
         public List<Player> leaderboard = new List<Player>(10);
+        public List<PieLeaderboardEntry> teamsLeaderboard = new List<PieLeaderboardEntry>();
         //public chatchannel worldchat
         public RectangleF border;
         public WorldStats stats;
@@ -150,17 +153,17 @@ namespace Ogar_CSharp.Worlds
             player.router.OnWorldReset();
             Console.WriteLine($"player {player.id} has been removed from world {this.id}");
         }
-        public (float X, float Y) GetRandomPos(int cellSize)
+        public PointF GetRandomPos(float cellSize)
         {
             var random = new Random();
-            return ((float)(border.X - border.Width + cellSize + random.NextDouble() * (2 * this.border.Width - cellSize)),
+            return new PointF((float)(border.X - border.Width + cellSize + random.NextDouble() * (2 * this.border.Width - cellSize)),
                 (float)(border.Y - border.Height + cellSize + random.NextDouble() * (2 * border.Height - cellSize)));
         }
         public bool IsSafeSpawnPos(RectangleF range)
         {
             return !finder.ContainsAny(range, (item) => item.AvoidWhenSpawning);
         }
-        public (float X, float Y) GetSafeSpawnPos(int cellSize)
+        public PointF GetSafeSpawnPos(float cellSize)
         {
             var tries = this.Settings.worldSafeSpawnTries;
             while(--tries >= 0)
@@ -171,7 +174,7 @@ namespace Ogar_CSharp.Worlds
             }
             return GetRandomPos(cellSize);
         }
-        public (int? color, PointF pos) GetPlayerSpawn(int cellSize)
+        public (int? color, PointF pos) GetPlayerSpawn(float cellSize)
         {
             var random = new Random();
             if(Settings.worldSafeSpawnFromEjectedChange > (float)random.NextDouble() && ejectedCells.Count > 0)

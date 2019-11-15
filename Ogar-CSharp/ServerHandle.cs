@@ -18,7 +18,6 @@ namespace Ogar_CSharp
             private set;
         }
         public ProtocolStore protocols = new ProtocolStore();
-        //public game gamemodes = new gamemodelist(this);
         public Gamemode gamemode;
         //commands = new commandlist(this);
         //chatcommnds = new commandlist(this);
@@ -44,7 +43,7 @@ namespace Ogar_CSharp
             listener = new Listener(this);
             //setSettings(settings);
             ticker.Add(OnTick);
-            gamemode = new FFA(this);
+            gamemode = new Teams(this);
             CreateWorld();
             SetSettings(settings);           
         }
@@ -60,7 +59,7 @@ namespace Ogar_CSharp
             if (running)
                 return false;
             Console.WriteLine("Starting");
-            //GameMode.setGaMEMODE(SERVER SETTINGS GAMEMODE);
+            gamemode = this.GetGamemode(Settings.serverGamemode);
             startTime = DateTimeOffset.Now;
             avargateTickTime = tick = 0;
             running = true;
