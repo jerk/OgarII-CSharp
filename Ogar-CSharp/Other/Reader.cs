@@ -5,6 +5,9 @@ using System.Text.Unicode;
 
 namespace Ogar_CSharp
 {
+    /// <summary>
+    /// Used for reading data sent over the network
+    /// </summary>
     public class Reader
     {
         public readonly byte[] data;

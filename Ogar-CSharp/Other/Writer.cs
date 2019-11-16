@@ -6,6 +6,9 @@ using System.Text;
 
 namespace Ogar_CSharp
 {
+    /// <summary>
+    /// Used for writing data to send over the network
+    /// </summary>
     public class Writer : IEnumerable
     {
         private List<byte> buf = new List<byte>();

@@ -13,15 +13,15 @@ namespace Ogar_CSharp.Worlds
 {
     public class World : ISpawner
     {
-        public class WorldStats
+        public struct WorldStats
         {
             public int limit;
             public int _internal;
             public int external;
             public int playing;
             public int spectating;
-            public string name = "";
-            public string gamemode = "";
+            public string name;
+            public string gamemode;
             public double uptime;
             public double loadTime;
         }

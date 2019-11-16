@@ -8,7 +8,6 @@ using Ogar_CSharp.Other;
 
 namespace Ogar_CSharp.Gamemodes
 {
-
     public class FFA : Gamemode
     {
         public static FFALeaderboardEntry GetLeaderboardData(Player player, Player requesting, short index)

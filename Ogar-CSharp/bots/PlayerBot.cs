@@ -18,7 +18,7 @@ namespace Ogar_CSharp.Bots
         public PlayerBot(World world) : base(world) { }
         public override async Task PerformAsyncTick()
         {        
-            Player.UpdateVisibleCells();
+           Player.UpdateVisibleCells();
         }
         public override void Update()
         {

@@ -8,10 +8,7 @@ namespace Ogar_CSharp.Gamemodes
 { 
     public class Teams : Gamemode
     {
-        public Teams(ServerHandle handle) : base(handle)
-        {
-
-        }
+        public Teams(ServerHandle handle) : base(handle){ }
         private const byte highlightBase = 231,
             lowlightBase = 23,
             highlightDiff = 24,
@@ -66,7 +63,7 @@ namespace Ogar_CSharp.Gamemodes
             world.teams[player.team.Value].Remove(player);
             player.team = null;
         }
-        //public override on
+
         public override void CompileLeaderboard(World world)
         {
             var teams = world.teamsLeaderboard = new List<Other.PieLeaderboardEntry>();

@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Ogar_CSharp
 {
+#pragma warning disable CA1815 // Override equals and operator equals on value types
     public struct Boost
+#pragma warning restore CA1815 // Override equals and operator equals on value types
     {
         public float dx;
         public float dy;
@@ -38,10 +40,10 @@ namespace Ogar_CSharp
                     throw new Exception("This is not suppose to happen");
             }
         }
-       /* public static int GrayScaleColor(int color)
+       /*public static int GrayScaleColor(int color)
         {
             int weight;
-            if (color != 0) weight = ~~(0.299 * (color & 0xFF) + 0.587 * ((color.g >> 8) & 0xFF) + 0.114 * (color.b >> 16));
+            if (color != 0) weight = Math.Floor(0.299 * (color & 0xFF) + 0.587 * ((color.g >> 8) & 0xFF) + 0.114 * (color.b >> 16));
             else weight = 0x7F + ~~(Random() * 0x80);
             return (weight << 16) | (weight << 8) | weight;
         }*/

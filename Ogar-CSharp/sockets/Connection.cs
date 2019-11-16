@@ -127,10 +127,9 @@ namespace Ogar_CSharp.Sockets
         }
         public override async Task PerformAsyncTick()
         {
-            Player.UpdateVisibleCells();
-            //Update();
+            Tick();
         }
-        public override void Update()
+        public void Tick()
         {
             if (!hasPlayer)
                 return;
@@ -147,16 +146,16 @@ namespace Ogar_CSharp.Sockets
                 hasProcessedQ = false;
                 return;
             }
-            //this.Player.UpdateVisibleCells();
+            this.Player.UpdateVisibleCells();
             List<Cell> add = new List<Cell>(), upd = new List<Cell>(), eat = new List<Cell>(), del = new List<Cell>();
             var player = this.Player;
             var visible = player.visibleCells;
             var lastVisible = player.lastVisibleCells;
             foreach (var item in visible)
             {
-                if (!lastVisible.ContainsKey(item.Key)) 
+                if (!lastVisible.ContainsKey(item.Key))
                     add.Add(item.Value);
-                else if (item.Value.ShouldUpdate) 
+                else if (item.Value.ShouldUpdate)
                     upd.Add(item.Value);
             }
             foreach (var item1 in lastVisible)
@@ -172,6 +171,10 @@ namespace Ogar_CSharp.Sockets
             if (Handle.tick % 4 == 0)
                 Handle.gamemode.SendLeaderboard(this);
             protocol.OnVisibleCellUpdate(add, upd, eat, del);
+        }
+
+        public override void Update()
+        {
         }
 
     }

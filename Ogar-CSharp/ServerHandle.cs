@@ -76,8 +76,7 @@ namespace Ogar_CSharp
             if (!running)
                 return false;
             Console.WriteLine("Stopping");
-            if (ticker.running)
-                ticker.Stop();
+            ticker.Stop();
             //foreach world = remove
             //foreach player = remove
             //foreach router = close
@@ -133,7 +132,6 @@ namespace Ogar_CSharp
             Console.WriteLine($"removed a player with id {id}");
             return true;
         }
-        Stopwatch timer = Stopwatch.StartNew();
         public void OnTick()
         {
             stopWatch.Start();

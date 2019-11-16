@@ -6,23 +6,37 @@ using System.Threading;
 
 namespace Ogar_CSharp
 {
-
+    /// <summary>
+    /// Used for updating game logic
+    /// </summary>
     public class Ticker
     {
-        private HashSet<Action> callbacks = new HashSet<Action>();
-        public bool running;
+
+        private event Action CallBacks;
+        private bool running;
         public int step;
-        public Thread tickingThread;
+        private Thread tickingThread;
         public Ticker(int step) =>
             this.step = step;
+        /// <summary>
+        /// Add action for a tick
+        /// </summary>
+        /// <param name="callback">Action to add</param>
         public void Add(Action callback)
         {
-            callbacks.Add(callback);
+            CallBacks += callback;
         }
+        /// <summary>
+        /// Remove action for a tick
+        /// </summary>
+        /// <param name="callback">Action to remove</param>
         public void Remove(Action callback)
         {
-            callbacks.Remove(callback);
+            CallBacks -= callback;
         }
+        /// <summary>
+        /// Starts the tick thread.
+        /// </summary>
         public void Start()
         {
             if (running)
@@ -35,13 +49,13 @@ namespace Ogar_CSharp
         {
             while (running)
             {
-                foreach (var callback in callbacks)
-                {
-                    callback();
-                }
+                CallBacks();
                 Thread.Sleep(step);
             }
         }
+        /// <summary>
+        /// Stops the ticking thread.
+        /// </summary>
         public void Stop()
         {
             if (!running)

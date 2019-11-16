@@ -3,6 +3,7 @@ using Ogar_CSharp.Worlds;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ogar_CSharp.Bots
 {

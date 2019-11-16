@@ -139,7 +139,7 @@ namespace Ogar_CSharp.Sockets
             Task[] awaitedTasks = new Task[l];
             /*for (i = 0; i < l; i++)
                 this.routers[i].Player?.up();*/
-            Parallel.ForEach(routers, async (x) => await x.PerformAsyncTick()); //Perfomance
+            Parallel.ForEach(routers, async (x) => { await x.PerformAsyncTick(); });
             for (i = 0; i < l; i++) 
                 this.routers[i].Update();
             for (i = 0, l = this.connections.Count; i < l; i++)
