@@ -42,7 +42,7 @@ namespace Ogar_CSharp.Protocols
             }
         }
 
-        internal static Protocol Decider(Reader reader, Connection connection)
+        internal static Protocol Decider(DataReader reader, Connection connection)
         {
             if (reader.length < 5)
                 return null;
@@ -61,7 +61,7 @@ namespace Ogar_CSharp.Protocols
         {
             spectateAreaPending = area;
         }
-        public override void OnSocketMessage(Reader reader)
+        public override void OnSocketMessage(DataReader reader)
         {
             byte messageId = reader.ReadByte();
             switch (messageId)
@@ -77,8 +77,8 @@ namespace Ogar_CSharp.Protocols
                         return;
                     }
                     int i, l, count;
-                    connection.mouseX = reader.ReadInt();
-                    connection.mouseY = reader.ReadInt();
+                    connection.mouseX = reader.Read<int>();
+                    connection.mouseY = reader.Read<int>();
                     connection.splitAttempts += reader.ReadByte();
                     count = reader.ReadByte();
                     for (i = 0, l = connection.minions.Count; count > 0 && i < l; i++)
@@ -135,7 +135,7 @@ namespace Ogar_CSharp.Protocols
             worldBorderPending = range;
             serverInfoPending = includeServerInfo;
         }
-        public override void OnVisibleCellUpdate(IEnumerable<Cell> add, IEnumerable<Cell> upd, IEnumerable<Cell> eat, IEnumerable<Cell> del)
+        public override void OnVisibleCellUpdate(IList<Cell> add, IList<Cell> upd, IList<Cell> eat, IList<Cell> del)
         {
             int i, l;
             bool hitSelfData = false;
@@ -149,7 +149,7 @@ namespace Ogar_CSharp.Protocols
                 globalFlags |= 2;
             if (connection.hasPlayer && connection.Player.hasWorld && worldStatsPending)
                 globalFlags |= 8;
-            if(chatPending.Count > 0)
+            if (chatPending.Count > 0)
                 globalFlags |= 16;
             if (leaderboardPending)
                 globalFlags |= 32;
@@ -168,14 +168,14 @@ namespace Ogar_CSharp.Protocols
             var writer = new Writer();
             writer.WriteByte(3);
             writer.WriteUShort(globalFlags);
-            if(spectateAreaPending != null)
+            if (spectateAreaPending != null)
             {
                 writer.WriteFloat(spectateAreaPending.Value.x);
                 writer.WriteFloat(spectateAreaPending.Value.y);
                 writer.WriteFloat(spectateAreaPending.Value.s);
                 spectateAreaPending = null;
             }
-            if(worldBorderPending != null)
+            if (worldBorderPending != null)
             {
                 var item = worldBorderPending.Value;
                 writer.WriteFloat(item.X - item.Width);
@@ -207,7 +207,7 @@ namespace Ogar_CSharp.Protocols
                 writer.WriteUShort((ushort)item.spectating);
                 worldStatsPending = false;
             }
-            if((l = chatPending.Count) > 0)
+            if ((l = chatPending.Count) > 0)
             {
                 writer.WriteUShort((ushort)l);
                 for (i = 0; i < l; i++)
@@ -243,7 +243,7 @@ namespace Ogar_CSharp.Protocols
                             writer.WriteUTF8String(entry.name);
                         }
                         FFALeaderboardEntry item;
-                        if(!hitSelfData && (item = (FFALeaderboardEntry)leaderboardSelfData) != null)
+                        if (!hitSelfData && (item = (FFALeaderboardEntry)leaderboardSelfData) != null)
                         {
                             writer.WriteUShort((ushort)item.position);
                             flags = (byte)(item.highlighted ? 1 : 0);
@@ -256,7 +256,7 @@ namespace Ogar_CSharp.Protocols
                         writer.WriteByte(2);
                         writer.WriteUShort((ushort)l);
                         IEnumerable<PieLeaderboardEntry> entries1 = leaderboardData.Cast<PieLeaderboardEntry>();
-                        foreach(var entry in entries1)
+                        foreach (var entry in entries1)
                             writer.WriteFloat(entry.weight);
                         break;
                     case LeaderboardType.Text:
@@ -272,10 +272,11 @@ namespace Ogar_CSharp.Protocols
                 leaderboardData = null;
                 leaderboardSelfData = null;
             }
-            if(add.Count() > 0)
+            if (add.Count > 0)
             {
-                foreach(var item in add)
+                for (int s = 0; s < add.Count; s++)
                 {
+                    var item = add[s];
                     writer.WriteUInt((uint)item.id);
                     writer.WriteByte(item.Type);
                     writer.WriteFloat(item.X);
@@ -292,10 +293,11 @@ namespace Ogar_CSharp.Protocols
                 }
                 writer.WriteUInt(0);
             }
-            if(upd.Count() > 0)
+            if (upd.Count > 0)
             {
-                foreach(var item in upd)
+                for (int s = 0; s < upd.Count; s++)
                 {
+                    var item = upd[s];
                     flags = 0;
                     if (item.posChanged)
                         flags |= 1;
@@ -325,19 +327,20 @@ namespace Ogar_CSharp.Protocols
                 }
                 writer.WriteUInt(0);
             }
-            if(eat.Count() > 0)
+            if (eat.Count > 0)
             {
-                foreach(var item in eat)
+                for (int s = 0; s < eat.Count; s++)
                 {
+                    var item = eat[s];
                     writer.WriteUInt((uint)item.id);
                     writer.WriteUInt((uint)item.eatenBy.id);
                 }
                 writer.WriteUInt(0);
             }
-            if(del.Count() > 0)
+            if (del.Count > 0)
             {
-                foreach (var item in del)
-                    writer.WriteUInt((uint)item.id);
+                for (int s = 0; s < del.Count; s++)
+                    writer.WriteUInt((uint)del[s].id);
                 writer.WriteUInt(0);
             }
             Send(writer.RawBuffer);

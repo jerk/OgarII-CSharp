@@ -8,6 +8,7 @@ using System.Linq;
 using Ogar_CSharp.Worlds;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Diagnostics;
 
 namespace Ogar_CSharp.Protocols
 {
@@ -43,7 +44,7 @@ namespace Ogar_CSharp.Protocols
                 return str;
             }
         }
-        internal static Protocol Decider(Reader reader, Connection connection)
+        internal static Protocol Decider(DataReader reader, Connection connection)
         {
             if (reader.length < 5)
                 return null;
@@ -86,7 +87,7 @@ namespace Ogar_CSharp.Protocols
             this.Send(writer.RawBuffer);
         }
 
-        public override void OnSocketMessage(Reader reader)
+        public override void OnSocketMessage(DataReader reader)
         {
             var messageId = reader.Read<byte>();
             if (!this.gotKey)
@@ -102,6 +103,7 @@ namespace Ogar_CSharp.Protocols
             {
                 case 0:
                     connection.spawningName = ReadZTString(reader, protocolVersion);
+                    Console.WriteLine(connection.spawningName + "u");
                     break;
                 case 1:
                     this.connection.requestingSpectate = true;
@@ -195,22 +197,25 @@ namespace Ogar_CSharp.Protocols
             else if (protocol <= 22)
                 WriteCellData11(writer, source, protocol, cell, includeType, includeSize, includePos, includeColor, includeName, includeSkin);
         }
-        public override void OnVisibleCellUpdate(IEnumerable<Cell> add, IEnumerable<Cell> upd, IEnumerable<Cell> eat, IEnumerable<Cell> del)
+        public override void OnVisibleCellUpdate(IList<Cell> add, IList<Cell> upd, IList<Cell> eat, IList<Cell> del)
         {
             var source = this.connection.Player;
-            var writer = new Writer() { (byte)16, (ushort)eat.Count() };
-            foreach (var item in eat)
+            var writer = new Writer() { (byte)16, (ushort)eat.Count };
+            for (int i = 0; i < eat.Count; i++)
             {
+                var item = eat[i];
                 writer.WriteUInt((uint)item.eatenBy.id);
                 writer.WriteUInt((uint)item.id);
             }
-            foreach (var item in add)
+            for (int i = 0; i < add.Count; i++)
             {
+                var item = add[i];
                 WriteCellData(writer, source, protocolVersion, item,
                     true, true, true, true, true, true);
             }
-            foreach (var item in upd)
+            for (int i = 0; i < upd.Count; i++)
             {
+                var item = upd[i];
                 WriteCellData(writer, source, protocolVersion, item,
                     false, item.sizeChanged, item.posChanged, item.colorChanged, item.nameChanged, item.skinChanged);
             }
@@ -219,11 +224,10 @@ namespace Ogar_CSharp.Protocols
                 writer.WriteUInt((uint)del.Count());
             else
                 writer.WriteUShort((ushort)del.Count());
-            foreach (var item in del)
-                writer.WriteUInt((uint)item.id);
+            for (int i = 0; i < del.Count; i++)
+                writer.WriteUInt((uint)del[i].id);
             this.Send(writer.RawBuffer);
         }
-
         public override void OnWorldReset()
         {
             this.Send(new Writer() { (byte)18 }.RawBuffer);
@@ -369,7 +373,7 @@ namespace Ogar_CSharp.Protocols
             writer.WriteByte(flags);
 
             if (includeSkin) writer.WriteUTF8String(cell.Skin);
-            if (includeName) writer.WriteUTF16String(cell.Name);
+            if (includeName) writer.WriteUTF16String(cell.Name?? "llll");
             else writer.WriteUShort(0);
         }
         public static void WriteCellData11(Writer writer, Player source, uint protocol, Cell cell, bool includeType, bool includeSize,
@@ -428,12 +432,12 @@ namespace Ogar_CSharp.Protocols
             if (includeSkin) writer.WriteUTF8String(cell.Skin);
             if (includeName) writer.WriteUTF8String(cell.Name);
         }
-        private static string ReadZTString(Reader reader, uint protocol)
+        private static string ReadZTString(DataReader reader, uint protocol)
         {
             if (protocol < 6)
-                return reader.Read<string>(null, true);
+                return reader.ReadUTF16String();
             else
-                return reader.Read<string>(null, false);
+                return reader.ReadUTF8String(); ;
         }
         private static void WriteZTString(Writer writer, string value, uint protocol)
         {

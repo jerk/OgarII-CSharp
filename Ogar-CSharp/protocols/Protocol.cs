@@ -20,13 +20,13 @@ namespace Ogar_CSharp.Protocols
         public ServerHandle Handle => connection.listener.handle;
         //logger() { return this.connection.listener.handle.logger; }
         public Settings Settings => connection.listener.handle.Settings;
-        public abstract void OnSocketMessage(Reader reader);
+        public abstract void OnSocketMessage(DataReader reader);
         //public abstract void OnChatMessage(ChatSource source, string message);
         public abstract void OnNewOwnedCell(PlayerCell cell);
         public abstract void OnNewWorldBounds(RectangleF range, bool includeServerInfo);
         public abstract void OnWorldReset();
         public abstract void OnSpectatePosition(ViewArea area);
-        public abstract void OnVisibleCellUpdate(IEnumerable<Cell> add, IEnumerable<Cell> upd, IEnumerable<Cell> eat, IEnumerable<Cell> del);
+        public abstract void OnVisibleCellUpdate(IList<Cell> add, IList<Cell> upd, IList<Cell> eat, IList<Cell> del);
         public abstract void OnLeaderboardUpdate(LeaderboardType type, IEnumerable<LeaderBoardEntry> data, LeaderBoardEntry selfData);
         public void Send(byte[] data) => connection.Send(data);
         public void Fail(ushort code, string reason) => connection.CloseSocket(code, reason);

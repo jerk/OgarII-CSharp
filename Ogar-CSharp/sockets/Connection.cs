@@ -98,10 +98,10 @@ namespace Ogar_CSharp.Sockets
             else
             {
                 if (protocol != null)
-                    protocol.OnSocketMessage(new Reader(bytes, 0));
+                    protocol.OnSocketMessage(new DataReader(bytes, 0));
                 else
                 {
-                    protocol = ProtocolStore.Decide(this, new Reader(bytes, 0));
+                    protocol = ProtocolStore.Decide(this, new DataReader(bytes, 0));
                     if (protocol == null)
                     {
                         CloseSocket(1003, "Ambiguous protocol");
