@@ -25,10 +25,10 @@ namespace Ogar_CSharp.Worlds
             public double uptime;
             public double loadTime;
         }
-        public int id;
+        public uint id;
         public ServerHandle handle;
         public bool frozen;
-        public long _nextCellId = 1;
+        public uint _nextCellId = 1;
         public readonly List<List<Player>> teams = new List<List<Player>>();
         public HashSet<Cell> cells = new HashSet<Cell>();
         public List<Cell> boostingCells = new List<Cell>();
@@ -48,7 +48,7 @@ namespace Ogar_CSharp.Worlds
 
         public int PelletCount { get; set; }
 
-        public World(ServerHandle handle, int id)
+        public World(ServerHandle handle, uint id)
         {
             this.handle = handle;
             this.id = id;
@@ -350,7 +350,7 @@ namespace Ogar_CSharp.Worlds
             CompileStatistics();
             handle.gamemode.CompileLeaderboard(this);
             if (stats.external <= 1 && handle.worlds.Count > Settings.worldMinCount)
-                handle.RemovePlayer((short)id);
+                handle.RemovePlayer(id);
         }
         public void FrozenUpdate()
         {

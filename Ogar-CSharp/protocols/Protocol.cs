@@ -27,7 +27,7 @@ namespace Ogar_CSharp.Protocols
         public abstract void OnWorldReset();
         public abstract void OnSpectatePosition(ViewArea area);
         public abstract void OnVisibleCellUpdate(IList<Cell> add, IList<Cell> upd, IList<Cell> eat, IList<Cell> del);
-        public abstract void OnLeaderboardUpdate(LeaderboardType type, IEnumerable<LeaderBoardEntry> data, LeaderBoardEntry selfData);
+        public abstract void OnLeaderboardUpdate<T>(LeaderboardType type, IList<T> data, LeaderBoardEntry selfData) where T : LeaderBoardEntry;
         public void Send(byte[] data) => connection.Send(data);
         public void Fail(ushort code, string reason) => connection.CloseSocket(code, reason);
     }

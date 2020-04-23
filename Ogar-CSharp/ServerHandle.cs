@@ -89,7 +89,7 @@ namespace Ogar_CSharp
         }
         public World CreateWorld()
         {
-            int id = 0;
+            uint id = 0;
             while (this.worlds.Any(x => x.id == ++id)) ;
             var newWorld = new World(this, id);
             this.worlds.Add(newWorld);
@@ -111,7 +111,7 @@ namespace Ogar_CSharp
         }
         public Player CreatePlayer(Router router)
         {
-            int id = 1;
+            uint id = 1;
             while (players.Any(x => x.id == ++id)) ;
             var newPlayer = new Player(this, id, router);
             players.Add(newPlayer);
@@ -120,7 +120,7 @@ namespace Ogar_CSharp
             Console.WriteLine($"added a player with id {id}");
             return newPlayer;
         }
-        public bool RemovePlayer(int id)
+        public bool RemovePlayer(uint id)
         {
             if (!players.Any(x => x.id == id)) 
                 return false;

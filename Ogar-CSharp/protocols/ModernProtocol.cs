@@ -167,21 +167,21 @@ namespace Ogar_CSharp.Protocols
                 return;
             var writer = new Writer();
             writer.WriteByte(3);
-            writer.WriteUShort(globalFlags);
+            writer.Write(globalFlags);
             if (spectateAreaPending != null)
             {
-                writer.WriteFloat(spectateAreaPending.Value.x);
-                writer.WriteFloat(spectateAreaPending.Value.y);
-                writer.WriteFloat(spectateAreaPending.Value.s);
+                writer.Write(spectateAreaPending.Value.x);
+                writer.Write(spectateAreaPending.Value.y);
+                writer.Write(spectateAreaPending.Value.s);
                 spectateAreaPending = null;
             }
             if (worldBorderPending != null)
             {
                 var item = worldBorderPending.Value;
-                writer.WriteFloat(item.X - item.Width);
-                writer.WriteFloat(item.X + item.Width);
-                writer.WriteFloat(item.Y - item.Height);
-                writer.WriteFloat(item.Y + item.Height);
+                writer.Write(item.X - item.Width);
+                writer.Write(item.X + item.Width);
+                writer.Write(item.Y - item.Height);
+                writer.Write(item.Y + item.Height);
                 worldBorderPending = null;
             }
             if (serverInfoPending)
@@ -198,18 +198,18 @@ namespace Ogar_CSharp.Protocols
                 var item = connection.Player.world.stats;
                 writer.WriteUTF8String(item.name);
                 writer.WriteUTF8String(item.gamemode);
-                writer.WriteFloat((float)item.loadTime / (float)this.Handle.tickDelay);
-                writer.WriteUInt((uint)item.uptime);
-                writer.WriteUShort((ushort)item.limit);
-                writer.WriteUShort((ushort)item.external);
-                writer.WriteUShort((ushort)item._internal);
-                writer.WriteUShort((ushort)item.playing);
-                writer.WriteUShort((ushort)item.spectating);
+                writer.Write((float)item.loadTime / this.Handle.tickDelay);
+                writer.Write((uint)item.uptime);
+                writer.Write((ushort)item.limit);
+                writer.Write((ushort)item.external);
+                writer.Write((ushort)item._internal);
+                writer.Write((ushort)item.playing);
+                writer.Write((ushort)item.spectating);
                 worldStatsPending = false;
             }
             if ((l = chatPending.Count) > 0)
             {
-                writer.WriteUShort((ushort)l);
+                writer.Write((ushort)l);
                 for (i = 0; i < l; i++)
                 {
                     var item = this.chatPending.Dequeue();
@@ -227,9 +227,10 @@ namespace Ogar_CSharp.Protocols
                 {
                     case LeaderboardType.FFA:
                         writer.WriteByte(1);
-                        IEnumerable<FFALeaderboardEntry> entries = leaderboardData.Cast<FFALeaderboardEntry>();
-                        foreach (FFALeaderboardEntry entry in entries)
+                        IList<FFALeaderboardEntry> entries = (IList<FFALeaderboardEntry>)leaderboardData;
+                        for (int j = 0; j < entries.Count; j++)
                         {
+                            var entry = entries[j];
                             flags = 0;
                             if (entry.highlighted)
                                 flags |= 1;
@@ -238,33 +239,33 @@ namespace Ogar_CSharp.Protocols
                                 flags |= 2;
                                 hitSelfData = true;
                             }
-                            writer.WriteUShort((ushort)entry.position);
+                            writer.Write((ushort)entry.position);
                             writer.WriteByte(flags);
                             writer.WriteUTF8String(entry.name);
                         }
                         FFALeaderboardEntry item;
                         if (!hitSelfData && (item = (FFALeaderboardEntry)leaderboardSelfData) != null)
                         {
-                            writer.WriteUShort((ushort)item.position);
+                            writer.Write((ushort)item.position);
                             flags = (byte)(item.highlighted ? 1 : 0);
                             writer.WriteByte(flags);
                             writer.WriteUTF8String(item.name);
                         }
-                        writer.WriteUShort(0);
+                        writer.Write<ushort>(0);
                         break;
                     case LeaderboardType.Pie:
                         writer.WriteByte(2);
-                        writer.WriteUShort((ushort)l);
-                        IEnumerable<PieLeaderboardEntry> entries1 = leaderboardData.Cast<PieLeaderboardEntry>();
-                        foreach (var entry in entries1)
-                            writer.WriteFloat(entry.weight);
+                        writer.Write((ushort)l);
+                        IList<PieLeaderboardEntry> entries1 = (IList<PieLeaderboardEntry >)leaderboardData;
+                        for (int j = 0; j < entries1.Count; j++)
+                            writer.Write(entries1[j].weight);
                         break;
                     case LeaderboardType.Text:
                         writer.WriteByte(3);
-                        writer.WriteUShort((ushort)l);
-                        IEnumerable<TextLeaderBoardEntry> entries2 = leaderboardData.Cast<TextLeaderBoardEntry>();
-                        foreach (var entry in entries2)
-                            writer.WriteUTF8String(entry.text);
+                        writer.Write((ushort)l);
+                        IList<TextLeaderBoardEntry> entries2 = (IList<TextLeaderBoardEntry>)leaderboardData;
+                        for (int j = 0; j < entries2.Count; j++)
+                            writer.WriteUTF8String(entries2[j].text);
                         break;
                 }
                 leaderboardPending = false;
@@ -277,11 +278,11 @@ namespace Ogar_CSharp.Protocols
                 for (int s = 0; s < add.Count; s++)
                 {
                     var item = add[s];
-                    writer.WriteUInt((uint)item.id);
+                    writer.Write(item.id);
                     writer.WriteByte(item.Type);
-                    writer.WriteFloat(item.X);
-                    writer.WriteFloat(item.X);
-                    writer.WriteUShort((ushort)item.Size);
+                    writer.Write(item.X);
+                    writer.Write(item.X);
+                    writer.Write((ushort)item.Size);
                     writer.WriteColor((uint)item.Color);
                     flags = 0;
                     if (item.Type == 0 && item.owner == connection.Player)
@@ -291,7 +292,7 @@ namespace Ogar_CSharp.Protocols
                     if (item.Skin != null)
                         writer.WriteUTF8String(item.Skin);
                 }
-                writer.WriteUInt(0);
+                writer.Write<uint>(0);
             }
             if (upd.Count > 0)
             {
@@ -309,15 +310,15 @@ namespace Ogar_CSharp.Protocols
                         flags |= 8;
                     if (item.sizeChanged)
                         flags |= 16;
-                    writer.WriteUInt((uint)item.id);
+                    writer.Write(item.id);
                     writer.WriteByte(flags);
                     if (item.posChanged)
                     {
-                        writer.WriteFloat(item.X);
-                        writer.WriteFloat(item.X);
+                        writer.Write(item.X);
+                        writer.Write(item.X);
                     }
                     if (item.skinChanged)
-                        writer.WriteUShort((ushort)item.Size);
+                        writer.Write((ushort)item.Size);
                     if (item.colorChanged)
                         writer.WriteColor((uint)item.Color);
                     if (item.nameChanged)
@@ -325,25 +326,25 @@ namespace Ogar_CSharp.Protocols
                     if (item.sizeChanged)
                         writer.WriteUTF8String(item.Skin);
                 }
-                writer.WriteUInt(0);
+                writer.Write<uint>(0);
             }
             if (eat.Count > 0)
             {
                 for (int s = 0; s < eat.Count; s++)
                 {
                     var item = eat[s];
-                    writer.WriteUInt((uint)item.id);
-                    writer.WriteUInt((uint)item.eatenBy.id);
+                    writer.Write(item.id);
+                    writer.Write(item.eatenBy.id);
                 }
-                writer.WriteUInt(0);
+                writer.Write<uint>(0);
             }
             if (del.Count > 0)
             {
                 for (int s = 0; s < del.Count; s++)
-                    writer.WriteUInt((uint)del[s].id);
-                writer.WriteUInt(0);
+                    writer.Write(del[s].id);
+                writer.Write<uint>(0);
             }
-            Send(writer.RawBuffer);
+            Send(writer.ToArray());
         }
         public override void OnWorldReset()
         {
@@ -353,7 +354,7 @@ namespace Ogar_CSharp.Protocols
             var empty = new List<Cell>();
             OnVisibleCellUpdate(empty, empty, empty, empty);
         }
-        public override void OnLeaderboardUpdate(LeaderboardType type, IEnumerable<LeaderBoardEntry> data, LeaderBoardEntry selfData)
+        public override void OnLeaderboardUpdate<T>(LeaderboardType type, IList<T> data, LeaderBoardEntry selfData)
         {
             leaderboardPending = true;
             leaderboardType = type;

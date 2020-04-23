@@ -14,7 +14,7 @@ namespace Ogar_CSharp.Cells
     public abstract class Cell : QuadItem<Cell>
     {
         public Boost boost = default;
-        public int id;
+        public uint id;
         public World world;
         public int birthTick;
         public bool exists;
@@ -46,12 +46,14 @@ namespace Ogar_CSharp.Cells
         {
             Item = this;
             this.world = world;
-            id = (int)world._nextCellId++;
+            id = world._nextCellId++;
             birthTick = world.handle.tick;
             X = x;
             Y = y;
             Size = size;
             Color = color;
+            Name = string.Empty;
+            Skin = string.Empty;
         }
         public abstract CellEatResult GetEatResult(Cell other);
         public virtual void OnSpawned() { }

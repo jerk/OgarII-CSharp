@@ -20,7 +20,7 @@ namespace Ogar_CSharp.Worlds
     public class Player
     {
         public ServerHandle handle;
-        public int id;
+        public uint id;
         public Router router;
         public bool exists;
         public string leaderBoardName;
@@ -35,11 +35,11 @@ namespace Ogar_CSharp.Worlds
         public int? team;
         public float score = float.NaN;
         public List<PlayerCell> ownedCells = new List<PlayerCell>();
-        public Dictionary<int, Cell> visibleCells = new Dictionary<int, Cell>(150);
-        public Dictionary<int, Cell> lastVisibleCells = new Dictionary<int, Cell>(150);
+        public Dictionary<uint, Cell> visibleCells = new Dictionary<uint, Cell>(150);
+        public Dictionary<uint, Cell> lastVisibleCells = new Dictionary<uint, Cell>(150);
         public ViewArea viewArea;
         public Settings Settings => handle.Settings;
-        public Player(ServerHandle handle, int id, Router router)
+        public Player(ServerHandle handle, uint id, Router router)
         {
             this.handle = handle;
             this.id = id;
@@ -140,7 +140,7 @@ namespace Ogar_CSharp.Worlds
             if (world == null)
                 return;
             lastVisibleCells = visibleCells;
-            visibleCells = new Dictionary<int, Cell>(150); //have an initial capacity for better perfomance.
+            visibleCells = new Dictionary<uint, Cell>(150); //have an initial capacity for better perfomance.
             foreach (var cell in ownedCells)
                 UpdateCell(cell, true);
             world.finder.Search(new RectangleF(viewArea.x, viewArea.y, viewArea.w, viewArea.h),

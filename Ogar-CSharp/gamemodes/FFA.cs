@@ -51,7 +51,7 @@ namespace Ogar_CSharp.Gamemodes
             short index = 0;
             var data = leaderboard.Select((x) => GetLeaderboardData(x, player, index++));
             var selfData = data.FirstOrDefault(x => x.highlighted);
-            connection.protocol.OnLeaderboardUpdate(LeaderboardType.FFA, data.Cast<LeaderBoardEntry>(), selfData);
+            connection.protocol.OnLeaderboardUpdate(LeaderboardType.FFA, data.ToList(), selfData);
         }
     }
 }

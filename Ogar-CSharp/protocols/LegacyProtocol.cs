@@ -52,39 +52,48 @@ namespace Ogar_CSharp.Protocols
                 return null;
             return new LegacyProtocol(connection) { gotProtocol = true, protocolVersion = reader.Read<uint>() };
         }
-        public override void OnLeaderboardUpdate(LeaderboardType type, IEnumerable<LeaderBoardEntry> data, LeaderBoardEntry selfData)
+        public override void OnLeaderboardUpdate<T>(LeaderboardType type, IList<T> data, LeaderBoardEntry selfData)
         {
             this.LastleaderboardType = type;
             var writer = new Writer();
             switch (type)
             {
                 case LeaderboardType.FFA: 
-                    FFALeaderboard(writer, data.Cast<FFALeaderboardEntry>().ToList(), (FFALeaderboardEntry)selfData, protocolVersion); 
+                    FFALeaderboard(writer, (IList<FFALeaderboardEntry>)data, (FFALeaderboardEntry)selfData, protocolVersion); 
                     break;
                 case LeaderboardType.Pie: 
-                    PieLeaderboard(writer, data.Cast<PieLeaderboardEntry>().ToList(), (PieLeaderboardEntry)selfData, protocolVersion); 
+                    PieLeaderboard(writer, (IList<PieLeaderboardEntry>)data, (PieLeaderboardEntry)selfData, protocolVersion); 
                     break;
                 case LeaderboardType.Text: 
-                    TextBoard(writer, data.Cast<TextLeaderBoardEntry>().ToList(), protocolVersion);
+                    TextBoard(writer, (IList<TextLeaderBoardEntry>)data, protocolVersion);
                     break;
             }
-            this.Send(writer.RawBuffer);
+            this.Send(writer.ToArray());
         }
 
-        public override void OnNewOwnedCell(PlayerCell cell) 
-            => Send(new Writer() { (byte)32, (uint)cell.id }.RawBuffer);
+        public override void OnNewOwnedCell(PlayerCell cell)
+        {
+            var writer = new Writer();
+            writer.WriteByte(32);
+            writer.Write(cell.id);
+            Send(writer.ToArray());
+        }
    
 
         public override void OnNewWorldBounds(RectangleF range, bool includeServerInfo)
         {
-            var writer = new Writer() 
-            { (byte)64, (double)(range.X - range.Width), (double)(range.Y - range.Height), (double)(range.X + range.Width), (double)(range.Y + range.Height) };
+            var writer = new Writer();
+            writer.WriteByte(64);
+            writer.Write((double)(range.X - range.Width));
+            writer.Write((double)(range.Y - range.Height));
+            writer.Write((double)(range.X + range.Width));
+            writer.Write((double)(range.Y + range.Height));
             if (includeServerInfo)
             {
-                writer.WriteUInt(Handle.gamemode.Type);
+                writer.Write<uint>(Handle.gamemode.Type);
                 WriteZTString(writer, $"OgarII-CSharp {Handle.Version}", protocolVersion);
             }
-            this.Send(writer.RawBuffer);
+            this.Send(writer.ToArray());
         }
 
         public override void OnSocketMessage(DataReader reader)
@@ -186,7 +195,14 @@ namespace Ogar_CSharp.Protocols
         }
 
         public override void OnSpectatePosition(ViewArea area)
-            => Send(new Writer() { (byte)17, area.x, area.y, area.s }.RawBuffer);
+        {
+            var writer = new Writer();
+            writer.WriteByte(17);
+            writer.Write(area.x);
+            writer.Write(area.y);
+            writer.Write(area.s);
+            Send(writer.ToArray());
+        }
         public static void WriteCellData(Writer writer, Player source, uint protocol, Cell cell, bool includeType, bool includeSize,
             bool includePos, bool includeColor, bool includeName, bool includeSkin)
         {
@@ -200,12 +216,14 @@ namespace Ogar_CSharp.Protocols
         public override void OnVisibleCellUpdate(IList<Cell> add, IList<Cell> upd, IList<Cell> eat, IList<Cell> del)
         {
             var source = this.connection.Player;
-            var writer = new Writer() { (byte)16, (ushort)eat.Count };
+            var writer = new Writer();
+            writer.WriteByte(16);
+            writer.Write((ushort)eat.Count);
             for (int i = 0; i < eat.Count; i++)
             {
                 var item = eat[i];
-                writer.WriteUInt((uint)item.eatenBy.id);
-                writer.WriteUInt((uint)item.id);
+                writer.Write(item.eatenBy.id);
+                writer.Write(item.id);
             }
             for (int i = 0; i < add.Count; i++)
             {
@@ -219,18 +237,18 @@ namespace Ogar_CSharp.Protocols
                 WriteCellData(writer, source, protocolVersion, item,
                     false, item.sizeChanged, item.posChanged, item.colorChanged, item.nameChanged, item.skinChanged);
             }
-            writer.WriteUInt(0);
+            writer.Write((uint)0);
             if (protocolVersion < 6)
-                writer.WriteUInt((uint)del.Count());
+                writer.Write((uint)del.Count);
             else
-                writer.WriteUShort((ushort)del.Count());
+                writer.Write((ushort)del.Count);
             for (int i = 0; i < del.Count; i++)
-                writer.WriteUInt((uint)del[i].id);
-            this.Send(writer.RawBuffer);
-        }
+                writer.Write(del[i].id);
+            this.Send(writer.ToArray());
+        } 
         public override void OnWorldReset()
         {
-            this.Send(new Writer() { (byte)18 }.RawBuffer);
+            Send(new byte[1] { 18 });
             if (LastleaderboardType != null)
             {
                 this.OnLeaderboardUpdate(LastleaderboardType.Value, new List<LeaderBoardEntry>(), null);
@@ -243,7 +261,8 @@ namespace Ogar_CSharp.Protocols
             if (!isCompilingStats)
             {
                 isCompilingStats = true;
-                var writer = new Writer() { (byte)254 };
+                var writer = new Writer();
+                writer.WriteByte(254);
                 var stats = connection.Player.world.stats;
                 var legacy = new Legacy
                 {
@@ -259,50 +278,50 @@ namespace Ogar_CSharp.Protocols
                 Task.Run(() =>
                 {
                     WriteZTString(writer, Newtonsoft.Json.JsonConvert.SerializeObject(legacy), protocolVersion);
-                    Send(writer.RawBuffer);
+                    Send(writer.ToArray());
                     isCompilingStats = false;
                 });
             }
         }
-        public static void PieLeaderboard(Writer writer, List<PieLeaderboardEntry> data, PieLeaderboardEntry selfData, uint protocol)
+        public static void PieLeaderboard(Writer writer, IList<PieLeaderboardEntry> data, PieLeaderboardEntry selfData, uint protocol)
         {
             if (protocol <= 20)
                 PieLeaderboard4(writer, data, selfData, protocol);
             else if (protocol <= 22)
                 PieLeaderboard21(writer, data, selfData, protocol);
         }
-        public static void PieLeaderboard4(Writer writer, List<PieLeaderboardEntry> data, PieLeaderboardEntry selfData, uint protocol)
+        public static void PieLeaderboard4(Writer writer, IList<PieLeaderboardEntry> data, PieLeaderboardEntry selfData, uint protocol)
         {
             writer.WriteByte(50);
-            writer.WriteUInt((uint)data.Count);
+            writer.Write((uint)data.Count);
             for (int i = 0, l = data.Count; i < l; i++)
-                writer.WriteFloat(data[i].weight);
+                writer.Write(data[i].weight);
         }
-        public static void PieLeaderboard21(Writer writer, List<PieLeaderboardEntry> data, PieLeaderboardEntry selfData, uint protocol)
+        public static void PieLeaderboard21(Writer writer, IList<PieLeaderboardEntry> data, PieLeaderboardEntry selfData, uint protocol)
         {
             writer.WriteByte(51);
-            writer.WriteUInt((uint)data.Count);
+            writer.Write((uint)data.Count);
             for (int i = 0, l = data.Count; i < l; i++)
             {
-                writer.WriteFloat(data[i].weight);
+                writer.Write(data[i].weight);
                 writer.WriteColor((uint)data[i].color);
             }
         }
-        public static void TextBoard(Writer writer, List<TextLeaderBoardEntry> data, uint protocol)
+        public static void TextBoard(Writer writer, IList<TextLeaderBoardEntry> data, uint protocol)
         {
             if (protocol <= 13)
                 TextBoard4(writer, data, protocol);
             else if (protocol <= 22)
                 TextBoard14(writer, data, protocol);
         }
-        public static void TextBoard4(Writer writer, List<TextLeaderBoardEntry> data, uint protocol)
+        public static void TextBoard4(Writer writer, IList<TextLeaderBoardEntry> data, uint protocol)
         {
             writer.WriteByte(48);
-            writer.WriteUInt((uint)data.Count);
+            writer.Write((uint)data.Count);
             for (int i = 0, l = data.Count; i < l; i++)
                 WriteZTString(writer, data[i].text, protocol);
         }
-        public static void TextBoard14(Writer writer, List<TextLeaderBoardEntry> data, uint protocol)
+        public static void TextBoard14(Writer writer, IList<TextLeaderBoardEntry> data, uint protocol)
         {
             writer.WriteByte(53);
             for (int i = 0, l = data.Count; i < l; i++)
@@ -311,28 +330,28 @@ namespace Ogar_CSharp.Protocols
                 WriteZTString(writer, data[i].text, protocol);
             }
         }
-        public static void FFALeaderboard(Writer writer, List<FFALeaderboardEntry> data, FFALeaderboardEntry selfdata, uint protocol)
+        public static void FFALeaderboard(Writer writer, IList<FFALeaderboardEntry> data, FFALeaderboardEntry selfdata, uint protocol)
         {
             if (protocol <= 10)
                 FFALeaderBoard4(writer, data, selfdata, protocol);
             else if (protocol <= 22)
                 FFALeaderBoard11(writer, data, selfdata, protocol);
         }
-        public static void FFALeaderBoard4(Writer writer, List<FFALeaderboardEntry> data, FFALeaderboardEntry selfdata, uint protocol)
+        public static void FFALeaderBoard4(Writer writer, IList<FFALeaderboardEntry> data, FFALeaderboardEntry selfdata, uint protocol)
         {
             writer.WriteByte(49);
-            writer.WriteUInt((uint)data.Count);
+            writer.Write((uint)data.Count);
             for (int i = 0, l = data.Count; i < l; i++)
             {
                 var item = data[i];
                 if (protocol == 6)
-                    writer.WriteUInt((uint)(item.highlighted ? 1 : 0));
+                    writer.Write((uint)(item.highlighted ? 1 : 0));
                 else 
-                    writer.WriteUInt((uint)item.cellId);
+                    writer.Write((uint)item.cellId);
                 WriteZTString(writer, item.name, protocol);
             }
         }
-        public static void FFALeaderBoard11(Writer writer, List<FFALeaderboardEntry> data, FFALeaderboardEntry selfdata, uint protocol)
+        public static void FFALeaderBoard11(Writer writer, IList<FFALeaderboardEntry> data, FFALeaderboardEntry selfdata, uint protocol)
         {
             writer.WriteByte((byte)(protocol >= 14 ? 53 : 51));
             for (int i = 0, l = data.Count; i < l; i++)
@@ -350,19 +369,19 @@ namespace Ogar_CSharp.Protocols
         public static void WriteCellData4(Writer writer, Player source, uint protocol, Cell cell, bool includeType, bool includeSize,
             bool includePos, bool includeColor, bool includeName, bool includeSkin)
         {
-            writer.WriteUInt((uint)cell.id);
+            writer.Write(cell.id);
             if(protocol == 4)
             {
-                writer.WriteShort((short)cell.X);
-                writer.WriteShort((short)cell.Y);
+                writer.Write((short)cell.X);
+                writer.Write((short)cell.Y);
             }
             else
             {
-                writer.WriteInt((int)cell.X);
-                writer.WriteInt((int)cell.Y);
+                writer.Write((int)cell.X);
+                writer.Write((int)cell.Y);
             }
 
-            writer.WriteUShort((ushort)cell.Size);
+            writer.Write((ushort)cell.Size);
             writer.WriteColor((uint)cell.Color);
 
             byte flags = 0;
@@ -374,15 +393,15 @@ namespace Ogar_CSharp.Protocols
 
             if (includeSkin) writer.WriteUTF8String(cell.Skin);
             if (includeName) writer.WriteUTF16String(cell.Name?? "llll");
-            else writer.WriteUShort(0);
+            else writer.Write<ushort>(0);
         }
         public static void WriteCellData11(Writer writer, Player source, uint protocol, Cell cell, bool includeType, bool includeSize,
             bool includePos, bool includeColor, bool includeName, bool includeSkin)
         {
-            writer.WriteUInt((uint)cell.id);
-            writer.WriteInt((int)cell.X);
-            writer.WriteInt((int)cell.Y);
-            writer.WriteUShort((ushort)cell.Size);
+            writer.Write(cell.id);
+            writer.Write((int)cell.X);
+            writer.Write((int)cell.Y);
+            writer.Write((ushort)cell.Size);
 
             byte flags = 0;
             if (cell.IsSpiked) 
@@ -415,10 +434,10 @@ namespace Ogar_CSharp.Protocols
         public static void WriteCellData6(Writer writer, Player source, uint protocol, Cell cell, bool includeType, bool includeSize,
             bool includePos, bool includeColor, bool includeName, bool includeSkin)
         {
-            writer.WriteUInt((uint)cell.id);
-            writer.WriteInt((int)cell.X);
-            writer.WriteInt((int)cell.Y);
-            writer.WriteUShort((ushort)cell.Size);
+            writer.Write(cell.id);
+            writer.Write((int)cell.X);
+            writer.Write((int)cell.Y);
+            writer.Write((ushort)cell.Size);
 
             byte flags = 0;
             if (cell.IsSpiked) flags |= 0x01;
