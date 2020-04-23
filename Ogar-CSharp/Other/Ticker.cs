@@ -59,7 +59,9 @@ namespace Ogar_CSharp
                 var delta = (virtualTime + step) - (int)stopWatch.ElapsedMilliseconds;
                 if (delta < 0)
                     virtualTime -= delta;
-                Thread.Sleep(delta < 0 ? 1 : delta);
+                Console.WriteLine(delta);
+                if(delta > 0)
+                    Thread.Sleep(delta);
             }
         }
         /// <summary>

@@ -58,14 +58,29 @@ namespace Ogar_CSharp.Protocols
             var writer = new Writer();
             switch (type)
             {
-                case LeaderboardType.FFA: 
-                    FFALeaderboard(writer, (IList<FFALeaderboardEntry>)data, (FFALeaderboardEntry)selfData, protocolVersion); 
+                case LeaderboardType.FFA:
+                    IList<FFALeaderboardEntry> leaderBoard;
+                    if (data != null)
+                        leaderBoard = (IList<FFALeaderboardEntry>)data;
+                    else
+                        leaderBoard = new List<FFALeaderboardEntry>();
+                    FFALeaderboard(writer, leaderBoard, (FFALeaderboardEntry)selfData, protocolVersion); 
                     break;
-                case LeaderboardType.Pie: 
-                    PieLeaderboard(writer, (IList<PieLeaderboardEntry>)data, (PieLeaderboardEntry)selfData, protocolVersion); 
+                case LeaderboardType.Pie:
+                    IList<PieLeaderboardEntry> leaderBoard1;
+                    if (data != null)
+                        leaderBoard1 = (IList<PieLeaderboardEntry>)data;
+                    else
+                        leaderBoard1 = new List<PieLeaderboardEntry>();
+                    PieLeaderboard(writer, leaderBoard1, (PieLeaderboardEntry)selfData, protocolVersion); 
                     break;
-                case LeaderboardType.Text: 
-                    TextBoard(writer, (IList<TextLeaderBoardEntry>)data, protocolVersion);
+                case LeaderboardType.Text:
+                    IList<TextLeaderBoardEntry> leaderBoard2;
+                    if (data != null)
+                        leaderBoard2 = (IList<TextLeaderBoardEntry>)data;
+                    else
+                        leaderBoard2 = new List<TextLeaderBoardEntry>();
+                    TextBoard(writer, leaderBoard2, protocolVersion);
                     break;
             }
             this.Send(writer.ToArray());
@@ -251,7 +266,7 @@ namespace Ogar_CSharp.Protocols
             Send(new byte[1] { 18 });
             if (LastleaderboardType != null)
             {
-                this.OnLeaderboardUpdate(LastleaderboardType.Value, new List<LeaderBoardEntry>(), null);
+                this.OnLeaderboardUpdate<LeaderBoardEntry>(LastleaderboardType.Value, null, null);
                 this.LastleaderboardType = null;
             }
         }
