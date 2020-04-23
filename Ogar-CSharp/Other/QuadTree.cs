@@ -6,19 +6,13 @@ using System.Threading.Tasks;
 
 namespace Ogar_CSharp
 {
-    public abstract class QuadItem<T> 
-    {
-        public T Item { get; protected set; }
-        public RectangleF range;
-    }
     public interface IQuadItem
     {
         public RectangleF Range { get; }
     }
     public class QuadTree<T> where T : IQuadItem
     {
-        private static Dictionary<T, QuadTree<T>> roots = new Dictionary<T, QuadTree<T>>();
-
+        private static readonly Dictionary<T, QuadTree<T>> roots = new Dictionary<T, QuadTree<T>>(3000);
         public QuadTree<T> root;
         public int level;
         public int maxLevel;
