@@ -1,6 +1,7 @@
 ﻿using Ogar_CSharp.Worlds;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 namespace Ogar_CSharp.Cells
 {
@@ -11,8 +12,9 @@ namespace Ogar_CSharp.Cells
         Eat,
         EatInvd
     }
-    public abstract class Cell : QuadItem<Cell>
+    public abstract class Cell : IQuadItem
     {
+        public RectangleF range;
         public Boost boost = default;
         public uint id;
         public World world;
@@ -28,6 +30,7 @@ namespace Ogar_CSharp.Cells
         private string name;
         private string skin;
         public bool posChanged, sizeChanged, colorChanged, nameChanged, skinChanged;
+        public RectangleF Range => range;
         public abstract byte Type { get; }
         public abstract bool IsSpiked { get; }
         public abstract bool IsAgitated { get; }
@@ -44,7 +47,6 @@ namespace Ogar_CSharp.Cells
         public string Skin { get => skin; set { skin = value; skinChanged = true; } }
         protected Cell(World world, float x, float y, float size, int color)
         {
-            Item = this;
             this.world = world;
             id = world._nextCellId++;
             birthTick = world.handle.tick;
