@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Ogar_CSharp.Cells;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 
@@ -15,7 +17,9 @@ namespace Ogar_CSharp
         private event Action CallBacks;
         private bool running;
         public int step;
+        private int virtualTime;
         private Thread tickingThread;
+        private Stopwatch stopWatch = Stopwatch.StartNew();
         public Ticker(int step) =>
             this.step = step;
         /// <summary>
@@ -42,6 +46,7 @@ namespace Ogar_CSharp
             if (running)
                 throw new Exception("The ticker has already been started");
             running = true;
+            virtualTime = (int)stopWatch.ElapsedMilliseconds;
             tickingThread = new Thread(TickThread) { IsBackground = true };
             tickingThread.Start();
         }
@@ -50,7 +55,11 @@ namespace Ogar_CSharp
             while (running)
             {
                 CallBacks();
-                Thread.Sleep(step);
+                virtualTime += step;
+                var delta = (virtualTime + step) - (int)stopWatch.ElapsedMilliseconds;
+                if (delta < 0)
+                    virtualTime -= delta;
+                Thread.Sleep(delta < 0 ? 1 : delta);
             }
         }
         /// <summary>
