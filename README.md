@@ -1,5 +1,5 @@
 # OgarII-CSharp
-OgarII written in .Net Core, All code is based off of Luka's OgarII with some changes.
+OgarII written in c# , All code is based off of Luka's OgarII with some changes.
 
 Currently Missing :
 
@@ -27,5 +27,5 @@ Moderon protocol has not been tested at all.
 
 Prerequisites for builiding :
 
-Visual Studio 2019 or greater with .Net Core 3.0 SDK
+Visual Studio 2019 or greater with .Net Core 3.1 SDK
 
