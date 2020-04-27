@@ -22,19 +22,19 @@ namespace Ogar_CSharp
         private static readonly Random randomMath = new Random();
         public static int RandomColor()
         {
-            switch(Math.Floor(randomMath.NextDouble() * 6))
+            switch (Math.Floor(randomMath.NextDouble() * 6))
             {
                 case 0:
                     return ((int)Math.Floor(randomMath.NextDouble() * 0x100) << 16) | (0xFF << 8) | 0x10;
-                case 1: 
+                case 1:
                     return ((int)Math.Floor(randomMath.NextDouble() * 0x100) << 16) | (0x10 << 8) | 0xFF;
-                case 2: 
+                case 2:
                     return (0xFF << 16) | ((int)Math.Floor(randomMath.NextDouble() * 0x100) << 8) | 0x10;
-                case 3: 
+                case 3:
                     return (0x10 << 16) | ((int)Math.Floor(randomMath.NextDouble() * 0x100) << 8) | 0xFF;
-                case 4: 
+                case 4:
                     return (0x10 << 16) | (0xFF << 8) | (int)Math.Floor(randomMath.NextDouble() * 0x100);
-                case 5: 
+                case 5:
                     return (0xFF << 16) | (0x10 << 8) | (int)Math.Floor(randomMath.NextDouble() * 0x100);
                 default:
                     throw new Exception("This is not suppose to happen");

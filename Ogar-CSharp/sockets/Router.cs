@@ -30,7 +30,7 @@ namespace Ogar_CSharp.Sockets
             ejectTick = listener.handle.tick;
             listener.AddRouter(this);
         }
-        public virtual async Task PerformAsyncTick() { }
+        public virtual void Tick() { } 
         public abstract bool IsExternal { get; }
         public abstract string Type { get; }
         public abstract bool SeparateInTeams { get; }

@@ -93,7 +93,7 @@ namespace Ogar_CSharp.Worlds
                     viewArea.x = x / l;
                     viewArea.y = y / l;
                     this.score = score;
-                    s = viewArea.s = (float)Math.Pow(Math.Min(64 / s, 1), 0.4);
+                    s = viewArea.s = MathF.Pow(MathF.Min(64 / s, 1), 0.4f);
                     viewArea.w = 1920 / s / 2 * Settings.playerViewScaleMult;
                     viewArea.h = 1080 / s / 2 * Settings.playerViewScaleMult;
                     break;
@@ -110,14 +110,14 @@ namespace Ogar_CSharp.Worlds
                     this.score = float.NaN;
                     float dx = this.router.mouseX - this.viewArea.x;
                     float dy = this.router.mouseY - this.viewArea.y;
-                    float d = (float)Math.Sqrt(dx * dx + dy * dy);
-                    float D = (float)Math.Min(d, Settings.playerRoamSpeed);
+                    float d = (float)MathF.Sqrt(dx * dx + dy * dy);
+                    float D = (float)MathF.Min(d, Settings.playerRoamSpeed);
                     if (D < 1) break;
                     dx /= d;
                     dy /= d;
                     var border = this.world.border;
-                    viewArea.x = Math.Max(border.X - border.Width, Math.Min(this.viewArea.x + dx * D, border.X + border.Width));
-                    viewArea.y = Math.Max(border.Y - border.Height, Math.Min(this.viewArea.y + dy * D, border.Y + border.Height));
+                    viewArea.x = MathF.Max(border.X - border.Width, MathF.Min(this.viewArea.x + dx * D, border.X + border.Width));
+                    viewArea.y = MathF.Max(border.Y - border.Height, MathF.Min(this.viewArea.y + dy * D, border.Y + border.Height));
                     s = this.viewArea.s = Settings.playerRoamViewScale;
                     this.viewArea.w = 1920 / s / 2 * Settings.playerViewScaleMult;
                     this.viewArea.h = 1080 / s / 2 * Settings.playerViewScaleMult;
@@ -141,8 +141,8 @@ namespace Ogar_CSharp.Worlds
                 return;
             lastVisibleCells = visibleCells;
             visibleCells = new Dictionary<uint, Cell>(150); //have an initial capacity for better perfomance.
-            foreach (var cell in ownedCells)
-                UpdateCell(cell, true);
+            for (int i = 0; i < ownedCells.Count; i++)
+                UpdateCell(ownedCells[i], true);
             world.finder.Search(new RectangleF(viewArea.x, viewArea.y, viewArea.w, viewArea.h),
                 (cell) =>
                 {

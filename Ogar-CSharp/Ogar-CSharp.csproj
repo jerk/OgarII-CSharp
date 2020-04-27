@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -7,6 +6,8 @@
     <PublishSingleFile>true</PublishSingleFile>
 	<PublishTrimmed>true</PublishTrimmed>
 	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<PublishReadyToRun>true</PublishReadyToRun>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -21,12 +22,6 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="VIEApps.Components.WebSockets" Version="10.3.2004.24" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="websocket-sharp">
-      <HintPath>References\websocket-sharp.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>

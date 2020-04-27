@@ -10,7 +10,7 @@ namespace Ogar_CSharp
     {
         public RectangleF Range { get; }
     }
-    public class QuadTree<T> where T : IQuadItem
+    public class QuadTree<T> where T : notnull, IQuadItem
     {
         private static readonly Dictionary<T, QuadTree<T>> roots = new Dictionary<T, QuadTree<T>>(3000);
         public QuadTree<T> root;
@@ -138,19 +138,19 @@ namespace Ogar_CSharp
         }
         public int GetQuadrant(RectangleF a)
         {
-            var quad = Misc.GetQuadFullIntersect(a, this.range);
-            if (quad.t)
+            var (t, b, l, r) = Misc.GetQuadFullIntersect(a, this.range);
+            if (t)
             {
-                if (quad.l)
+                if (l)
                     return 0;
-                if (quad.r)
+                if (r)
                     return 1;
             }
-            if (quad.b)
+            if (b)
             {
-                if (quad.l) 
+                if (l) 
                     return 2;
-                if (quad.r) 
+                if (r) 
                     return 3;
             }
             return -1;

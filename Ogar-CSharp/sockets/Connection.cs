@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using net.vieapps.Components.WebSockets;
 using Ogar_CSharp.Bots;
 using Ogar_CSharp.Cells;
 using Ogar_CSharp.Protocols;
 using Ogar_CSharp.Worlds;
-using WebSocketSharp;
 using static Ogar_CSharp.Sockets.Listener;
 
 namespace Ogar_CSharp.Sockets
@@ -15,7 +16,6 @@ namespace Ogar_CSharp.Sockets
     public class Connection : Router 
     {
         public IPAddress remoteAddress;
-        public ClientSocket webSocket;
         public DateTime connectionTime;
         public DateTime lastActivityTime;
         public DateTime lastChatTime;
@@ -27,15 +27,14 @@ namespace Ogar_CSharp.Sockets
         public List<Minion> minions = new List<Minion>();
         public bool minionsFrozen;
         public bool controllingMinions;
-        public Connection(Listener listener, ClientSocket socket) : base(listener)
+        public ManagedWebSocket webSocket;
+        public Connection(Listener listener , ManagedWebSocket webSocket) : base(listener)
         {
-            webSocket = socket;
-            remoteAddress = socket.Context.UserEndPoint.Address;
+            this.webSocket = webSocket;
+            remoteAddress = (webSocket.RemoteEndPoint as IPEndPoint).Address;
             connectionTime = DateTime.Now;
             lastActivityTime = DateTime.Now;
             lastChatTime = DateTime.Now;
-            webSocket.onClose = (x) => OnSocketClose(x.Code, x.Reason);
-            webSocket.onMessage = (x) => OnSocketMessage(x);
         }
 
         public override bool ShouldClose => socketDisconnected;
@@ -43,7 +42,8 @@ namespace Ogar_CSharp.Sockets
         public override bool SeparateInTeams => true;
         public override string Type => "connection";
         public void CloseSocket(ushort errorCode, string reason)
-            => webSocket.CloseSocket(errorCode, reason);
+            => webSocket.CloseAsync((System.Net.WebSockets.WebSocketCloseStatus)errorCode, 
+                reason, CancellationToken.None);
         public override void OnNewOwnedCell(PlayerCell cell)
             => protocol.OnNewOwnedCell(cell);
         public override void OnWorldSet()
@@ -64,14 +64,12 @@ namespace Ogar_CSharp.Sockets
             base.Close();
             disconnected = true;
             disconnectionTick = Handle.tick;
-            listener.OnDisconnection(this, closeCode, closeReason);
-            webSocket.RemoveAllListeners();
         }
         public void Send(byte[] data)
         {
             if (socketDisconnected)
                 return;
-            webSocket.Send(data);
+            webSocket.SendAsync(data);
         }
         public void OnSocketClose(ushort code, string reason)
         {
@@ -81,16 +79,11 @@ namespace Ogar_CSharp.Sockets
             socketDisconnected = true;
             closeCode = code;
             closeReason = reason;
+            webSocket = null;
         }
-        public void OnSocketMessage(MessageEventArgs data)
+        public void OnSocketMessage(byte[] data)
         {
-            if (data.IsText || data.IsPing)
-            {
-                CloseSocket(1003, "Unexpected message format");
-                return;
-            }
-            var bytes = data.RawData;
-            if (bytes.Length > 512 || bytes.Length == 0)
+            if (data.Length > 512 || data.Length == 0)
             {
                 CloseSocket(1003, "Unexpected message size");
                 return;
@@ -98,10 +91,10 @@ namespace Ogar_CSharp.Sockets
             else
             {
                 if (protocol != null)
-                    protocol.OnSocketMessage(new DataReader(bytes, 0));
+                    protocol.OnSocketMessage(new DataReader(data, 0));
                 else
                 {
-                    protocol = ProtocolStore.Decide(this, new DataReader(bytes, 0));
+                    protocol = ProtocolStore.Decide(this, new DataReader(data, 0));
                     if (protocol == null)
                     {
                         CloseSocket(1003, "Ambiguous protocol");
@@ -125,11 +118,8 @@ namespace Ogar_CSharp.Sockets
                 //to implement.
             }
         }
-        public override async Task PerformAsyncTick()
-        {
-            Tick();
-        }
-        public void Tick()
+
+        public override void Tick()
         {
             if (!hasPlayer)
                 return;
