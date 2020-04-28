@@ -19,7 +19,7 @@ Minions don't work.
 
 If a player connects while server is initializaing, it crashes.
 
-Prerequisites for builiding :
+# Prerequisites for builiding
 
 Visual Studio 2019 or greater with .Net Core 3.1 SDK
 
