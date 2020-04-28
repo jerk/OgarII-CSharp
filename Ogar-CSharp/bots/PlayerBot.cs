@@ -16,7 +16,7 @@ namespace Ogar_CSharp.Bots
         public override bool ShouldClose => !hasPlayer
             || !Player.exists || !Player.hasWorld;
         public PlayerBot(World world) : base(world) { }
-        public override void Update()
+        public override void Tick()
         {
             if (splitCooldownTicks > 0)
                 splitCooldownTicks--;

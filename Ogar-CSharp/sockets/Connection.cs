@@ -52,9 +52,10 @@ namespace Ogar_CSharp.Sockets
         public override void CreatePlayer()
         {
             base.CreatePlayer();
-            //if(Settings.chatEnabled) chat stuff
-            //else
+            if (Settings.chatEnabled)
+                listener.globalChat.Add(this);
             Handle.worlds[0].AddPlayer(Player);
+
         }
         public override void Close()
         {
@@ -104,9 +105,7 @@ namespace Ogar_CSharp.Sockets
         }
         public void OnChatMessage(string message)
         {
-            return;
-            message = message?.Trim();
-            if (message == null)
+            if (string.IsNullOrWhiteSpace(message))
                 return;
             var globalChat = listener.globalChat;
             var lastChatTime = this.lastChatTime;
@@ -115,6 +114,10 @@ namespace Ogar_CSharp.Sockets
             {
                 //if(!Handle.ch)
                 //to implement.
+            }
+            else if (true) // should be Date.now() - lastChatTime >= this.settings.chatCooldown
+            {
+                globalChat.Broadcast(this, message);
             }
         }
 
@@ -160,10 +163,6 @@ namespace Ogar_CSharp.Sockets
             if (Handle.tick % 4 == 0)
                 Handle.gamemode.SendLeaderboard(this);
             protocol.OnVisibleCellUpdate(add, upd, eat, del);
-        }
-
-        public override void Update()
-        {
         }
 
     }

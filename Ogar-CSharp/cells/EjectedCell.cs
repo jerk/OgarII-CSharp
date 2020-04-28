@@ -7,7 +7,7 @@ namespace Ogar_CSharp.Cells
 {
     public class EjectedCell : Cell
     {
-        public EjectedCell(World world, Player owner, float x, float y, int color) : base(world, x, y, world.Settings.ejectedSize, color)
+        public EjectedCell(World world, Player owner, float x, float y, uint color) : base(world, x, y, world.Settings.ejectedSize, color)
         {
             this.owner = owner;
         }

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using static Ogar_CSharp.Sockets.ChatChannel;
 
 namespace Ogar_CSharp.Protocols
 {
@@ -21,7 +22,7 @@ namespace Ogar_CSharp.Protocols
         //logger() { return this.connection.listener.handle.logger; }
         public Settings Settings => connection.listener.handle.Settings;
         public abstract void OnSocketMessage(DataReader reader);
-        //public abstract void OnChatMessage(ChatSource source, string message);
+        public virtual void OnChatMessage(ChatSource source, string message) { }
         public abstract void OnNewOwnedCell(PlayerCell cell);
         public abstract void OnNewWorldBounds(RectangleF range, bool includeServerInfo);
         public abstract void OnWorldReset();

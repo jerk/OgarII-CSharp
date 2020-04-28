@@ -28,6 +28,7 @@ namespace Ogar_CSharp.Sockets
         public Listener(ServerHandle handle)
         {
             listenerSocket = new WebSocket() { NoDelay = false };
+            globalChat = new ChatChannel(this);
             this.handle = handle;
         }
         public int ConnectionCountForIP(string ipAddress)
@@ -104,6 +105,7 @@ namespace Ogar_CSharp.Sockets
             Console.WriteLine($"DISCONNECTION FROM {connection.RemoteAddress}");
             connection.OnSocketClose(0, null);
             connections.Remove(connection);
+            globalChat.Remove(connection);
         }
         public void OnData(ManagedWebSocket ws, WebSocketReceiveResult res, byte[] data)
         {
@@ -129,9 +131,6 @@ namespace Ogar_CSharp.Sockets
                 this.routers[i].Player?.up();*/
             for (i = 0; i < l; i++)
                 this.routers[i].Tick();
-
-            for (i = 0; i < l; i++)
-                this.routers[i].Update();
             for (i = 0, l = this.connections.Count; i < l; i++)
             {
                 var connection = connections[i];

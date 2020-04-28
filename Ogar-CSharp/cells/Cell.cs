@@ -26,7 +26,7 @@ namespace Ogar_CSharp.Cells
         private float x = float.NaN;
         private float y = float.NaN;
         private float size = float.NaN;
-        private int color;
+        private uint color;
         private string name;
         private string skin;
         public bool posChanged, sizeChanged, colorChanged, nameChanged, skinChanged;
@@ -42,10 +42,10 @@ namespace Ogar_CSharp.Cells
         public float Size { get => size; set { Misc.ThrowIfBadOrNegativeNumber(value); size = value; sizeChanged = true; } }
         public float SquareSize { get => Size * Size; set => Size = (float)Math.Sqrt(value); }
         public float Mass { get => Size * Size / 100; set => Size = (float)Math.Sqrt(100 * value); }
-        public int Color { get => color; set { color = value; colorChanged = true; } }
+        public uint Color { get => color; set { color = value; colorChanged = true; } }
         public string Name { get => name; set { name = value; nameChanged = true; } }
         public string Skin { get => skin; set { skin = value; skinChanged = true; } }
-        protected Cell(World world, float x, float y, float size, int color)
+        protected Cell(World world, float x, float y, float size, uint color)
         {
             this.world = world;
             Id = world._nextCellId++;

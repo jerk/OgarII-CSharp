@@ -22,7 +22,7 @@ namespace Ogar_CSharp.Bots
             base.Close();
             following.Minions.Remove(this);
         }
-        public override void Update()
+        public override void Tick()
         {
             if (Player.currentState == PlayerState.Idle && following.Player.currentState == PlayerState.Alive)
             {

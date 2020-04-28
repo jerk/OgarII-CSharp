@@ -97,6 +97,5 @@ namespace Ogar_CSharp.Sockets
         }
         public virtual void Close() => listener.RemoveRouter(this);
         public abstract bool ShouldClose { get; }
-        public abstract void Update();
     }
 }

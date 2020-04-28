@@ -27,8 +27,8 @@ namespace Ogar_CSharp.Worlds
         public string cellName;
         public string chatName = "Spectator";
         public string cellSkin;
-        public int cellColor = 0x7F7F7F;
-        public int chatColor = 0x7F7F7F;
+        public uint cellColor = 0x7F7F7F;
+        public uint chatColor = 0x7F7F7F;
         public PlayerState currentState = PlayerState.Idle;
         public bool hasWorld;
         public World world;

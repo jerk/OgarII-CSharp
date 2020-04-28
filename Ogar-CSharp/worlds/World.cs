@@ -174,7 +174,7 @@ namespace Ogar_CSharp.Worlds
             }
             return GetRandomPos(cellSize);
         }
-        public (int? color, PointF pos) GetPlayerSpawn(float cellSize)
+        public (uint? color, PointF pos) GetPlayerSpawn(float cellSize)
         {
             var random = new Random();
             if(Settings.worldSafeSpawnFromEjectedChange > (float)random.NextDouble() && ejectedCells.Count > 0)

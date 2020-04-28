@@ -26,7 +26,7 @@ namespace Ogar_CSharp.Gamemodes
             Color.FromArgb(lowlightBase, lowlightBase, highlightBase)
         };
         private static int TeamCount => teamColors.Length;
-        private static int GetTeamColor(int index)
+        private static uint GetTeamColor(int index)
         {
             Color color = teamColors[index];
             float random = (float)new Random().NextDouble();
@@ -35,7 +35,7 @@ namespace Ogar_CSharp.Gamemodes
             var r = color.R == highlightBase ? highlight : lowlight;
             var g = color.G == highlightBase ? highlight : lowlight;
             var b = color.B == highlightBase ? highlight : lowlight;
-            return (r << 16) | (g << 8) | b;
+            return (uint)((r << 16) | (g << 8) | b);
         }
         public override byte Type => 2;
 
@@ -90,7 +90,7 @@ namespace Ogar_CSharp.Gamemodes
                 return;
             float size = player.router.Type == "minion" ? handle.Settings.minionSpawnSize : handle.Settings.playerSpawnSize;
             var pos = player.world.GetSafeSpawnPos(size);
-            var color = player.router.SeparateInTeams ? GetTeamColor(player.team.Value) : Misc.RandomColor();
+            uint color = player.router.SeparateInTeams ? GetTeamColor(player.team.Value) : Misc.RandomColor();
             player.cellName = player.chatName = player.leaderBoardName = name;
             player.cellSkin = null;
             player.chatColor = player.cellColor = color;

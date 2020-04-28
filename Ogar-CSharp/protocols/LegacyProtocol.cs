@@ -298,6 +298,17 @@ namespace Ogar_CSharp.Protocols
                 });
             }
         }
+        public override void OnChatMessage(ChatChannel.ChatSource source, string message)
+        {
+            Console.WriteLine("yup");
+            Writer writer = new Writer();
+            writer.Write<byte>(99);
+            writer.Write((byte)((source.isServer ? 1 : 0) * 128));
+            writer.WriteColor(source.color);
+            WriteZTString(writer, source.name, protocolVersion);
+            WriteZTString(writer, message, protocolVersion);
+            Send(writer.ToArray());
+        }
         public static void PieLeaderboard(Writer writer, IList<PieLeaderboardEntry> data, PieLeaderboardEntry selfData, uint protocol)
         {
             if (protocol <= 20)
