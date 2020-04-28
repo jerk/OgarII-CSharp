@@ -31,7 +31,7 @@ namespace Ogar_CSharp.Sockets
             this.handle = handle;
         }
         public int ConnectionCountForIP(string ipAddress)
-            => connections.Count((x) => x.remoteAddress.ToString() == ipAddress);
+            => connections.Count((x) => x.RemoteAddress.ToString() == ipAddress);
         public Settings Settings
             => handle.Settings;
         public bool Open()
@@ -95,13 +95,13 @@ namespace Ogar_CSharp.Sockets
                 client.CloseAsync(System.Net.WebSockets.WebSocketCloseStatus.InternalServerError, "Connection rejected", CancellationToken.None);
             var newConnection = new Connection(this, client);
             client.Set("agar", newConnection);
-            Console.WriteLine($"CONNECTION FROM {newConnection.remoteAddress}");
+            Console.WriteLine($"CONNECTION FROM {newConnection.RemoteAddress}");
             connections.Add(newConnection);
         }
         public void OnDisconnection(ManagedWebSocket ws)
         {
             Connection connection = ws.Get<Connection>("agar");
-            Console.WriteLine($"DISCONNECTION FROM {connection.remoteAddress}");
+            Console.WriteLine($"DISCONNECTION FROM {connection.RemoteAddress}");
             connection.OnSocketClose(0, null);
             connections.Remove(connection);
         }
@@ -135,7 +135,7 @@ namespace Ogar_CSharp.Sockets
             for (i = 0, l = this.connections.Count; i < l; i++)
             {
                 var connection = connections[i];
-                if (Settings.listenerForbiddenIPs.Contains(connection.remoteAddress.ToString()))
+                if (Settings.listenerForbiddenIPs.Contains(connection.RemoteAddress.ToString()))
                     connection.CloseSocket(1003, "Remote address is forbidden");
                 //else if (DateTime.Now.Ticks - connection.lastActivityTime.Ticks >= Settings.listenerMaxClientDormancy)
                 // connection.CloseSocket(1003, "Maximum dormancy time exceeded");

@@ -14,9 +14,9 @@ namespace Ogar_CSharp.Cells
     }
     public abstract class Cell : IQuadItem
     {
+        public uint Id { get; }
         public RectangleF range;
         public Boost boost = default;
-        public uint id;
         public World world;
         public int birthTick;
         public bool exists;
@@ -48,7 +48,7 @@ namespace Ogar_CSharp.Cells
         protected Cell(World world, float x, float y, float size, int color)
         {
             this.world = world;
-            id = world._nextCellId++;
+            Id = world._nextCellId++;
             birthTick = world.handle.tick;
             X = x;
             Y = y;

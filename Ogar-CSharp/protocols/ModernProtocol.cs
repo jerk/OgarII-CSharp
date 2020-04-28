@@ -81,8 +81,9 @@ namespace Ogar_CSharp.Protocols
                     connection.mouseY = reader.Read<int>();
                     connection.splitAttempts += reader.ReadByte();
                     count = reader.ReadByte();
-                    for (i = 0, l = connection.minions.Count; count > 0 && i < l; i++)
-                        connection.minions[i].splitAttempts += count;
+                    if(connection.Minions != null)
+                    for (i = 0, l = connection.Minions.Count; count > 0 && i < l; i++)
+                        connection.Minions[i].splitAttempts += count;
                     byte globalFlags = reader.ReadByte();
                     if((globalFlags & 1) != 0)
                     {
@@ -101,9 +102,9 @@ namespace Ogar_CSharp.Protocols
                         this.connection.isPressingQ = this.connection.hasProcessedQ = false;
                     if ((globalFlags & 16) != 0) 
                         this.connection.ejectAttempts++;
-                    if ((globalFlags & 32) != 0)
-                        for (i = 0, l = connection.minions.Count; i < l; i++)
-                            connection.minions[i].ejectAttempts++;
+                    if (((globalFlags & 32) != 0) && connection.Minions != null)
+                        for (i = 0, l = connection.Minions.Count; i < l; i++)
+                            connection.Minions[i].ejectAttempts++;
                     if ((globalFlags & 64) != 0) 
                         this.connection.minionsFrozen = !this.connection.minionsFrozen;
                     if((globalFlags & 128) != 0)
@@ -278,7 +279,7 @@ namespace Ogar_CSharp.Protocols
                 for (int s = 0; s < add.Count; s++)
                 {
                     var item = add[s];
-                    writer.Write(item.id);
+                    writer.Write(item.Id);
                     writer.WriteByte(item.Type);
                     writer.Write(item.X);
                     writer.Write(item.X);
@@ -310,7 +311,7 @@ namespace Ogar_CSharp.Protocols
                         flags |= 8;
                     if (item.sizeChanged)
                         flags |= 16;
-                    writer.Write(item.id);
+                    writer.Write(item.Id);
                     writer.WriteByte(flags);
                     if (item.posChanged)
                     {
@@ -333,15 +334,15 @@ namespace Ogar_CSharp.Protocols
                 for (int s = 0; s < eat.Count; s++)
                 {
                     var item = eat[s];
-                    writer.Write(item.id);
-                    writer.Write(item.eatenBy.id);
+                    writer.Write(item.Id);
+                    writer.Write(item.eatenBy.Id);
                 }
                 writer.Write<uint>(0);
             }
             if (del.Count > 0)
             {
                 for (int s = 0; s < del.Count; s++)
-                    writer.Write(del[s].id);
+                    writer.Write(del[s].Id);
                 writer.Write<uint>(0);
             }
             Send(writer.ToArray());

@@ -112,7 +112,7 @@ namespace Ogar_CSharp
         public Player CreatePlayer(Router router)
         {
             uint id = 1;
-            while (players.Any(x => x.id == ++id)) ;
+            while (players.Any(x => x.Id == ++id)) ;
             var newPlayer = new Player(this, id, router);
             players.Add(newPlayer);
             router.Player = newPlayer;
@@ -122,9 +122,9 @@ namespace Ogar_CSharp
         }
         public bool RemovePlayer(uint id)
         {
-            if (!players.Any(x => x.id == id)) 
+            if (!players.Any(x => x.Id == id)) 
                 return false;
-            var player = this.players.First(x => x.id == id);
+            var player = this.players.First(x => x.Id == id);
             this.gamemode.OnPlayerDestroy(player);
             player.Destroy();
             player.exists = false;

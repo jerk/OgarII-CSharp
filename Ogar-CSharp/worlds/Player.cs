@@ -20,7 +20,7 @@ namespace Ogar_CSharp.Worlds
     public class Player
     {
         public ServerHandle handle;
-        public uint id;
+        public uint Id { get; }
         public Router router;
         public bool exists;
         public string leaderBoardName;
@@ -42,7 +42,7 @@ namespace Ogar_CSharp.Worlds
         public Player(ServerHandle handle, uint id, Router router)
         {
             this.handle = handle;
-            this.id = id;
+            Id = id;
             this.router = router;
             exists = true;
             viewArea = new ViewArea(0, 0, 1920 / 2 * handle.Settings.playerViewScaleMult, 1080 / 2 * handle.Settings.playerViewScaleMult, 1);
@@ -128,11 +128,11 @@ namespace Ogar_CSharp.Worlds
         {
             if (isVisible)
             {
-                visibleCells[cell.id] = cell;
+                visibleCells[cell.Id] = cell;
             }
             else
             {
-                lastVisibleCells[cell.id] = cell;
+                lastVisibleCells[cell.Id] = cell;
             }
         }
         public void UpdateVisibleCells()
@@ -146,7 +146,7 @@ namespace Ogar_CSharp.Worlds
             world.finder.Search(new RectangleF(viewArea.x, viewArea.y, viewArea.w, viewArea.h),
                 (cell) =>
                 {
-                    visibleCells[cell.id] = cell;
+                    visibleCells[cell.Id] = cell;
                 });
         }
         public void CheckExistence()
@@ -155,12 +155,12 @@ namespace Ogar_CSharp.Worlds
                 return;
             if(currentState != PlayerState.Alive)
             {
-                handle.RemovePlayer(id);
+                handle.RemovePlayer(Id);
                 return;
             }
             int disposeDelay = Settings.worldPlayerDisposeDelay;
             if (disposeDelay > 0 && handle.tick - router.disconnectionTick >= disposeDelay)
-                handle.RemovePlayer(id);
+                handle.RemovePlayer(Id);
         }
     }
 }

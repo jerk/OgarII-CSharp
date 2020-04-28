@@ -47,7 +47,7 @@ namespace Ogar_CSharp.Sockets
         {
             if (!hasPlayer)
                 return;
-            listener.handle.RemovePlayer(Player.id);
+            listener.handle.RemovePlayer(Player.Id);
             Player = null;
         }
         public virtual void OnWorldSet() { }

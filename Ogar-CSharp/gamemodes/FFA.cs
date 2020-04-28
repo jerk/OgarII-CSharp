@@ -12,7 +12,7 @@ namespace Ogar_CSharp.Gamemodes
     {
         public static FFALeaderboardEntry GetLeaderboardData(Player player, Player requesting, short index)
         {
-            return new FFALeaderboardEntry(player.leaderBoardName, requesting.id == player.id, player.ownedCells[0].id, (short)(1 + index));
+            return new FFALeaderboardEntry(player.leaderBoardName, requesting.Id == player.Id, player.ownedCells[0].Id, (short)(1 + index));
         }
         public FFA(ServerHandle handle) : base(handle)
         {

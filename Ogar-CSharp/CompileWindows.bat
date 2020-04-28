@@ -1,1 +1,1 @@
-dotnet publish -r win-x64 /p:IlcPath="C:\Users\sethl\Documents\CoreRT\corert\bin\Windows_NT.x64.Release";NativeCodeGen=cpp -c release
+dotnet publish -r win-x64 /p:IlcPath="C:\Users\sethl\Documents\CoreRT\corert\bin\Windows_NT.x64.Debug";NativeCodeGen=cpp;AdditionalCppCompilerFlags=/MTd -c debug

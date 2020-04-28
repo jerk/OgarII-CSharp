@@ -7,8 +7,7 @@ namespace Ogar_CSharp.Cells
 {
     public class PlayerCell : Cell
     {
-        public float MoveSpeed
-            => (float)(88 * Math.Pow(Size, -0.4396754) * owner.Settings.playerMoveMult);
+        public float MoveSpeed => 88 * MathF.Pow(Size, -0.4396754f) * owner.Settings.playerMoveMult;
         public bool CanMerge { get; set; }
         public override byte Type => 0;
         public override bool IsSpiked => false;
@@ -39,7 +38,7 @@ namespace Ogar_CSharp.Cells
             {
                 PlayerCell otherPlayer = (PlayerCell)other;
                 var delay = world.Settings.playerNoCollideDelay;
-                if(otherPlayer.owner.id == owner.id)
+                if(otherPlayer.owner.Id == owner.Id)
                 {
                     if (otherPlayer.Age < delay || Age < delay)
                         return CellEatResult.None;
@@ -56,7 +55,7 @@ namespace Ogar_CSharp.Cells
                 return CellEatResult.Eat;
             return GetDefaultEatResult(other);
         }
-        public CellEatResult GetDefaultEatResult(Cell other) => (other.Size * Misc.SQRT_1_3 > Size ? CellEatResult.None : CellEatResult.Eat);
+        public CellEatResult GetDefaultEatResult(Cell other) => other.Size * Misc.SQRT_1_3 > Size ? CellEatResult.None : CellEatResult.Eat;
         public override void OnTick()
         {
             base.OnTick();
@@ -70,9 +69,9 @@ namespace Ogar_CSharp.Cells
             var delay = settings.playerNoMergeDelay;
             if(settings.playerMergeTime > 0)
             {
-                var initial = Math.Round(25 * settings.playerMergeTime);
-                var increase = Math.Round(25 * Mass * settings.playerMergeTimeIncrease);
-                delay = (float)(Math.Max(delay, (settings.playerMergeVersion == Settings.MergeVersion.New) ? Math.Max(initial, increase) : initial + increase));
+                var initial = MathF.Round(25 * settings.playerMergeTime);
+                var increase = MathF.Round(25 * Mass * settings.playerMergeTimeIncrease);
+                delay = MathF.Max(delay, (settings.playerMergeVersion == Settings.MergeVersion.New) ? MathF.Max(initial, increase) : initial + increase);
             }
             CanMerge = Age >= delay;
         }

@@ -74,7 +74,7 @@ namespace Ogar_CSharp.Bots
                 switch (check.Type)
                 {
                     case 0:
-                        if (Player.id == check.owner.id)
+                        if (Player.Id == check.owner.Id)
                             break;
                         if (Player.team != null && Player.team == check.owner.team)
                             break;

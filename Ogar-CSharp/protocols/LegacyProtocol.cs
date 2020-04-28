@@ -90,7 +90,7 @@ namespace Ogar_CSharp.Protocols
         {
             var writer = new Writer();
             writer.WriteByte(32);
-            writer.Write(cell.id);
+            writer.Write(cell.Id);
             Send(writer.ToArray());
         }
    
@@ -153,8 +153,8 @@ namespace Ogar_CSharp.Protocols
                     break;
                 case 17:
                     if (this.connection.controllingMinions)
-                        for (int i = 0, l = this.connection.minions.Count; i < l; i++)
-                            this.connection.minions[i].splitAttempts++;
+                        for (int i = 0, l = this.connection.Minions.Count; i < l; i++)
+                            this.connection.Minions[i].splitAttempts++;
                     else if (connection.splitAttempts != byte.MaxValue)
                         this.connection.splitAttempts++;
                     break;
@@ -162,19 +162,19 @@ namespace Ogar_CSharp.Protocols
                 case 19: this.connection.isPressingQ = this.hasProcessedQ = false; break;
                 case 21:
                     if (this.connection.controllingMinions)
-                        for (int i = 0, l = this.connection.minions.Count; i < l; i++)
-                            this.connection.minions[i].ejectAttempts++;
+                        for (int i = 0, l = this.connection.Minions.Count; i < l; i++)
+                            this.connection.Minions[i].ejectAttempts++;
                     else this.connection.ejectAttempts++;
                     break;
                 case 22:
                     if (!this.gotKey || !Settings.minionEnableERTPControls) break;
-                    for (int i = 0, l = this.connection.minions.Count; i < l; i++)
-                        this.connection.minions[i].splitAttempts++;
+                    for (int i = 0, l = this.connection.Minions.Count; i < l; i++)
+                        this.connection.Minions[i].splitAttempts++;
                     break;
                 case 23:
                     if (!this.gotKey || !Settings.minionEnableERTPControls) break;
-                    for (int i = 0, l = this.connection.minions.Count; i < l; i++)
-                        this.connection.minions[i].ejectAttempts++;
+                    for (int i = 0, l = this.connection.Minions.Count; i < l; i++)
+                        this.connection.Minions[i].ejectAttempts++;
                     break;
                 case 24:
                     if (!this.gotKey || !Settings.minionEnableERTPControls) break;
@@ -237,8 +237,8 @@ namespace Ogar_CSharp.Protocols
             for (int i = 0; i < eat.Count; i++)
             {
                 var item = eat[i];
-                writer.Write(item.eatenBy.id);
-                writer.Write(item.id);
+                writer.Write(item.eatenBy.Id);
+                writer.Write(item.Id);
             }
             for (int i = 0; i < add.Count; i++)
             {
@@ -258,7 +258,7 @@ namespace Ogar_CSharp.Protocols
             else
                 writer.Write((ushort)del.Count);
             for (int i = 0; i < del.Count; i++)
-                writer.Write(del[i].id);
+                writer.Write(del[i].Id);
             this.Send(writer.ToArray());
         } 
         public override void OnWorldReset()
@@ -384,7 +384,7 @@ namespace Ogar_CSharp.Protocols
         public static void WriteCellData4(Writer writer, Player source, uint protocol, Cell cell, bool includeType, bool includeSize,
             bool includePos, bool includeColor, bool includeName, bool includeSkin)
         {
-            writer.Write(cell.id);
+            writer.Write(cell.Id);
             if(protocol == 4)
             {
                 writer.Write((short)cell.X);
@@ -413,7 +413,7 @@ namespace Ogar_CSharp.Protocols
         public static void WriteCellData11(Writer writer, Player source, uint protocol, Cell cell, bool includeType, bool includeSize,
             bool includePos, bool includeColor, bool includeName, bool includeSkin)
         {
-            writer.Write(cell.id);
+            writer.Write(cell.Id);
             writer.Write((int)cell.X);
             writer.Write((int)cell.Y);
             writer.Write((ushort)cell.Size);
@@ -449,7 +449,7 @@ namespace Ogar_CSharp.Protocols
         public static void WriteCellData6(Writer writer, Player source, uint protocol, Cell cell, bool includeType, bool includeSize,
             bool includePos, bool includeColor, bool includeName, bool includeSkin)
         {
-            writer.Write(cell.id);
+            writer.Write(cell.Id);
             writer.Write((int)cell.X);
             writer.Write((int)cell.Y);
             writer.Write((ushort)cell.Size);

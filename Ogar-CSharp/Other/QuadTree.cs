@@ -12,7 +12,7 @@ namespace Ogar_CSharp
     }
     public class QuadTree<T> where T : notnull, IQuadItem
     {
-        private static readonly Dictionary<T, QuadTree<T>> roots = new Dictionary<T, QuadTree<T>>(3000);
+        private static readonly Dictionary<T, QuadTree<T>> roots = new Dictionary<T, QuadTree<T>>(10000);
         public QuadTree<T> root;
         public int level;
         public int maxLevel;

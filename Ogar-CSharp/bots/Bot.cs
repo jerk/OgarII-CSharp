@@ -17,7 +17,7 @@ namespace Ogar_CSharp.Bots
         public override void Close()
         {
             base.Close();
-            listener.handle.RemovePlayer(Player.id);
+            listener.handle.RemovePlayer(Player.Id);
             disconnected = true;
             disconnectionTick = listener.handle.tick;
         }

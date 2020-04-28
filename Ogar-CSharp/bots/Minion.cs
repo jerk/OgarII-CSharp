@@ -13,14 +13,14 @@ namespace Ogar_CSharp.Bots
         public Minion(Connection following) : base(following.Player.world)
         {
             this.following = following;
-            following.minions.Add(this);
+            following.Minions.Add(this);
         }
         public override string Type => "minion";
         public override bool SeparateInTeams => false;
         public override void Close()
         {
             base.Close();
-            following.minions.Remove(this);
+            following.Minions.Remove(this);
         }
         public override void Update()
         {

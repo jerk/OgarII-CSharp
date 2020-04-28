@@ -13,27 +13,26 @@ using static Ogar_CSharp.Sockets.Listener;
 
 namespace Ogar_CSharp.Sockets
 {
-    public class Connection : Router 
+    public class Connection : Router
     {
-        public IPAddress remoteAddress;
-        public DateTime connectionTime;
-        public DateTime lastActivityTime;
-        public DateTime lastChatTime;
+        public ManagedWebSocket WebSocket { get; private set; }
+        public IPAddress RemoteAddress { get; }
+        public List<Minion> Minions { get; private set; }
+        public readonly DateTime ConnectionTime;
+        public DateTime /*lastActivityTime,*/ lastChatTime;
         public int upgradeLevel;
         public Protocol protocol = null;
         public bool socketDisconnected = false;
         public ushort closeCode;
         public string closeReason = null;
-        public List<Minion> minions = new List<Minion>();
         public bool minionsFrozen;
         public bool controllingMinions;
-        public ManagedWebSocket webSocket;
         public Connection(Listener listener , ManagedWebSocket webSocket) : base(listener)
         {
-            this.webSocket = webSocket;
-            remoteAddress = (webSocket.RemoteEndPoint as IPEndPoint).Address;
-            connectionTime = DateTime.Now;
-            lastActivityTime = DateTime.Now;
+            WebSocket = webSocket;
+            RemoteAddress = (webSocket.RemoteEndPoint as IPEndPoint).Address;
+            ConnectionTime = DateTime.Now;
+            //lastActivityTime = DateTime.Now;
             lastChatTime = DateTime.Now;
         }
 
@@ -42,7 +41,7 @@ namespace Ogar_CSharp.Sockets
         public override bool SeparateInTeams => true;
         public override string Type => "connection";
         public void CloseSocket(ushort errorCode, string reason)
-            => webSocket.CloseAsync((System.Net.WebSockets.WebSocketCloseStatus)errorCode, 
+            => WebSocket.CloseAsync((System.Net.WebSockets.WebSocketCloseStatus)errorCode, 
                 reason, CancellationToken.None);
         public override void OnNewOwnedCell(PlayerCell cell)
             => protocol.OnNewOwnedCell(cell);
@@ -65,21 +64,21 @@ namespace Ogar_CSharp.Sockets
             disconnected = true;
             disconnectionTick = Handle.tick;
         }
-        public void Send(byte[] data)
+        public Task Send(byte[] data)
         {
             if (socketDisconnected)
-                return;
-            webSocket.SendAsync(data);
+                return Task.CompletedTask;
+            return WebSocket.SendAsync(data);
         }
         public void OnSocketClose(ushort code, string reason)
         {
             if (socketDisconnected)
                 return;
-            Console.WriteLine($"connection from {remoteAddress} has disconnected");
+            Console.WriteLine($"connection from {RemoteAddress} has disconnected");
             socketDisconnected = true;
             closeCode = code;
             closeReason = reason;
-            webSocket = null;
+            WebSocket = null;
         }
         public void OnSocketMessage(byte[] data)
         {
