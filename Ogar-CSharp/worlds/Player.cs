@@ -4,6 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,8 +20,21 @@ namespace Ogar_CSharp.Worlds
     }
     public class Player
     {
+        private class Comparer : IEqualityComparer<uint>
+        {
+            public static Comparer Instance = new();
+            public bool Equals(uint x, uint y)
+            {
+                return x == y;
+            }
+
+            public int GetHashCode([DisallowNull] uint obj)
+            {
+                return unchecked((int)obj);
+            }
+        }
         public ServerHandle handle;
-        public uint Id { get; }
+        public readonly uint Id;
         public Router router;
         public bool exists;
         public string leaderBoardName;
@@ -34,14 +48,15 @@ namespace Ogar_CSharp.Worlds
         public World world;
         public int? team;
         public float score = float.NaN;
-        public List<PlayerCell> ownedCells = new List<PlayerCell>();
-        public Dictionary<uint, Cell> visibleCells = new Dictionary<uint, Cell>(150);
-        public Dictionary<uint, Cell> lastVisibleCells = new Dictionary<uint, Cell>(150);
+        public List<PlayerCell> ownedCells;
+        public Dictionary<uint, Cell> visibleCells = new Dictionary<uint, Cell>(Comparer.Instance);
+        public Dictionary<uint, Cell> lastVisibleCells = new Dictionary<uint, Cell>(Comparer.Instance);
         public ViewArea viewArea;
         public Settings Settings => handle.Settings;
         public Player(ServerHandle handle, uint id, Router router)
         {
             this.handle = handle;
+            ownedCells = new List<PlayerCell>(handle.Settings.playerMaxCells);
             Id = id;
             this.router = router;
             exists = true;
@@ -139,11 +154,13 @@ namespace Ogar_CSharp.Worlds
         {
             if (world == null)
                 return;
+            var oldDictionary = lastVisibleCells;
             lastVisibleCells = visibleCells;
-            visibleCells = new Dictionary<uint, Cell>(150); //have an initial capacity for better perfomance.
+            oldDictionary.Clear();
+            visibleCells = oldDictionary; //have an initial capacity for better perfomance.
             for (int i = 0; i < ownedCells.Count; i++)
                 UpdateCell(ownedCells[i], true);
-            world.finder.Search(new RectangleF(viewArea.x, viewArea.y, viewArea.w, viewArea.h),
+            world.finder.Search(viewArea.ToRectangle(),
                 (cell) =>
                 {
                     visibleCells[cell.Id] = cell;

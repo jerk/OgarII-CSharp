@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
+using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace Ogar_CSharp
 {
@@ -12,7 +15,7 @@ namespace Ogar_CSharp
     }
     public class QuadTree<T> where T : notnull, IQuadItem
     {
-        private static readonly Dictionary<T, QuadTree<T>> roots = new Dictionary<T, QuadTree<T>>(10000);
+        private static readonly Dictionary<T, QuadTree<T>> roots = new Dictionary<T, QuadTree<T>>();
         public QuadTree<T> root;
         public int level;
         public int maxLevel;
@@ -65,7 +68,6 @@ namespace Ogar_CSharp
                 newQuad = newQuad.root;
                 if (Misc.FullyIntersects(newQuad.range, item.Range))
                     break;
-
             }
             while (true)
             {
@@ -128,7 +130,8 @@ namespace Ogar_CSharp
             for (int i = 0, l = this.items.Count, quadrant; i < l; i++)
             {
                 quadrant = this.GetQuadrant(this.items[i].Range);
-                if (quadrant == -1) continue;
+                if (quadrant == -1) 
+                    continue;
                 roots[this.items[i]] = null;
                 this.branches[quadrant].Insert(this.items[i]);
                 this.items.RemoveAt(i);
@@ -159,8 +162,10 @@ namespace Ogar_CSharp
         {
             T item;
             for (int i = 0, l = items.Count; i < l; i++)
-                if (Misc.Intersects(range, (item = this.items[i]).Range))
+            {
+                if (Misc.Intersects(range, (item = items[i]).Range))
                     callback(item);
+            }
             if (!hasSplit)
                 return;
             var quad = Misc.GetQuadIntersect(range, this.range);

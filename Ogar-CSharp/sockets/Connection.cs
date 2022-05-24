@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -17,7 +18,7 @@ namespace Ogar_CSharp.Sockets
     {
         public ManagedWebSocket WebSocket { get; private set; }
         public IPAddress RemoteAddress { get; }
-        public List<Minion> Minions { get; private set; }
+        public List<Minion> Minions;
         public readonly DateTime ConnectionTime;
         public DateTime /*lastActivityTime,*/ lastChatTime;
         public int upgradeLevel;
@@ -65,11 +66,11 @@ namespace Ogar_CSharp.Sockets
             disconnected = true;
             disconnectionTick = Handle.tick;
         }
-        public Task Send(byte[] data)
+        public void Send(byte[] data)
         {
             if (socketDisconnected)
-                return Task.CompletedTask;
-            return WebSocket.SendAsync(data);
+                return;
+            WebSocket.SendAsync(data);
         }
         public void OnSocketClose(ushort code, string reason)
         {

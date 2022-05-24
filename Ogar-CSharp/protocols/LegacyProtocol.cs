@@ -52,7 +52,7 @@ namespace Ogar_CSharp.Protocols
                 return null;
             return new LegacyProtocol(connection) { gotProtocol = true, protocolVersion = reader.Read<uint>() };
         }
-        public override void OnLeaderboardUpdate<T>(LeaderboardType type, IList<T> data, LeaderBoardEntry selfData)
+        public override void OnLeaderboardUpdate<T>(LeaderboardType type, IList<T> data, ILeaderBoardEntry selfData)
         {
             this.LastleaderboardType = type;
             var writer = new Writer();
@@ -64,7 +64,7 @@ namespace Ogar_CSharp.Protocols
                         leaderBoard = (IList<FFALeaderboardEntry>)data;
                     else
                         leaderBoard = new List<FFALeaderboardEntry>();
-                    FFALeaderboard(writer, leaderBoard, (FFALeaderboardEntry)selfData, protocolVersion); 
+                    FFALeaderboard(writer, leaderBoard, (FFALeaderboardEntry)(selfData ?? (FFALeaderboardEntry)default), protocolVersion); 
                     break;
                 case LeaderboardType.Pie:
                     IList<PieLeaderboardEntry> leaderBoard1;
@@ -266,7 +266,7 @@ namespace Ogar_CSharp.Protocols
             Send(new byte[1] { 18 });
             if (LastleaderboardType != null)
             {
-                this.OnLeaderboardUpdate<LeaderBoardEntry>(LastleaderboardType.Value, null, null);
+                this.OnLeaderboardUpdate<ILeaderBoardEntry>(LastleaderboardType.Value, null, null);
                 this.LastleaderboardType = null;
             }
         }
@@ -383,7 +383,7 @@ namespace Ogar_CSharp.Protocols
             for (int i = 0, l = data.Count; i < l; i++)
             {
                 var item = data[i];
-                if (item == selfdata)
+                if (item.Equals(selfdata))
                     writer.WriteByte(8);
                 else
                 {

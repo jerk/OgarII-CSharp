@@ -12,11 +12,11 @@ namespace Ogar_CSharp.Protocols
 {
     public class ModernProtocol : Protocol
     {
-        readonly byte[] pingReturn = new byte[1] { 2 };
+        static readonly byte[] pingReturn = new byte[1] { 2 };
         public uint protocolVersion;
         public bool gotProtocol;
-        public LeaderBoardEntry leaderboardSelfData;
-        public IEnumerable<LeaderBoardEntry> leaderboardData;
+        public ILeaderBoardEntry? leaderboardSelfData;
+        public IList<ILeaderBoardEntry> leaderboardData;
         public LeaderboardType? leaderboardType;
         public Queue<(ChatChannel.ChatSource source, string message)> chatPending = new Queue<(ChatChannel.ChatSource source, string message)>();
         public RectangleF? worldBorderPending;
@@ -223,7 +223,7 @@ namespace Ogar_CSharp.Protocols
             }
             if (leaderboardPending)
             {
-                l = leaderboardData.Count();
+                l = leaderboardData.Count;
                 switch (leaderboardType.Value)
                 {
                     case LeaderboardType.FFA:
@@ -235,7 +235,7 @@ namespace Ogar_CSharp.Protocols
                             flags = 0;
                             if (entry.highlighted)
                                 flags |= 1;
-                            if (entry == leaderboardSelfData)
+                            if (entry.Equals((FFALeaderboardEntry)leaderboardSelfData))
                             {
                                 flags |= 2;
                                 hitSelfData = true;
@@ -245,8 +245,9 @@ namespace Ogar_CSharp.Protocols
                             writer.WriteUTF8String(entry.name);
                         }
                         FFALeaderboardEntry item;
-                        if (!hitSelfData && (item = (FFALeaderboardEntry)leaderboardSelfData) != null)
+                        if (!hitSelfData && leaderboardSelfData != null)
                         {
+                            item = (FFALeaderboardEntry)leaderboardSelfData;
                             writer.Write((ushort)item.position);
                             flags = (byte)(item.highlighted ? 1 : 0);
                             writer.WriteByte(flags);
@@ -352,14 +353,14 @@ namespace Ogar_CSharp.Protocols
             clearCellsPending = true;
             worldBorderPending = null;
             worldStatsPending = false;
-            var empty = new List<Cell>();
+            var empty = Array.Empty<Cell>();
             OnVisibleCellUpdate(empty, empty, empty, empty);
         }
-        public override void OnLeaderboardUpdate<T>(LeaderboardType type, IList<T> data, LeaderBoardEntry selfData)
+        public override void OnLeaderboardUpdate<T>(LeaderboardType type, IList<T> data, ILeaderBoardEntry selfData)
         {
             leaderboardPending = true;
             leaderboardType = type;
-            leaderboardData = data;
+            leaderboardData = data as IList<ILeaderBoardEntry>;
             leaderboardSelfData = selfData;
         }
     }

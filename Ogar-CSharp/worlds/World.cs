@@ -30,7 +30,7 @@ namespace Ogar_CSharp.Worlds
         public bool frozen;
         public uint _nextCellId = 1;
         public readonly List<List<Player>> teams = new List<List<Player>>();
-        public HashSet<Cell> cells = new HashSet<Cell>();
+        public Dictionary<uint, Cell> cells = new Dictionary<uint, Cell>();
         public List<Cell> boostingCells = new List<Cell>();
         public int motherCellCount;
         public int virusCount;
@@ -39,7 +39,7 @@ namespace Ogar_CSharp.Worlds
         public List<Player> players = new List<Player>();
         public Player largestPlayer;
         public List<Player> leaderboard = new List<Player>(10);
-        public List<PieLeaderboardEntry> teamsLeaderboard = new List<PieLeaderboardEntry>();
+        public PieLeaderboardEntry[] teamsLeaderboard;
         //public chatchannel worldchat
         public RectangleF border;
         public WorldStats stats;
@@ -65,7 +65,7 @@ namespace Ogar_CSharp.Worlds
             while (players.Count > 0)
                 RemovePlayer(players.First());
             while (cells.Count > 0)
-                RemoveCell(cells.First());
+                RemoveCell(cells.First().Value);
         }
         public void SetBorder(RectangleF range)
         {
@@ -78,18 +78,18 @@ namespace Ogar_CSharp.Worlds
             finder = new QuadTree<Cell>(border, Settings.worldFinderMaxLevel, Settings.worldFinderMaxItems, null);
             foreach (var cell in cells)
             {
-                if (cell.Type == 0)
+                if (cell.Value.Type == 0)
                     continue;
-                finder.Insert(cell);
-                if (!Misc.FullyIntersects(border, cell.range))
-                    RemoveCell(cell);
+                finder.Insert(cell.Value);
+                if (!Misc.FullyIntersects(border, cell.Value.range))
+                    RemoveCell(cell.Value);
             }
         }
         public void AddCell(Cell cell)
         {
             cell.exists = true;
             cell.range = new RectangleF(cell.X, cell.Y, cell.Size, cell.Size);
-            cells.Add(cell);
+            cells.Add(cell.Id, cell);
             finder.Insert(cell);
             cell.OnSpawned();
             handle.gamemode.OnNewCell(cell);
@@ -125,7 +125,7 @@ namespace Ogar_CSharp.Worlds
             finder.Remove(cell);
             cell.range = default;
             this.SetCellAsNotBoosting(cell);
-            this.cells.Remove(cell);
+            this.cells.Remove(cell.Id);
             cell.exists = false;
         }
         public void AddPlayer(Player player)
@@ -136,10 +136,17 @@ namespace Ogar_CSharp.Worlds
             //worldchat stuff
             handle.gamemode.OnPlayerJoinWorld(player, this);
             player.router.OnWorldSet();
+            if(player.router is not Bot)
             Console.WriteLine($"player {player.Id} has been added to world {this.id}");
             if (player.router.IsExternal)
-                for (int i = 0; i < this.Settings.worldMinionsPerPlayer; i++)
-                    new Minion((Connection)player.router);
+            {
+                if (Settings.worldMinionsPerPlayer > 0)
+                {
+                    ((Connection)player.router).Minions = new List<Minion>();
+                    for (int i = 0; i < this.Settings.worldMinionsPerPlayer; i++)
+                        handle.CreatePlayer(new Minion((Connection)player.router));
+                }
+            }
         }
         public void RemovePlayer(Player player)
         {
@@ -227,7 +234,7 @@ namespace Ogar_CSharp.Worlds
             var self = this;
             List<Cell> eat = new List<Cell>(), rigid = new List<Cell>();
             foreach (var _cell in cells)
-                _cell.OnTick();
+                _cell.Value.OnTick();
             while (PelletCount < Settings.pelletCount)
             {
                 var pos = GetSafeSpawnPos(Settings.pelletMinSize);
@@ -246,8 +253,10 @@ namespace Ogar_CSharp.Worlds
 
             for (int i = 0, l = this.boostingCells.Count; i < l;)
             {
-                if (!this.BoostCell(this.boostingCells[i])) l--;
-                else i++;
+                if (!this.BoostCell(this.boostingCells[i]))
+                    l--;
+                else 
+                    i++;
             }
             for (int i = 0; i < this.boostingCells.Count; i++)
             {
@@ -256,44 +265,45 @@ namespace Ogar_CSharp.Worlds
                     continue;
                 finder.Search(cell.Range, (other) =>
                 {
-                    if (cell.Id != other.Id)
+                        if (cell.Id != other.Id)
                         switch (cell.GetEatResult(other))
                         {
                             case CellEatResult.Rigid:
-                                rigid.AddRange(new Cell[2] { cell, other }); break;
+                                rigid.AddRange(new Cell[2] { cell, other });
+                                break;
                             case CellEatResult.Eat:
-                                eat.AddRange(new Cell[2] { cell, other }); break;
+                                eat.AddRange(new Cell[2] { cell, other });
+                                break;
                             case CellEatResult.EatInvd:
-                                eat.AddRange(new Cell[2] { other, cell }); break;
+                                eat.AddRange(new Cell[2] { other, cell });
+                                break;
                         }
                 });
             }
             for (int i = 0, l = this.playerCells.Count; i < l; i++)
             {
-                var cell = this.playerCells[i];
-                this.AutoSplitPlayerCell(cell);
+                var cell = this.playerCells[i];           
                 this.MovePlayerCell(cell);
                 this.DecayPlayerCell(cell);
+                this.AutoSplitPlayerCell(cell);
                 this.BounceCell(cell, false);
                 this.UpdateCell(cell);
             }
-            object locker = new object();
             for (int i = 0, l = playerCells.Count; i < l; i++)
             {
                 var cell = this.playerCells[i];
                 this.finder.Search(cell.range, (other) =>
                 {
                     if (cell.Id != other.Id)
-                        lock (locker)
-                            switch (cell.GetEatResult(other))
-                            {
-                                case CellEatResult.Rigid:
-                                    rigid.AddRange(new Cell[2] { cell, other }); break;
-                                case CellEatResult.Eat:
-                                    eat.AddRange(new Cell[2] { cell, (other) }); break;
-                                case CellEatResult.EatInvd:
-                                    eat.AddRange(new Cell[2] { (other), cell }); break;
-                            }
+                        switch (cell.GetEatResult(other))
+                        {
+                            case CellEatResult.Rigid:
+                                rigid.AddRange(new Cell[2] { cell, other }); break;
+                            case CellEatResult.Eat:
+                                eat.AddRange(new Cell[2] { cell, (other) }); break;
+                            case CellEatResult.EatInvd:
+                                eat.AddRange(new Cell[2] { (other), cell }); break;
+                        }
                 });
             }
             for (int i = 0, l = rigid.Count; i < l;)
@@ -411,7 +421,7 @@ namespace Ogar_CSharp.Worlds
             var dx = b.X - a.X;
             var dy = b.Y - a.Y;
             var d = (float)Math.Sqrt(dx * dx + dy * dy);
-            if (d > a.Size - b.Size / 3)
+            if (d > a.Size - b.Size / Settings.worldEatOverlapDiv)
                 return;
             if (!handle.gamemode.CanEat(a, b))
                 return;
@@ -490,8 +500,8 @@ namespace Ogar_CSharp.Worlds
         public void LaunchPlayerCell(PlayerCell cell, float size, Boost boost)
         {
             cell.SquareSize -= size * size;
-            var X = cell.X + 20 * boost.dx;
-            var Y = cell.Y + 20 * boost.dy;
+            var X = cell.X + Settings.playerSplitDistance * boost.dx;
+            var Y = cell.Y + Settings.playerSplitDistance * boost.dy;
             var newCell = new PlayerCell(cell.owner, X, Y, size);
             newCell.boost.dx = boost.dx;
             newCell.boost.dy = boost.dy;
@@ -546,7 +556,7 @@ namespace Ogar_CSharp.Worlds
                     dx /= d; 
                     dy /= d;
                 }
-                LaunchPlayerCell(cell, cell.Size / Misc.SQRT_2, new Boost
+                LaunchPlayerCell(cell, cell.Size / (float)Settings.playerSplitSizeDiv, new Boost
                 {
                     dx = dx,
                     dy = dy,
@@ -572,9 +582,8 @@ namespace Ogar_CSharp.Worlds
                 else { dx /= d; dy /= d; }
                 var sx = cell.X + dx * cell.Size;
                 var sy = cell.Y + dy * cell.Size;
-                var random = new Random();
                 var newCell = new EjectedCell(this, player, sx, sy, cell.Color);
-                var a = (float)Math.Atan2(dx, dy) - dispersion + random.NextDouble() * 2 * dispersion;
+                var a = (float)Math.Atan2(dx, dy) - dispersion + Misc.RandomDouble() * 2 * dispersion;
                 newCell.boost.dx = (float)Math.Sin(a);
                 newCell.boost.dy = (float)Math.Cos(a);
                 newCell.boost.d = Settings.ejectedCellBoost;

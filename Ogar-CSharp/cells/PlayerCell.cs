@@ -49,13 +49,13 @@ namespace Ogar_CSharp.Cells
                 if (other.owner.team == owner.team && owner.team != null)
                     return ((other.Age < delay || Age < delay) ? CellEatResult.None : CellEatResult.Rigid);
             }
-            if (other.Type == 4 && other.Size > Size * Misc.SQRT_1_3)
+            if (other.Type == 4 && other.Size > Size * world.Settings.worldEatMult)
                 return CellEatResult.EatInvd;
             if (other.Type == 1)
                 return CellEatResult.Eat;
             return GetDefaultEatResult(other);
         }
-        public CellEatResult GetDefaultEatResult(Cell other) => other.Size * Misc.SQRT_1_3 > Size ? CellEatResult.None : CellEatResult.Eat;
+        public CellEatResult GetDefaultEatResult(Cell other) => other.Size * world.Settings.worldEatMult > Size ? CellEatResult.None : CellEatResult.Eat;
         public override void OnTick()
         {
             base.OnTick();

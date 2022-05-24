@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Linq;
 using Ogar_CSharp.Gamemodes;
+using Ogar_CSharp.Bots;
 
 namespace Ogar_CSharp
 {
@@ -65,10 +66,8 @@ namespace Ogar_CSharp
             running = true;
             listener.Open();
             ticker.Start();
-            //gamemode on handle start();
-            Console.WriteLine("ticker begin");
             Console.WriteLine($"Ogar-CSharp II {Misc.version}");
-            Console.WriteLine("gamemode ??");
+            Console.WriteLine("Game Mode: " + gamemode.Name);
             return true;
         }
         public bool Stop()
@@ -117,6 +116,7 @@ namespace Ogar_CSharp
             players.Add(newPlayer);
             router.Player = newPlayer;
             gamemode.OnNewPlayer(newPlayer);
+            if (router is not Bot)
             Console.WriteLine($"added a player with id {id}");
             return newPlayer;
         }
@@ -134,7 +134,7 @@ namespace Ogar_CSharp
         }
         public void OnTick()
         {
-            stopWatch.Start();
+            stopWatch.Restart();
             tick++;
             foreach(var world in worlds)
                 world.Update();

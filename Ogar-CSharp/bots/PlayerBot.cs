@@ -65,11 +65,11 @@ namespace Ogar_CSharp.Bots
             foreach (var item in Player.visibleCells)
             {
                 var check = item.Value;
-                float truncatedInfluence = (float)Math.Log10(cell.SquareSize);
+                float truncatedInfluence = MathF.Log10(cell.SquareSize);
                 float dx = check.X - cell.X;
                 float dy = check.Y - cell.Y;
-                float dSplit = (float)Math.Max(1, Math.Sqrt(dx * dx + dy * dy));
-                float d = (float)Math.Max(1, dSplit - cell.Size - check.Size);
+                float dSplit = MathF.Max(1, MathF.Sqrt(dx * dx + dy * dy));
+                float d = MathF.Max(1, dSplit - cell.Size - check.Size);
                 float influence = 0;
                 switch (check.Type)
                 {
@@ -139,17 +139,17 @@ namespace Ogar_CSharp.Bots
             }
             else
             {
-                var d = (float)Math.Max(1, Math.Sqrt(mouseX * mouseX + mouseY * mouseY));
+                var d = MathF.Max(1, MathF.Sqrt(mouseX * mouseX + mouseY * mouseY));
                 this.mouseX = cell.X + mouseX / d * Player.viewArea.w;
                 this.mouseY = cell.Y + mouseY / d * Player.viewArea.h;
             }
         }
         public bool CanEat(double aSize, double bSize)
-            => aSize > bSize * Misc.SQRT_1_3;
+            => aSize > bSize * Handle.Settings.worldEatMult;
         public bool CanSplitKill(double aSize, double bSize, double d)
         {
-            var splitDistance = Math.Max(2 * aSize / Misc.SQRT_2 / 2, listener.Settings.playerSplitBoost);
-            return aSize / Misc.SQRT_2 > bSize * Misc.SQRT_1_3 && d - splitDistance <= aSize - bSize / 2;
+            var splitDistance = Math.Max(2 * aSize / Handle.Settings.playerSplitSizeDiv / 2, listener.Settings.playerSplitBoost);
+            return aSize / Handle.Settings.playerSplitSizeDiv > bSize * Handle.Settings.worldEatMult && d - splitDistance <= aSize - bSize / 2;
         }
     }
 }

@@ -15,11 +15,8 @@ namespace Ogar_CSharp.Sockets
     {
         static Listener()
         {
-            WebSocket.ReceiveBufferSize = 3072;
+            WebSocket.ReceiveBufferSize = 1024;
         }
-        public const int PARALLEL_AT = 400; //will use parallel when at or above this number.
-        public static bool ShouldParallel(int routerCount)
-            => routerCount >= 500;
         public WebSocket listenerSocket;
         public ServerHandle handle;
         public ChatChannel globalChat;
@@ -27,7 +24,7 @@ namespace Ogar_CSharp.Sockets
         public List<Connection> connections = new List<Connection>();
         public Listener(ServerHandle handle)
         {
-            listenerSocket = new WebSocket() { NoDelay = false };
+            listenerSocket = new WebSocket() { NoDelay = true };
             globalChat = new ChatChannel(this);
             this.handle = handle;
         }
@@ -116,7 +113,6 @@ namespace Ogar_CSharp.Sockets
             }
             connection.OnSocketMessage(data);
         }
-        private static readonly ParallelOptions opts = new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount };
         public void Update()
         {
             int l;

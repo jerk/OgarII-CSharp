@@ -66,10 +66,10 @@ namespace Ogar_CSharp.Gamemodes
 
         public override void CompileLeaderboard(World world)
         {
-            var teams = world.teamsLeaderboard = new List<Other.PieLeaderboardEntry>();
+            var teams = world.teamsLeaderboard = new Other.PieLeaderboardEntry[TeamCount];
             for (int i = 0; i < TeamCount; i++)
             {
-                teams.Add(new Other.PieLeaderboardEntry(0, teamColorsInt[i]));
+                teams[i] = new Other.PieLeaderboardEntry(0, teamColorsInt[i]);
             }
             float sum = 0;
             for (int i = 0; i < world.playerCells.Count; i++)
@@ -81,7 +81,9 @@ namespace Ogar_CSharp.Gamemodes
                 sum += cell.SquareSize;
             }
             for (int i = 0; i < TeamCount; i++)
+            {
                 teams[i].weight /= sum;
+            }
         }
 
         public override void OnPlayerSpawnRequest(Player player, string name, string skin)

@@ -33,10 +33,18 @@ namespace Ogar_CSharp.Bots
             mouseX = following.minionsFrozen ? Player.viewArea.x : following.mouseX;
             mouseY = following.minionsFrozen ? Player.viewArea.y : following.mouseY;
         }
-        public override bool ShouldClose => !hasPlayer
-            || !Player.exists 
-            || !Player.hasWorld || following.socketDisconnected
-            || following.disconnected || !following.hasPlayer || !following.Player.exists 
-            || following.Player.world != Player.world;
+        public override bool ShouldClose
+        {
+            get
+            {
+                bool isf = !hasPlayer
+                || !Player.exists
+                || !Player.hasWorld || following.socketDisconnected
+                || following.disconnected || !following.hasPlayer || !following.Player.exists
+                || (following.Player.world != Player.world);
+                Console.WriteLine(isf);
+                return isf;
+            }
+        }
     }
 }

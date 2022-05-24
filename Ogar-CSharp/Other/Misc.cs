@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,12 +17,32 @@ namespace Ogar_CSharp
         public float dy;
         public float d;
     }
+    
     public static class Misc
     {
-        public const string version = "1.3.5";
-        public const float SQRT_1_3 = 1.140175425099138f;
-        public const float SQRT_2 = 1.414213562373095f;
+        [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl)]
+        static unsafe extern int memcmp(byte* b1, byte* b2, long count);
+        public unsafe class BinaryComparer<T> : IEqualityComparer<T> where T : unmanaged
+        {
+            private BinaryComparer() { }
+            public static readonly BinaryComparer<T> Instance = new BinaryComparer<T>();
+            public bool Equals(T x, T y)
+            {
+                return memcmp((byte*)&x, (byte*)&y, sizeof(T)) == 0;
+            }
+
+            public int GetHashCode([DisallowNull] T obj)
+            {
+                if(sizeof(T) <= 4)
+                {
+                    return (int)&obj;
+                }
+                return obj.GetHashCode();
+            }
+        }
+        public const string version = "1.3.6";
         private static readonly Random randomMath = new Random();
+        public static double RandomDouble() => randomMath.NextDouble();
         public static uint RandomColor()
         {
             switch (Math.Floor(randomMath.NextDouble() * 6))
@@ -61,10 +84,10 @@ namespace Ogar_CSharp
         }
         public static bool Intersects(RectangleF a, RectangleF b)
         {
-            return a.X - a.Width <= b.X + b.Width &&
-            a.X + a.Width >= b.X - b.Width &&
-            a.Y - a.Height <= b.Y + b.Height &&
-            a.Y + a.Height >= b.Y - b.Height;
+            return a.X - a.Width < b.X + b.Width &&
+            a.X + a.Width > b.X - b.Width &&
+            a.Y - a.Height < b.Y + b.Height &&
+            a.Y + a.Height > b.Y - b.Height;
         }
         public static bool FullyIntersects(RectangleF a, RectangleF b)
         {

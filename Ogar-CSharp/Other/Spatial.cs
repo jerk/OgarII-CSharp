@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 
 namespace Ogar_CSharp
@@ -40,5 +41,6 @@ namespace Ogar_CSharp
         {
             return !(left == right);
         }
+        public RectangleF ToRectangle() => new RectangleF(x, y, w, h);
     }
 }

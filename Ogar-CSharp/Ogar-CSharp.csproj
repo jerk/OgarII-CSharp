@@ -1,13 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>Ogar_CSharp</RootNamespace>
-    <PublishSingleFile>true</PublishSingleFile>
 	<PublishTrimmed>true</PublishTrimmed>
 	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<PublishReadyToRun>true</PublishReadyToRun>
+	<StartupObject>Ogar_CSharp.Program</StartupObject>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

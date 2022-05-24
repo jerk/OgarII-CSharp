@@ -1,21 +1,17 @@
 # OgarII-CSharp
-OgarII written in c# , All code is based off of Luka's OgarII with some changes.
+OgarII 1.3.6 written in c# , All code is based off of Luka's OgarII with some changes.
 
 # Missing 
 
-- Last Man Standing,
+- Last Man Standing
 
-- Mother Cells,
+- Mother Cells
 
-- Commands and command line,
+- Commands and command line
 
 - Match maker
 
-
-
-# Bugs
-
-- Minions don't work.
+- Minions not fully implemented
 
 # Prerequisites for builiding
 
