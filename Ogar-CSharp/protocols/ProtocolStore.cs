@@ -22,7 +22,7 @@ namespace Ogar_CSharp.Protocols
             foreach (var decider in currentDeciders)
             {
                 Protocol protocol = decider(reader, connection);
-                reader.Offset = 0;
+                reader.Reset();
                 if(protocol != null)
                     return protocol;
             }

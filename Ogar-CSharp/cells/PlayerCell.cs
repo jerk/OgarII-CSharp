@@ -17,7 +17,7 @@ namespace Ogar_CSharp.Cells
         {
             this.owner = owner;
             Name = owner.cellName ?? "";
-            Skin = owner.cellName ?? "";
+            Skin = owner.cellSkin ?? "";
             CanMerge = false;
         }
         public override void OnRemoved()

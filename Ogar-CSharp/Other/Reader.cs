@@ -8,48 +8,47 @@ namespace Ogar_CSharp
     /// <summary>
     /// Used for reading data sent over the network
     /// </summary>
-    public class DataReader
+    public ref struct DataReader
     {
-        public readonly byte[] Data;
-        private int _offset;
-        public readonly int length;
-        public int Offset { get => _offset; set => _offset = value; }
-        public DataReader(byte[] data, int offset = 0)
+        public ReadOnlySpan<byte> buffer;
+        public int Length => buffer.Length;
+        public int Offset { get; private set; }
+        public DataReader(ReadOnlySpan<byte> buffer, int offset = 0)
         {
-            this.Data = data;
-            this._offset = offset;
-            this.length = data.Length;
+            this.buffer = buffer;
+            this.Offset = offset;
         }
         public byte ReadByte()
-            => Data[_offset++];
+            => buffer[Offset++];
         public unsafe T Read<T>() where T : unmanaged
         {
-
-            int size = sizeof(T);
             T ret;
-            byte* t = (byte*)&ret;
-            for (int i = 0; i < size; i++)
-                t[i] = Data[_offset++];
-
+            fixed(byte* unsafeBuf = &buffer[Offset])
+                ret = *(T*)unsafeBuf;
+            Offset += sizeof(T);
             return ret;
+        }
+        public void Reset()
+        {
+            Offset = 0;
         }
         public void Skip(int count)
         {
-            _offset += count;
+            Offset += count;
         }
         public string ReadUTF16String()
         {
-            int start = this._offset, index = this._offset;
-            while (index + 2 < this.length && this.Read<ushort>() != 0) 
+            int start = this.Offset, index = this.Offset;
+            while ((index + 2) < Length && this.Read<ushort>() != 0) 
                 index += 2;
-            return Encoding.Unicode.GetString(Data, start, index - start); 
+            return Encoding.Unicode.GetString(buffer.Slice(start, index - start)); 
         }
         public string ReadUTF8String()
         {
-            int start = this._offset, index = this._offset;
-            while (index + 1 < this.length && this.ReadByte() != 0)
+            int start = this.Offset, index = this.Offset;
+            while ((index + 1) < Length && buffer[Offset++] != 0)
                 index++;
-            return Encoding.UTF8.GetString(Data, start, index - start); 
+            return Encoding.UTF8.GetString(buffer.Slice(start, index - start)); 
         }
     }
 }

@@ -51,7 +51,6 @@ namespace Ogar_CSharp.Worlds
             var bulkSize = handle.Settings.matchMakerBulkSize;
             while (true)
             {
-                return; // remove later
                 if (queued.Count < bulkSize)
                     return;
                 //var world =

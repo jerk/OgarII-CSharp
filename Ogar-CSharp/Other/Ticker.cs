@@ -20,12 +20,15 @@ namespace Ogar_CSharp
         public int step;
         private long virtualTime;
         private Thread tickingThread;
-        private Stopwatch stopWatch = Stopwatch.StartNew();
-        private long[] averageTicks = new long[24];
+        private readonly Stopwatch stopWatch = Stopwatch.StartNew();
+        private readonly long[] averageTicks = new long[24];
         public bool ticksFilled = false;
         private long tickPos;
         public Ticker(int step) =>
             this.step = step  * 10_000;
+        public long ServerTimeInMilliseconds => stopWatch.ElapsedMilliseconds;
+        public long TotalDormancyInMilliseconds => compensatedMS;
+        private long compensatedMS;
         /// <summary>
         /// Add action for a tick
         /// </summary>
@@ -64,20 +67,8 @@ namespace Ogar_CSharp
                 if (delta < 0)
                     virtualTime -= delta;
                 if (delta > 0)
-                    Thread.Sleep((int)GetDelta(delta));
+                    Thread.Sleep((int)delta);
             }
-        }
-        private long GetDelta(long newDelta)
-        {
-            var averageDelta = (long)averageTicks.Average();
-            tickPos++;
-            if ((tickPos % averageTicks.Length) == 1)
-            {
-                ticksFilled = true;
-                tickPos = 0;
-            }
-            averageTicks[tickPos] = newDelta;
-            return averageDelta;
         }
         /// <summary>
         /// Stops the ticking thread.

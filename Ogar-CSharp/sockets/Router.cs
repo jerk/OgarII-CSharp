@@ -59,7 +59,7 @@ namespace Ogar_CSharp.Sockets
                 return;
             string name;
             if (spawningName.Length > Settings.playerMaxNameLength)
-                name = spawningName.Substring(0, Settings.playerMaxNameLength);
+                name = spawningName[..Settings.playerMaxNameLength];
             else
                 name = spawningName;
             string skin = null;

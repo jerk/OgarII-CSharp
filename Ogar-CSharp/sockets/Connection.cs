@@ -19,8 +19,9 @@ namespace Ogar_CSharp.Sockets
         public ManagedWebSocket WebSocket { get; private set; }
         public IPAddress RemoteAddress { get; }
         public List<Minion> Minions;
-        public readonly DateTime ConnectionTime;
-        public DateTime /*lastActivityTime,*/ lastChatTime;
+        public readonly long ConnectionTime;
+        public DateTime lastChatTime;
+        public long lastActivityTime;
         public int upgradeLevel;
         public Protocol protocol = null;
         public bool socketDisconnected = false;
@@ -32,8 +33,8 @@ namespace Ogar_CSharp.Sockets
         {
             WebSocket = webSocket;
             RemoteAddress = (webSocket.RemoteEndPoint as IPEndPoint).Address;
-            ConnectionTime = DateTime.Now;
-            //lastActivityTime = DateTime.Now;
+            ConnectionTime = Handle.ServerTimeInMilliseconds;
+            lastActivityTime = ConnectionTime;
             lastChatTime = DateTime.Now;
         }
 
@@ -66,11 +67,11 @@ namespace Ogar_CSharp.Sockets
             disconnected = true;
             disconnectionTick = Handle.tick;
         }
-        public void Send(byte[] data)
+        public void Send(ReadOnlySpan<byte> data)
         {
             if (socketDisconnected)
                 return;
-            WebSocket.SendAsync(data);
+            WebSocket.SendAsync(data.ToArray());
         }
         public void OnSocketClose(ushort code, string reason)
         {
@@ -80,10 +81,12 @@ namespace Ogar_CSharp.Sockets
             socketDisconnected = true;
             closeCode = code;
             closeReason = reason;
+            WebSocket.Dispose();
             WebSocket = null;
         }
-        public void OnSocketMessage(byte[] data)
+        public void OnSocketMessage(ReadOnlySpan<byte> data)
         {
+            lastActivityTime = Handle.ServerTimeInMilliseconds;
             if (data.Length > 512 || data.Length == 0)
             {
                 CloseSocket(1003, "Unexpected message size");

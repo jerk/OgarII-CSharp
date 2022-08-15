@@ -54,7 +54,6 @@ namespace Ogar_CSharp.Sockets
         public bool VerifyClient(ManagedWebSocket socket)
         {
             var address = (socket.RemoteEndPoint as IPEndPoint).Address.ToString();
-           // Console.WriteLine($"REQUEST FROM {address}, {(socket. ? "" : "not ")}secure, Origin: {socket.Context.Origin}");
             if (connections.Count > Settings.listenerMaxConnections)
             {
                 Console.WriteLine("listenerMaxConnections reached, dropping new connections");
@@ -80,7 +79,6 @@ namespace Ogar_CSharp.Sockets
                     return false;
                 }
             }
-            Console.WriteLine("client verification passed");
             return true;
         }
         public void AddRouter(Router router)
@@ -123,8 +121,6 @@ namespace Ogar_CSharp.Sockets
                 if (!router.ShouldClose) continue;
                 router.Close(); i--; l--;
             }
-            /*for (i = 0; i < l; i++)
-                this.routers[i].Player?.up();*/
             for (i = 0; i < l; i++)
                 this.routers[i].Tick();
             for (i = 0, l = this.connections.Count; i < l; i++)
@@ -132,8 +128,10 @@ namespace Ogar_CSharp.Sockets
                 var connection = connections[i];
                 if (Settings.listenerForbiddenIPs.Contains(connection.RemoteAddress.ToString()))
                     connection.CloseSocket(1003, "Remote address is forbidden");
-                //else if (DateTime.Now.Ticks - connection.lastActivityTime.Ticks >= Settings.listenerMaxClientDormancy)
-                // connection.CloseSocket(1003, "Maximum dormancy time exceeded");
+                else if(connection.protocol == null && ((handle.ServerTimeInMilliseconds - connection.ConnectionTime) > 5_000))
+                    connection.CloseSocket(1003, "never received protocol init");
+               // else if ((handle.ServerTimeInMilliseconds - connection.lastActivityTime) >= (Settings.listenerMaxClientDormancy / 10_000))
+                 //   connection.CloseSocket(1003, "Maximum dormancy time exceeded");
             }
         }
     }

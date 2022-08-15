@@ -22,6 +22,7 @@ namespace Ogar_CSharp.Commands
         public static Command<T> GenerateCommand(string args, string description, string name, ExecuteCommand<T> exec)
             => new Command<T>(name, description, name, exec);
     }
+    /*
     public class CommandList<T>
     {
         private ServerHandle handle;
@@ -48,5 +49,5 @@ namespace Ogar_CSharp.Commands
             else
                 return false;
         }
-    }
+    }*/
 }

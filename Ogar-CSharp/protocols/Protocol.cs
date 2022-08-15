@@ -29,7 +29,7 @@ namespace Ogar_CSharp.Protocols
         public abstract void OnSpectatePosition(ViewArea area);
         public abstract void OnVisibleCellUpdate(IList<Cell> add, IList<Cell> upd, IList<Cell> eat, IList<Cell> del);
         public abstract void OnLeaderboardUpdate<T>(LeaderboardType type, IList<T> data, ILeaderBoardEntry selfData) where T : ILeaderBoardEntry;
-        public void Send(byte[] data) => connection.Send(data);
+        public void Send(ReadOnlySpan<byte> data) => connection.Send(data);
         public void Fail(ushort code, string reason) => connection.CloseSocket(code, reason);
     }
 }

@@ -32,6 +32,7 @@ namespace Ogar_CSharp
         Ticker ticker = new Ticker(40);
         Stopwatch stopWatch = new Stopwatch();
         //logger = new Logger();
+        public long ServerTimeInMilliseconds => ticker.ServerTimeInMilliseconds;
         public Listener listener;
         public MatchMaker matchMaker;
         public List<World> worlds = new List<World>();

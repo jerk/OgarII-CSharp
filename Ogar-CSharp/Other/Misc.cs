@@ -1,23 +1,43 @@
-﻿using System;
+﻿using KUM.Shared;
+using Ogar_CSharp.Other;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ogar_CSharp
 {
-#pragma warning disable CA1815 // Override equals and operator equals on value types
     public struct Boost
-#pragma warning restore CA1815 // Override equals and operator equals on value types
     {
         public float dx;
         public float dy;
         public float d;
     }
-    
+    public static class Parallel
+    {
+        static Parallel()
+        {
+            main = new WorkerThreads();
+            main.Start();
+        }
+        private static readonly WorkerThreads main;
+        public static void ForEach<T>(IList<T> list, Action<T> callback)
+        {
+            int count = list.Count;
+            var _ref = new WorkerThreads.ReferenceInt() { MAX = count };
+            var hanlde = new EventWaitHandle(false, EventResetMode.ManualReset);
+            for (int i = 0; i < count; i++)
+            {
+                main.EnqueueJob(list[i], (x) => callback((T)x), hanlde, _ref);
+            }
+            Console.WriteLine(hanlde.WaitOne());
+        }
+    }
     public static class Misc
     {
         [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -28,6 +48,7 @@ namespace Ogar_CSharp
             public static readonly BinaryComparer<T> Instance = new BinaryComparer<T>();
             public bool Equals(T x, T y)
             {
+
                 return memcmp((byte*)&x, (byte*)&y, sizeof(T)) == 0;
             }
 
@@ -43,22 +64,22 @@ namespace Ogar_CSharp
         public const string version = "1.3.6";
         private static readonly Random randomMath = new Random();
         public static double RandomDouble() => randomMath.NextDouble();
-        public static uint RandomColor()
+        public static OgarColor RandomColor()
         {
             switch (Math.Floor(randomMath.NextDouble() * 6))
             {
                 case 0:
-                    return (uint)((int)Math.Floor(randomMath.NextDouble() * 0x100) << 16) | (0xFF << 8) | 0x10;
+                    return new OgarColor((byte)Math.Floor(randomMath.NextDouble() * 0x100) ,0xFF , 0x10);
                 case 1:
-                    return (uint)((int)Math.Floor(randomMath.NextDouble() * 0x100) << 16) | (0x10 << 8) | 0xFF;
+                    return new OgarColor((byte)Math.Floor(randomMath.NextDouble() * 0x100),  0x10, 0xFF);
                 case 2:
-                    return (uint)((0xFF << 16) | ((int)Math.Floor(randomMath.NextDouble() * 0x100) << 8) | 0x10);
+                    return new OgarColor(0xFF, (byte)Math.Floor(randomMath.NextDouble() * 0x100), 0x10);
                 case 3:
-                    return (uint)((0x10 << 16) | ((int)Math.Floor(randomMath.NextDouble() * 0x100) << 8) | 0xFF);
+                    return new OgarColor(0x10 , (byte)Math.Floor(randomMath.NextDouble() * 0x100) ,0xFF);
                 case 4:
-                    return (uint)((0x10 << 16) | (0xFF << 8) | (int)Math.Floor(randomMath.NextDouble() * 0x100));
+                    return new OgarColor(0x10, 0xFF, (byte)Math.Floor(randomMath.NextDouble() * 0x100));
                 case 5:
-                    return (uint)((0xFF << 16) | (0x10 << 8) | (int)Math.Floor(randomMath.NextDouble() * 0x100));
+                    return new OgarColor(0xFF, 0x10, (byte)Math.Floor(randomMath.NextDouble() * 0x100));
                 default:
                     throw new Exception("This is not suppose to happen");
             }

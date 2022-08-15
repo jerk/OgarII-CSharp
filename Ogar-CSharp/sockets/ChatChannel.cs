@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ogar_CSharp.Other;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -16,7 +17,7 @@ namespace Ogar_CSharp.Sockets
             public static readonly ChatSource ServerSource = new ChatSource() { color = 0x3F3FC0, isServer = true, name = "server" };            
             public string name;
             public bool isServer;
-            public uint color;
+            public OgarColor color;
             public static ChatSource GetSourceFromConnection(Connection connection)
             {
                 return new ChatSource()

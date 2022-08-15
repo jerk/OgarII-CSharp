@@ -4,6 +4,8 @@ using System.Text;
 using Ogar_CSharp.Sockets;
 using Ogar_CSharp.Worlds;
 using System.Drawing;
+using Ogar_CSharp.Other;
+
 namespace Ogar_CSharp.Gamemodes
 { 
     public class Teams : Gamemode
@@ -13,7 +15,7 @@ namespace Ogar_CSharp.Gamemodes
             lowlightBase = 23,
             highlightDiff = 24,
             lowlightDiff = 24;
-        private static readonly int[] teamColorsInt = new int[]
+        private static readonly OgarColor[] teamColorsInt = new OgarColor[]
         {
             0xFF0000,
             0x00FF00,

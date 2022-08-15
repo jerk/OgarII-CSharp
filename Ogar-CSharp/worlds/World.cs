@@ -55,6 +55,11 @@ namespace Ogar_CSharp.Worlds
             SetBorder(new RectangleF(Settings.worldMapX, Settings.worldMapY, Settings.worldMapW, Settings.worldMapH));
         }
         public uint NextCellId => (_nextCellId >= uint.MaxValue) ? (_nextCellId = 1) : _nextCellId++;
+        public Cell GetCellFromId(uint id)
+        {
+            cells.TryGetValue(id, out Cell value);
+            return value;
+        }
         public void AfterCreation()
         {
             for (int i = 0; i < Settings.worldPlayerBotsPerWorld; i++)
@@ -162,9 +167,8 @@ namespace Ogar_CSharp.Worlds
         }
         public PointF GetRandomPos(float cellSize)
         {
-            var random = new Random();
-            return new PointF((float)(border.X - border.Width + cellSize + random.NextDouble() * (2 * this.border.Width - cellSize)),
-                (float)(border.Y - border.Height + cellSize + random.NextDouble() * (2 * border.Height - cellSize)));
+            return new PointF((float)(border.X - border.Width + cellSize + Misc.RandomDouble() * (2 * this.border.Width - cellSize)),
+                (float)(border.Y - border.Height + cellSize + Misc.RandomDouble() * (2 * border.Height - cellSize)));
         }
         public bool IsSafeSpawnPos(RectangleF range)
         {
@@ -181,15 +185,14 @@ namespace Ogar_CSharp.Worlds
             }
             return GetRandomPos(cellSize);
         }
-        public (uint? color, PointF pos) GetPlayerSpawn(float cellSize)
+        public (OgarColor? color, PointF pos) GetPlayerSpawn(float cellSize)
         {
-            var random = new Random();
-            if(Settings.worldSafeSpawnFromEjectedChange > (float)random.NextDouble() && ejectedCells.Count > 0)
+            if(Settings.worldSafeSpawnFromEjectedChange > (float)Misc.RandomDouble() && ejectedCells.Count > 0)
             {
                 var tries = Settings.worldSafeSpawnTries;
                 while (--tries >= 0)
                 {
-                    var cell = ejectedCells[(int)Math.Floor(random.NextDouble() * ejectedCells.Count)];
+                    var cell = ejectedCells[(int)Math.Floor(Misc.RandomDouble() * ejectedCells.Count)];
                     if (IsSafeSpawnPos(new RectangleF(cell.X, cell.Y, cellSize, cellSize)))
                     {
                         RemoveCell(cell);
@@ -209,10 +212,9 @@ namespace Ogar_CSharp.Worlds
         public void PopPlayerCell(PlayerCell cell)
         {
             var splits = DistributeCellMass(cell);
-            var random = new Random();
             for (int i = 0, l = splits.Count; i < l; i++)
             {
-                var angle = (float)random.NextDouble() * 2 * Math.PI;
+                var angle = (float)Misc.RandomDouble() * 2 * Math.PI;
                 LaunchPlayerCell(cell, (float)Math.Sqrt(splits[i] * 100), new Boost
                 {
                     dx = (float)Math.Sin(angle),

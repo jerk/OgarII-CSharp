@@ -14,6 +14,7 @@ namespace Ogar_CSharp
             this.w = w;
             this.h = h;
             this.s = s;
+            
         }
         public float x;
         public float y;
@@ -40,6 +41,10 @@ namespace Ogar_CSharp
         public static bool operator !=(ViewArea left, ViewArea right)
         {
             return !(left == right);
+        }
+        public static implicit operator RectangleF(ViewArea viewArea)
+        {
+            return viewArea.ToRectangle();
         }
         public RectangleF ToRectangle() => new RectangleF(x, y, w, h);
     }

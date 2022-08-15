@@ -15,7 +15,7 @@ namespace Ogar_CSharp.Protocols
         static readonly byte[] pingReturn = new byte[1] { 2 };
         public uint protocolVersion;
         public bool gotProtocol;
-        public ILeaderBoardEntry? leaderboardSelfData;
+        public ILeaderBoardEntry leaderboardSelfData;
         public IList<ILeaderBoardEntry> leaderboardData;
         public LeaderboardType? leaderboardType;
         public Queue<(ChatChannel.ChatSource source, string message)> chatPending = new Queue<(ChatChannel.ChatSource source, string message)>();
@@ -44,7 +44,7 @@ namespace Ogar_CSharp.Protocols
 
         internal static Protocol Decider(DataReader reader, Connection connection)
         {
-            if (reader.length < 5)
+            if (reader.Length < 5)
                 return null;
             var val = reader.Read<byte>();
             if (val != 1)
@@ -71,7 +71,7 @@ namespace Ogar_CSharp.Protocols
                     worldStatsPending = true;
                     break;
                 case 3:
-                    if (reader.length < 12)
+                    if (reader.Length < 12)
                     {
                         Fail(1003, "Unexpected message format");
                         return;
@@ -87,7 +87,7 @@ namespace Ogar_CSharp.Protocols
                     byte globalFlags = reader.ReadByte();
                     if((globalFlags & 1) != 0)
                     {
-                        if(reader.length < 13)
+                        if(reader.Length < 13)
                         {
                             Fail(1003, "Unexpected message format");
                             return;
@@ -109,7 +109,7 @@ namespace Ogar_CSharp.Protocols
                         this.connection.minionsFrozen = !this.connection.minionsFrozen;
                     if((globalFlags & 128) != 0)
                     {
-                        if(reader.length < 13 + (globalFlags & 1)  + count)
+                        if(reader.Length < 13 + (globalFlags & 1)  + count)
                         {
                             Fail(1003, "Unexpected message format");
                             return;
@@ -125,7 +125,7 @@ namespace Ogar_CSharp.Protocols
                     }
             }
         }
-        public void OnChatMessage(ChatChannel.ChatSource source, string message)
+        public override void OnChatMessage(ChatChannel.ChatSource source, string message)
             => chatPending.Enqueue((source, message));
         public override void OnNewOwnedCell(PlayerCell cell)
         {
@@ -215,8 +215,8 @@ namespace Ogar_CSharp.Protocols
                 {
                     var item = this.chatPending.Dequeue();
                     writer.WriteUTF8String(item.source.name);
-                    writer.WriteColor((uint)item.source.color);
-                    writer.WriteByte((byte)((item.source.isServer != null) ? 1 : 0));
+                    writer.Write(item.source.color);
+                    writer.WriteByte((byte)((item.source.isServer) ? 1 : 0));
                     writer.WriteUTF8String(item.message);
                 }
 
@@ -285,7 +285,7 @@ namespace Ogar_CSharp.Protocols
                     writer.Write(item.X);
                     writer.Write(item.X);
                     writer.Write((ushort)item.Size);
-                    writer.WriteColor((uint)item.Color);
+                    writer.Write(item.Color);
                     flags = 0;
                     if (item.Type == 0 && item.owner == connection.Player)
                         flags |= 0;
@@ -322,7 +322,7 @@ namespace Ogar_CSharp.Protocols
                     if (item.skinChanged)
                         writer.Write((ushort)item.Size);
                     if (item.colorChanged)
-                        writer.WriteColor((uint)item.Color);
+                        writer.Write(item.Color);
                     if (item.nameChanged)
                         writer.WriteUTF8String(item.Name);
                     if (item.sizeChanged)
@@ -346,7 +346,7 @@ namespace Ogar_CSharp.Protocols
                     writer.Write(del[s].Id);
                 writer.Write<uint>(0);
             }
-            Send(writer.ToArray());
+            Send(writer.GetBytes());
         }
         public override void OnWorldReset()
         {

@@ -46,7 +46,7 @@ namespace Ogar_CSharp.Protocols
         }
         internal static Protocol Decider(DataReader reader, Connection connection)
         {
-            if (reader.length < 5)
+            if (reader.Length < 5)
                 return null;
             if (reader.Read<byte>() != 254)
                 return null;
@@ -83,7 +83,7 @@ namespace Ogar_CSharp.Protocols
                     TextBoard(writer, leaderBoard2, protocolVersion);
                     break;
             }
-            this.Send(writer.ToArray());
+            this.Send(writer.GetBytes());
         }
 
         public override void OnNewOwnedCell(PlayerCell cell)
@@ -91,7 +91,7 @@ namespace Ogar_CSharp.Protocols
             var writer = new Writer();
             writer.WriteByte(32);
             writer.Write(cell.Id);
-            Send(writer.ToArray());
+            Send(writer.GetBytes());
         }
    
 
@@ -108,7 +108,7 @@ namespace Ogar_CSharp.Protocols
                 writer.Write<uint>(Handle.gamemode.Type);
                 WriteZTString(writer, $"OgarII-CSharp {Handle.Version}", protocolVersion);
             }
-            this.Send(writer.ToArray());
+            this.Send(writer.GetBytes());
         }
 
         public override void OnSocketMessage(DataReader reader)
@@ -117,7 +117,7 @@ namespace Ogar_CSharp.Protocols
             if (!this.gotKey)
             {
                 if (messageId != 255) return;
-                if (reader.length < 5) { this.Fail(0, "Unexpected message format"); return; };
+                if (reader.Length < 5) { this.Fail(0, "Unexpected message format"); return; };
                 this.gotKey = true;
                 this.Key = reader.Read<uint>();
                 this.connection.CreatePlayer();
@@ -127,13 +127,12 @@ namespace Ogar_CSharp.Protocols
             {
                 case 0:
                     connection.spawningName = ReadZTString(reader, protocolVersion);
-                    Console.WriteLine(connection.spawningName + "u");
                     break;
                 case 1:
                     this.connection.requestingSpectate = true;
                     break;
                 case 16:
-                    switch (reader.length)
+                    switch (reader.Length)
                     {
                         case 13:
                             this.connection.mouseX = reader.Read<int>();
@@ -181,14 +180,14 @@ namespace Ogar_CSharp.Protocols
                     this.connection.minionsFrozen = !this.connection.minionsFrozen;
                     break;
                 case 99:
-                    if (reader.length < 2)
+                    if (reader.Length < 2)
                     {
                         this.Fail(1003, "Bad message format");
                         return;
                     }
                     var flags = reader.Read<byte>();
                     var skipLen = 2 * ((flags & 2) + (flags & 4) + (flags & 8));
-                    if (reader.length < 2 + skipLen) {
+                    if (reader.Length < 2 + skipLen) {
                         Fail(1003, "Unexpected message format");
                         return;
                     }
@@ -216,7 +215,7 @@ namespace Ogar_CSharp.Protocols
             writer.Write(area.x);
             writer.Write(area.y);
             writer.Write(area.s);
-            Send(writer.ToArray());
+            Send(writer.GetBytes());
         }
         public static void WriteCellData(Writer writer, Player source, uint protocol, Cell cell, bool includeType, bool includeSize,
             bool includePos, bool includeColor, bool includeName, bool includeSkin)
@@ -259,7 +258,7 @@ namespace Ogar_CSharp.Protocols
                 writer.Write((ushort)del.Count);
             for (int i = 0; i < del.Count; i++)
                 writer.Write(del[i].Id);
-            this.Send(writer.ToArray());
+            this.Send(writer.GetBytes());
         } 
         public override void OnWorldReset()
         {
@@ -293,7 +292,7 @@ namespace Ogar_CSharp.Protocols
                 Task.Run(() =>
                 {
                     WriteZTString(writer, Newtonsoft.Json.JsonConvert.SerializeObject(legacy), protocolVersion);
-                    Send(writer.ToArray());
+                    Send(writer.GetBytes());
                     isCompilingStats = false;
                 });
             }
@@ -304,10 +303,10 @@ namespace Ogar_CSharp.Protocols
             Writer writer = new Writer();
             writer.Write<byte>(99);
             writer.Write((byte)((source.isServer ? 1 : 0) * 128));
-            writer.WriteColor(source.color);
+            writer.Write(source.color);
             WriteZTString(writer, source.name, protocolVersion);
             WriteZTString(writer, message, protocolVersion);
-            Send(writer.ToArray());
+            Send(writer.GetBytes());
         }
         public static void PieLeaderboard(Writer writer, IList<PieLeaderboardEntry> data, PieLeaderboardEntry selfData, uint protocol)
         {
@@ -330,7 +329,7 @@ namespace Ogar_CSharp.Protocols
             for (int i = 0, l = data.Count; i < l; i++)
             {
                 writer.Write(data[i].weight);
-                writer.WriteColor((uint)data[i].color);
+                writer.Write(data[i].color);
             }
         }
         public static void TextBoard(Writer writer, IList<TextLeaderBoardEntry> data, uint protocol)
@@ -408,18 +407,23 @@ namespace Ogar_CSharp.Protocols
             }
 
             writer.Write((ushort)cell.Size);
-            writer.WriteColor((uint)cell.Color);
+            writer.Write(cell.Color);
 
             byte flags = 0;
-            if (cell.IsSpiked) flags |= 0x01;
-            if (includeSkin) flags |= 0x04;
-            if (cell.IsAgitated) flags |= 0x10;
-            if (cell.Type == 3) flags |= 0x20;
+            if (cell.IsSpiked) 
+                flags |= 0x01;
+            if (includeSkin) 
+                flags |= 0x04;
+            if (cell.IsAgitated) 
+                flags |= 0x10;
+            if (cell.Type == 3)
+                flags |= 0x20;
             writer.WriteByte(flags);
 
             if (includeSkin) writer.WriteUTF8String(cell.Skin);
-            if (includeName) writer.WriteUTF16String(cell.Name?? "llll");
-            else writer.Write<ushort>(0);
+            if (includeName) writer.WriteUTF16String(cell.Name );
+            else 
+                writer.Write<ushort>(0);
         }
         public static void WriteCellData11(Writer writer, Player source, uint protocol, Cell cell, bool includeType, bool includeSize,
             bool includePos, bool includeColor, bool includeName, bool includeSkin)
@@ -451,7 +455,7 @@ namespace Ogar_CSharp.Protocols
                 writer.WriteByte(1);
 
             if (includeColor) 
-                writer.WriteColor((uint)cell.Color);
+                writer.Write(cell.Color);
             if (includeSkin) 
                 writer.WriteUTF8String(cell.Skin);
             if (includeName) 
@@ -473,7 +477,7 @@ namespace Ogar_CSharp.Protocols
             if (cell.IsAgitated) flags |= 0x10;
             if (cell.Type == 3) flags |= 0x20;
             writer.WriteByte(flags);
-            if (includeColor) writer.WriteColor((uint)cell.Color);
+            if (includeColor) writer.Write(cell.Color);
             if (includeSkin) writer.WriteUTF8String(cell.Skin);
             if (includeName) writer.WriteUTF8String(cell.Name);
         }

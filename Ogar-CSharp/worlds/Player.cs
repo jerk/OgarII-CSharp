@@ -1,4 +1,5 @@
 ﻿using Ogar_CSharp.Cells;
+using Ogar_CSharp.Other;
 using Ogar_CSharp.Sockets;
 using System;
 using System.Collections.Concurrent;
@@ -41,8 +42,8 @@ namespace Ogar_CSharp.Worlds
         public string cellName;
         public string chatName = "Spectator";
         public string cellSkin;
-        public uint cellColor = 0x7F7F7F;
-        public uint chatColor = 0x7F7F7F;
+        public OgarColor cellColor = 0x7F7F7F;
+        public OgarColor chatColor = 0x7F7F7F;
         public PlayerState currentState = PlayerState.Idle;
         public bool hasWorld;
         public World world;
